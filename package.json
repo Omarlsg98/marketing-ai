@@ -1,6 +1,6 @@
 {
-  "name": "next-starter-ai",
-  "version": "0.1.0",
+  "name": "interseed",
+  "version": "npm run dev",
   "private": true,
   "scripts": {
     "postinstall": "patch-package",
@@ -90,5 +90,10 @@
     "tailwindcss": "^3.3.3",
     "typescript": "^5.2.2",
     "uglify-js": "3.17.4"
-  }
+  },
+  "description": "interseed projet",
+  "main": "index.js",
+  "repository": "https://github.com/ty-interseed/interseed.git",
+  "author": "ty-interseed <tyrone@interseed.ai>",
+  "license": "MIT"
 }
