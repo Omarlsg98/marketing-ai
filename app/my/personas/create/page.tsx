@@ -1,14 +1,15 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Progress } from "@/components/ui/progress"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Progress } from "@/components/ui/progress"
-import { ChevronLeft, Grid, Bell, Sun, Send } from "lucide-react"
+import { Send } from "lucide-react"
+import { useRouter } from 'next/navigation'
+import { useEffect, useRef, useState } from 'react'
 
 const questions = [
   {
@@ -51,8 +52,37 @@ export default function Component() {
   const [aiRecommendations, setAiRecommendations] = useState<Recommendation[]>([]); // Use the Recommendation type
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
+
+  const router = useRouter();
+
+
   useEffect(() => {
     addAiMessage(questions[0].question)
+  }, [])
+
+  useEffect(() => {
+    const startChat = async () => {
+      const newChat = await fetch('/api/chat/create', {
+        method: 'POST',
+        body: JSON.stringify({ title: 'New Persona', description: 'New persona chat', category: 'Persona B2B' })
+      });
+
+      const chatData = await newChat.json();
+      console.log(chatData);
+
+      const chatId = chatData.output.id;
+
+
+      await fetch(`/api/chat/${chatId}/send`, {
+        method: 'POST',
+        body: JSON.stringify({ message: "Hello! can you help me build my customer persona?" })
+      });
+      
+      //redirect to chat page
+      router.push(`/my/personas/chat/${chatId}`);
+    }
+    startChat();
+    
   }, [])
 
   useEffect(() => {

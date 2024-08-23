@@ -79,7 +79,8 @@ export const getLastMessages: (chatId: string) => any = async (chatId) => {
 };
 
 // LLM Specific
-export const getAllQuestionsInfo: (chat: chatType) => any = async (chat) => {
+export const getAllQuestionsInfo: (chat: chatType, returnLastMessages: boolean) => any = async (
+  chat, returnLastMessages=true) => {
   const supabase = getSupabaseClient();
   const userId = await getUserId();
 
@@ -115,9 +116,21 @@ export const getAllQuestionsInfo: (chat: chatType) => any = async (chat) => {
   return {
     outstandingQuestions: outstandingQuestions,
     userAnswers: userAnswers,
-    lastMessages: await getLastMessages(chat.id)
+    lastMessages: returnLastMessages? await getLastMessages(chat.id): null
   };
 };
+
+export const getAllQuestion: (category: string) => Promise<Database["public"]["Tables"]["questions"]["Row"][]> = async (category) => {
+  const supabase = getSupabaseClient();
+  const { data, error } = await supabase
+    .from('questions')
+    .select('*')
+    .eq('category', category);
+
+  handleError(error);
+
+  return data;
+}
 
 export const saveUserAnswer: (
   chat_id: string,
@@ -190,10 +203,7 @@ export const getChat: (chatId: string) => Promise<{
 };
 
 export const getQuestionOptions: (questionId: number) => Promise<
-  | {
-      q_option: string;
-    }[]
-  | null
+  string[] | null
 > = async (questionId) => {
   const supabase = getSupabaseClient();
   const { data, error } = await supabase
@@ -202,7 +212,7 @@ export const getQuestionOptions: (questionId: number) => Promise<
     .eq('question_id', questionId);
 
   handleError(error);
-  return data;
+  return data.map((option) => option.q_option);
 };
 
 export const getChats: () => any = async () => {
@@ -230,7 +240,7 @@ export const getMessages: (
     query = query.not('role', 'eq', 'system');
   }
   const { data, error } = await query
-    .order('created_at', { ascending: false })
+    .order('created_at', { ascending: true })
     .returns<Database['public']['Tables']['llm_messages']['Row']>();
 
   if (!handleError(error)) {

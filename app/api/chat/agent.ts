@@ -230,9 +230,10 @@ export const getAgentAnswer: (
   role: roles;
   question: questionType | null;
   actionTakenMessage: string;
+  outstandingQuestions: questionType[];
 }> = async (chat, userMessage, prevQuestion) => {
   const { outstandingQuestions, answeredQuestions, lastMessages } =
-    await getAllQuestionsInfo(chat);
+    await getAllQuestionsInfo(chat, true);
 
   let agentAction: agentActionType = agentActions[0];
   let chatIsNew = false;
@@ -296,6 +297,7 @@ export const getAgentAnswer: (
     messageAgent: newMessage,
     role: agentAction['role'],
     question: nextQuestion,
-    actionTakenMessage: `You decided to ${agentAction.name}`
+    actionTakenMessage: `You decided to ${agentAction.name}`,
+    outstandingQuestions: outstandingQuestions 
   };
 };

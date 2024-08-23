@@ -3,9 +3,9 @@
 * @see https://v0.dev/t/cdLf4tchTNP
 * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
 */
-import { Card, CardContent, CardFooter } from "@/components/ui/card"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { Separator } from "@/components/ui/separator"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui_old/avatar"
+import { Card, CardContent, CardFooter } from "@/components/ui_old/card"
+import { Separator } from "@/components/ui_old/separator"
 import Link from "next/link"
 
 export function persona_overview_card() {

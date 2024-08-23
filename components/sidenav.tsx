@@ -3,8 +3,8 @@
 * @see https://v0.dev/t/oNZ2T1FCzBZ
 * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
 */
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui_old/button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui_old/select"
 import Link from "next/link"
 
 export function sidenav() {

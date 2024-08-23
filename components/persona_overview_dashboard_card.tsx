@@ -3,8 +3,8 @@
 * @see https://v0.dev/t/8weDeXT4DOa
 * Documentation: https://v0.dev/docs#integrating-generated-code-into-your-nextjs-app
 */
-import { Card } from "@/components/ui/card"
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui_old/avatar"
+import { Card } from "@/components/ui_old/card"
 
 export function persona_overview_dashboard_card() {
   return (

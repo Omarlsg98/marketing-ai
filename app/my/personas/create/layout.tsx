@@ -5,7 +5,7 @@ import Header from '@/components/chat-components/Header'
 import SideNav from '@/components/chat-components/SideNav'
 import { useState } from 'react'
 
-export default function RootLayout({
+export default function ChatLayout({
   children,
 }: {
   children: React.ReactNode
