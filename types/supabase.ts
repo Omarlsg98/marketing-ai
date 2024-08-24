@@ -7,6 +7,31 @@ export type Json =
   | Json[]
 
 export type Database = {
+  graphql_public: {
+    Tables: {
+      [_ in never]: never
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      graphql: {
+        Args: {
+          operationName?: string
+          query?: string
+          variables?: Json
+          extensions?: Json
+        }
+        Returns: Json
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
   public: {
     Tables: {
       leads: {
@@ -84,6 +109,233 @@ export type Database = {
         }
         Relationships: []
       }
+      llm_chats: {
+        Row: {
+          category: Database["public"]["Enums"]["question_category"]
+          context: string | null
+          created_at: string
+          deleted_at: string | null
+          description: string | null
+          id: string
+          last_question_id: number | null
+          persona_id: string | null
+          status: Database["public"]["Enums"]["chat_status"]
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["question_category"]
+          context?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          description?: string | null
+          id: string
+          last_question_id?: number | null
+          persona_id?: string | null
+          status?: Database["public"]["Enums"]["chat_status"]
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["question_category"]
+          context?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          description?: string | null
+          id?: string
+          last_question_id?: number | null
+          persona_id?: string | null
+          status?: Database["public"]["Enums"]["chat_status"]
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "llm_chats_last_question_id_fkey"
+            columns: ["last_question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "llm_chats_persona_id_fkey"
+            columns: ["persona_id"]
+            isOneToOne: false
+            referencedRelation: "persona"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "llm_chats_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      llm_messages: {
+        Row: {
+          chat_id: string
+          content: string
+          created_at: string
+          deleted_at: string | null
+          id: number
+          role: Database["public"]["Enums"]["message_role"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          chat_id: string
+          content: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: number
+          role: Database["public"]["Enums"]["message_role"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          chat_id?: string
+          content?: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: number
+          role?: Database["public"]["Enums"]["message_role"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "llm_messages_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "llm_chats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "llm_messages_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      persona: {
+        Row: {
+          about_me: string
+          created_at: string
+          deleted_at: string | null
+          id: string
+          image_link: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          about_me: string
+          created_at?: string
+          deleted_at?: string | null
+          id: string
+          image_link: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          about_me?: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          image_link?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "persona_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      question_options: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          id: number
+          q_option: string
+          question_id: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: number
+          q_option: string
+          question_id: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: number
+          q_option?: string
+          question_id?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_options_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      questions: {
+        Row: {
+          category: Database["public"]["Enums"]["question_category"]
+          created_at: string
+          deleted_at: string | null
+          id: number
+          q_order: number
+          q_type: Database["public"]["Enums"]["question_type"]
+          question: string
+          sub_category: Database["public"]["Enums"]["question_sub_category"]
+          updated_at: string
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["question_category"]
+          created_at?: string
+          deleted_at?: string | null
+          id?: number
+          q_order: number
+          q_type: Database["public"]["Enums"]["question_type"]
+          question: string
+          sub_category: Database["public"]["Enums"]["question_sub_category"]
+          updated_at?: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["question_category"]
+          created_at?: string
+          deleted_at?: string | null
+          id?: number
+          q_order?: number
+          q_type?: Database["public"]["Enums"]["question_type"]
+          question?: string
+          sub_category?: Database["public"]["Enums"]["question_sub_category"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       stripe_customers: {
         Row: {
           customer_id: string | null
@@ -104,7 +356,7 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       stripe_subscriptions: {
@@ -163,7 +415,112 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
+        ]
+      }
+      user_answers: {
+        Row: {
+          answer: string
+          chat_id: string
+          created_at: string
+          deleted_at: string | null
+          id: number
+          persona_id: string | null
+          question_id: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          answer: string
+          chat_id: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: number
+          persona_id?: string | null
+          question_id: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          answer?: string
+          chat_id?: string
+          created_at?: string
+          deleted_at?: string | null
+          id?: number
+          persona_id?: string | null
+          question_id?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_answers_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "llm_chats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_answers_persona_id_fkey"
+            columns: ["persona_id"]
+            isOneToOne: false
+            referencedRelation: "persona"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_answers_question_id_fkey"
+            columns: ["question_id"]
+            isOneToOne: false
+            referencedRelation: "questions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_answers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_answers_sources: {
+        Row: {
+          message_id: number
+          user_answer_id: number
+          user_id: string
+        }
+        Insert: {
+          message_id: number
+          user_answer_id: number
+          user_id: string
+        }
+        Update: {
+          message_id?: number
+          user_answer_id?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_answers_sources_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "llm_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_answers_sources_user_answer_id_fkey"
+            columns: ["user_answer_id"]
+            isOneToOne: false
+            referencedRelation: "user_answers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_answers_sources_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
         ]
       }
       users: {
@@ -198,7 +555,7 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
     }
@@ -215,6 +572,7 @@ export type Database = {
       }
     }
     Enums: {
+      chat_status: "new" | "in_progress" | "closed"
       lemon_squeezy_subscription_status:
         | "active"
         | "unpaid"
@@ -222,6 +580,19 @@ export type Database = {
         | "on_trial"
         | "cancelled"
         | "expired"
+      message_role: "user" | "assistant" | "system"
+      question_category: "Persona B2B" | "Persona B2C"
+      question_sub_category:
+        | "Decision-Making"
+        | "Current Situation"
+        | "Background Information"
+      question_type:
+        | "text"
+        | "multiline"
+        | "number"
+        | "date"
+        | "select"
+        | "multi-select"
       stripe_subscription_status:
         | "trialing"
         | "active"
@@ -238,14 +609,16 @@ export type Database = {
   }
 }
 
+type PublicSchema = Database[Extract<keyof Database, "public">]
+
 export type Tables<
   PublicTableNameOrOptions extends
-    | keyof (Database["public"]["Tables"] & Database["public"]["Views"])
+    | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
         Database[PublicTableNameOrOptions["schema"]]["Views"])
-    : never = never
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
       Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
@@ -253,67 +626,68 @@ export type Tables<
     }
     ? R
     : never
-  : PublicTableNameOrOptions extends keyof (Database["public"]["Tables"] &
-      Database["public"]["Views"])
-  ? (Database["public"]["Tables"] &
-      Database["public"]["Views"])[PublicTableNameOrOptions] extends {
-      Row: infer R
-    }
-    ? R
+  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
+        PublicSchema["Views"])
+    ? (PublicSchema["Tables"] &
+        PublicSchema["Views"])[PublicTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
     : never
-  : never
 
 export type TablesInsert<
   PublicTableNameOrOptions extends
-    | keyof Database["public"]["Tables"]
+    | keyof PublicSchema["Tables"]
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
-    : never = never
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
-  ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
-      Insert: infer I
-    }
-    ? I
+  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
+    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
     : never
-  : never
 
 export type TablesUpdate<
   PublicTableNameOrOptions extends
-    | keyof Database["public"]["Tables"]
+    | keyof PublicSchema["Tables"]
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
-    : never = never
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
-  ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
-      Update: infer U
-    }
-    ? U
+  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
+    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
     : never
-  : never
 
 export type Enums<
   PublicEnumNameOrOptions extends
-    | keyof Database["public"]["Enums"]
+    | keyof PublicSchema["Enums"]
     | { schema: keyof Database },
   EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
-    : never = never
+    : never = never,
 > = PublicEnumNameOrOptions extends { schema: keyof Database }
   ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : PublicEnumNameOrOptions extends keyof Database["public"]["Enums"]
-  ? Database["public"]["Enums"][PublicEnumNameOrOptions]
-  : never
+  : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
+    ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+    : never
+

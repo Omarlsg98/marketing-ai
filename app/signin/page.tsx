@@ -1,19 +1,22 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { Provider } from "@supabase/supabase-js";
-import toast from "react-hot-toast";
-import config from "@/config";
+import { createClient } from '@/lib/client/supabase';
+import { Provider } from '@supabase/supabase-js';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 
 // This a login/singup page for Supabase Auth.
 // Successfull login redirects to /api/auth/callback where the Code Exchange is processed (see app/api/auth/callback/route.js).
 export default function Login() {
-  const supabase = createClientComponentClient();
-  const [email, setEmail] = useState<string>("");
+  const supabase = createClient();
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
+
+  const router = useRouter();
 
   const handleSignup = async (options: {
     type: string;
@@ -23,24 +26,24 @@ export default function Login() {
 
     try {
       const { type, provider } = options;
-      const redirectURL = window.location.origin + "/api/auth/callback";
+      const redirectURL = window.location.origin + '/api/auth/callback';
 
-      if (type === "oauth") {
+      if (type === 'oauth') {
         await supabase.auth.signInWithOAuth({
           provider,
           options: {
-            redirectTo: redirectURL,
-          },
+            redirectTo: redirectURL
+          }
         });
-      } else if (type === "magic_link") {
+      } else if (type === 'magic_link') {
         await supabase.auth.signInWithOtp({
           email,
           options: {
-            emailRedirectTo: redirectURL,
-          },
+            emailRedirectTo: redirectURL
+          }
         });
 
-        toast.success("Check your emails!");
+        toast.success('Check your emails!');
 
         setIsDisabled(true);
       }
@@ -51,8 +54,49 @@ export default function Login() {
     }
   };
 
+  const handleLoginWithPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setIsDisabled(true);
+
+    try {
+      // Hcheck with supabase if user exists
+      const { data: data_1, error: error_1 } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          emailRedirectTo: 'http://localhost:3000/dashboard'
+        }
+      });
+
+      if (error_1) {
+        console.error('Error signing up:', error_1);
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+        if (error) {
+          throw error;
+        }
+      }
+
+      // Handle successful login or user creation
+      console.log('User logged in or created successfully');
+
+      // Redirect to /my/personas
+      router.push('/my/personas');
+  
+    } catch (error) {
+      // Handle errors
+      console.error('Error logging in or creating user:', error);
+    } finally {
+      setIsLoading(false);
+      setIsDisabled(true);
+    }
+  };
+
   return (
-    <main className="p-8 md:p-24" data-theme={config.colors.theme}>
+    <main className="p-8 md:p-24">
       <div className="text-center mb-4">
         <Link href="/" className="btn btn-ghost btn-sm">
           <svg
@@ -71,13 +115,13 @@ export default function Login() {
         </Link>
       </div>
       <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-center mb-12">
-        Sign-in to {config.appName}{" "}
+        Sign-in to Interseed
       </h1>
 
       <div className="space-y-8 max-w-xl mx-auto">
         <button
           className="btn btn-block"
-          onClick={(e) => handleSignup({ type: "oauth", provider: "google" })}
+          onClick={(e) => handleSignup({ type: 'oauth', provider: 'google' })}
           disabled={isLoading}
         >
           {isLoading ? (
@@ -115,7 +159,9 @@ export default function Login() {
 
         <form
           className="form-control w-full space-y-4"
-          onSubmit={(e) => handleSignup({ type: "magic_link" })}
+          onSubmit={(e) =>
+            handleSignup({ type: 'magic_link' }) && e.preventDefault()
+          }
         >
           <input
             required
@@ -136,6 +182,45 @@ export default function Login() {
               <span className="loading loading-spinner loading-xs"></span>
             )}
             Send Magic Link
+          </button>
+        </form>
+
+        <div className="divider text-xs text-base-content/50 font-medium">
+          OR
+        </div>
+
+        {/* this is a comment */}
+
+        <form onSubmit={(e) => handleLoginWithPassword(e)}>
+          <input
+            required
+            type="email"
+            value={email}
+            autoComplete="email"
+            placeholder="tom@cruise.com"
+            className="input input-bordered w-full placeholder:opacity-60"
+            onChange={(e) => setEmail(e.target.value)}
+          />
+
+          <input
+            required
+            type="password"
+            value={password}
+            autoComplete="current-password"
+            placeholder="Password"
+            className="input input-bordered w-full placeholder:opacity-60 mt-4"
+            onChange={(e) => setPassword(e.target.value)}
+          />
+
+          <button
+            className="btn btn-primary btn-block mt-4"
+            disabled={isLoading || isDisabled}
+            type="submit"
+          >
+            {isLoading && (
+              <span className="loading loading-spinner loading-xs"></span>
+            )}
+            Login
           </button>
         </form>
       </div>

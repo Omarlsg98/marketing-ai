@@ -1,23 +1,28 @@
-# Next Starter AI — Typescript
+# Interseed
 
-Hey maker 👋 it's Berk from [Next Starter AI](https://nextstarter.ai/docs). Let's get your startup off the ground, FAST ⚡️
+Template from [Next Starter AI](https://nextstarter.ai/docs).
 
-<sub>**Watch/Star the repo to be notified when updates are pushed**</sub>
 
-## Get Started
+## Managing Supabase
 
-1. Follow the [Get Started Tutorial](https://nextstarter.ai/docs) to clone the repo and run your local server 💻
+```bash
+npx supabase login
 
-2. Follow the [Ship In 5 Minutes Tutorial](https://nextstarter.ai/docs/tutorials/getting-started) to learn the foundation and ship your app quickly ⚡️
+# Select the project
+npx supabase link
 
-## Links
+# get cahnges from upstream
+npx supabase pull
 
-- [📚 Documentation](https://nextstarter.ai/docs)
+# reset the database (apply migrations and seed data)
+npx supabase db reset
 
-## Support
+# Apply migrations to the database
+npx supabase db push
 
-Reach out to me on [Twitter](https://x.com/softwio) or support@nextstarter.ai
+# setup local environment 
+npx supabase db start 
 
-\_
-
-Let's ship it, FAST ⚡️
+# get typescript types
+npx supabase gen types --lang=typescript --local > types/supabase.ts
+```

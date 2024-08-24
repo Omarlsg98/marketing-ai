@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { TestimonialProps } from "./types";
 import { defaultTestimonials } from "./testimonials";
+import { TestimonialProps } from "./types";
 
 const Testimonials1 = ({
   testimonials = defaultTestimonials,
@@ -64,10 +64,10 @@ const Testimonials1 = ({
         role="list"
         className="px-4 mx-auto space-y-4 max-w-7xl md:columns-2 lg:columns-3 xl:columns-4 md:space-y-6 md:gap-6"
       >
-        {testimonials.map((t) => {
+        {testimonials.map((t, i) => {
           if (t.type === "video")
             return (
-              <li className="justify-center break-inside-avoid max-md:flex">
+              <li key={t.id} className="justify-center break-inside-avoid max-md:flex">
                 <div className="max-w-[550px] rounded-3xl p-4 bg-surface-brand">
                   <div className="relative w-full overflow-hidden rounded-2xl">
                     <video
@@ -150,7 +150,7 @@ const Testimonials1 = ({
             );
           else if (t.type === "tweet")
             return (
-              <li className="justify-center break-inside-avoid max-md:flex">
+              <li key={t.id} className="justify-center break-inside-avoid max-md:flex">
                 <figure className="relative h-full w-full max-w-[550px] p-4 rounded-3xl bg-surface-brand-subdued">
                   {t.imageUrl && (
                     <img
