@@ -2,6 +2,18 @@
 
 Template from [Next Starter AI](https://nextstarter.ai/docs).
 
+## Getting Started
+
+```bash
+# Install dependencies
+yarn install
+
+# Run the development server
+yarn run dev
+
+# Build for production
+yarn run build
+```
 
 ## Managing Supabase
 

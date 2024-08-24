@@ -1,4 +1,4 @@
-
+'use client';
 import {
   CTA,
   FAQ,
@@ -15,8 +15,20 @@ import SampleAppShowcase from "@/components/LandingPage/SampleAppShowcase/Sample
 
 import { defaultTestimonials } from "@/components/landing-components/Testimonials1/testimonials";
 import "aos/dist/aos.css"; // Import AOS styles (you can customize the styles if needed)
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Home() {
+
+  // Redirect to the demo page
+  const router = useRouter();
+  useEffect(() => {
+
+
+    router.push('/my/personas');
+  }, []);
+  
+
   return (
     <>
       <Header />
