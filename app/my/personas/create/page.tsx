@@ -55,11 +55,6 @@ export default function Component() {
 
   const router = useRouter();
 
-
-  useEffect(() => {
-    addAiMessage(questions[0].question)
-  }, [])
-
   useEffect(() => {
     const startChat = async () => {
       const newChat = await fetch('/api/chat/create', {
@@ -77,7 +72,7 @@ export default function Component() {
         method: 'POST',
         body: JSON.stringify({ message: "Hello! can you help me build my customer persona?" })
       });
-      
+
       //redirect to chat page
       router.push(`/my/personas/chat/${chatId}`);
     }
