@@ -3,12 +3,12 @@
 import '@/app/globals.css'
 import Header from '@/components/chat-components/Header'
 import SideNav from '@/components/chat-components/SideNav'
-import { useState } from 'react'
+import { ReactNode, useState } from 'react'
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: ReactNode
 }) {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)

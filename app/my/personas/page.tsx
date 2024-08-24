@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 
 type TabName =
   | "overview"
@@ -78,7 +78,7 @@ export default function Component() {
     </div>
   );
 
-  const tabContent: Record<TabName, React.ReactNode> = {
+  const tabContent: Record<TabName, ReactNode> = {
     overview: <PersonaOverview />,
     description: (
       <p>This tab contains detailed descriptions of each persona.</p>

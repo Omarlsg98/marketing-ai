@@ -4,7 +4,7 @@ import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { Provider } from '@supabase/supabase-js';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 
 // This a login/singup page for Supabase Auth.

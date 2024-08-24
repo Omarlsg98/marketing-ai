@@ -1,8 +1,8 @@
+import { ConfigProps } from '@/types';
+import type { Database } from '@/types/supabase';
+import { createClient } from '@supabase/supabase-js';
 import { toDateTime } from './helpers';
 import { stripe } from './stripe';
-import { createClient } from '@supabase/supabase-js';
-import type { Database } from '@/types/supabase';
-import { ConfigProps } from '@/types';
 
 
 // Note: supabaseAdmin uses the SERVICE_ROLE_KEY which you must only use in a secure server-side context
@@ -89,13 +89,13 @@ const upsertSubscription = async (
             : null
     };
 
-    const { error } = await supabaseAdmin
-        .from('subscriptions')
-        .upsert([subscriptionData]);
-    if (error) throw error;
-    console.log(
-        `Inserted/updated subscription [${subscription.id}] for user [${uuid}]`
-    );
+    // const { error } = await supabaseAdmin
+    //     .from('subscriptions')
+    //     .upsert([subscriptionData]);
+    // if (error) throw error;
+    // console.log(
+    //     `Inserted/updated subscription [${subscription.id}] for user [${uuid}]`
+    // );
 };
 
 const addCreditsToCustomer = async (
@@ -119,7 +119,6 @@ const addCreditsToCustomer = async (
 }
 
 export {
-    createOrRetrieveCustomer,
-    upsertSubscription,
-    addCreditsToCustomer,
+    addCreditsToCustomer, createOrRetrieveCustomer,
+    upsertSubscription
 };

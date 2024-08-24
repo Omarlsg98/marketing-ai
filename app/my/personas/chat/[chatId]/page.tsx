@@ -12,17 +12,15 @@ import {
 } from "@/components/ui/select";
 import { ChatGetOut, ChatSendOut } from "@/types/api/chat";
 import { Database } from "@/types/supabase";
-import { useEffect, useRef, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 
 type Message = Database["public"]["Tables"]["llm_messages"]["Row"];
 type Question = Database["public"]["Tables"]["questions"]["Row"];
-type Event = React.ChangeEvent<HTMLInputElement>;
-type KeyboardEvent = React.KeyboardEvent<HTMLInputElement>;
 
 const Input = ({ value, onChange, placeholder, className, type = "text" , handleKeyDown}:
     {
         value: string;
-        onChange: (e: Event) => void;
+        onChange: (e: ChangeEvent) => void;
         placeholder: string;
         className: string;
         type: string | undefined;
@@ -41,7 +39,7 @@ const Input = ({ value, onChange, placeholder, className, type = "text" , handle
 
 const Textarea = ({ value, onChange, placeholder, className, handleKeyDown }: {
     value: string;
-    onChange: (e: Event) => void;
+    onChange: (e: ChangeEvent) => void;
     placeholder: string;
     className: string;
     handleKeyDown: (e: KeyboardEvent) => void;
@@ -198,7 +196,7 @@ export default function Component({ params }: { params: { chatId: string } }) {
           <div className="flex flex-col space-y-4">
             <Input
               value={userInput}
-              onChange={(e: Event) => setUserInput(e.target.value)}
+              onChange={(e: ChangeEvent) => setUserInput((e.target as HTMLInputElement).value)}
               placeholder="10, 100, 1000..."
               type="number"
               className="my-4"
@@ -235,8 +233,8 @@ export default function Component({ params }: { params: { chatId: string } }) {
               </div>
               <Input
                 value={userInput}
-                onChange={(e: Event) => {
-                  setUserInput(e.target.value);
+                onChange={(e: ChangeEvent) => {
+                  setUserInput((e.target as HTMLInputElement).value);
                   setSelectedJobTitle("");
                 }}
                 placeholder="Type your answer here or select from above"
@@ -257,18 +255,15 @@ export default function Component({ params }: { params: { chatId: string } }) {
           );
         }
       // Fall through for text inputs without suggestions
-      case "multiline":
-        const InputComponent =
-          currentQuestion.q_type === "text" ? Input : Textarea;
+      case "multiline" :
         return (
           <div className="flex flex-col space-y-4">
-            <InputComponent
+            <Textarea
               value={userInput}
-              onChange={(e:Event) => setUserInput(e.target.value)}
+              onChange={(e:ChangeEvent) => setUserInput((e.target as HTMLTextAreaElement).value)}
               placeholder="Type your answer here"
               className="my-4"
               handleKeyDown={handleKeyDown}
-              type="text"
             />
             <div className="flex justify-between mt-2">
               {iDontKnowButton}
@@ -320,7 +315,7 @@ export default function Component({ params }: { params: { chatId: string } }) {
             </div>
             <Textarea
               value={userInput}
-              onChange={(e: Event) => setUserInput(e.target.value)}
+              onChange={(e: ChangeEvent) => setUserInput((e.target as HTMLTextAreaElement).value)}
               placeholder='Selected options will appear here. Feel free to add more details'
               className="my-4"
               handleKeyDown={handleKeyDown}
