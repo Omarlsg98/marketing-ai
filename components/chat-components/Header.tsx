@@ -1,4 +1,4 @@
-import SideNav from '@/components/chat-components/SideNav'
+import SideNav from '@/components/general/SideNav'
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Bell, ChevronRight, Menu, Search } from 'lucide-react'

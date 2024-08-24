@@ -1,12 +1,12 @@
 "use client";
-import React, { FC, ReactNode, useContext, useEffect } from "react";
+import config from "@/config";
+import { DarkModeContext } from "@/store/context/DarkModeContext";
 import cx from "classnames";
 import PlausibleProvider from "next-plausible";
-import config from "@/config";
+import { Inter } from "next/font/google";
+import { FC, ReactNode, useContext } from "react";
 import GTMProvider from "../GTMProvider/GTMProvider";
 import ClientLayout from "../LayoutClient";
-import { Inter } from "next/font/google";
-import { DarkModeContext } from "@/store/context/DarkModeContext";
 
 const font = Inter({ subsets: ["latin"] });
 
@@ -16,12 +16,6 @@ interface AppSubLayoutProps {
 
 const AppSubLayout: FC<AppSubLayoutProps> = ({ children }) => {
   const { isDarkMode } = useContext(DarkModeContext);
-
-  // useEffect(() => {
-  //   console.log("IS DARK MODE IN SUB: ", isDarkMode)
-  // }, [isDarkMode])
-
-  console.log("IS DARK MODE IN SUB: ", isDarkMode)
 
   return (
     <html
@@ -35,7 +29,7 @@ const AppSubLayout: FC<AppSubLayoutProps> = ({ children }) => {
         </head>
       )}
       <GTMProvider />
-      <body className="h-[100%]">
+      <body className="h-[100%] bg-background text-foreground">
         {/* ClientLayout contains all the client wrappers (Crisp chat support, toast messages, tooltips, etc.) */}
         <ClientLayout>{children}</ClientLayout>
       </body>
