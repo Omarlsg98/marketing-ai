@@ -17,12 +17,6 @@ interface AppSubLayoutProps {
 const AppSubLayout: FC<AppSubLayoutProps> = ({ children }) => {
   const { isDarkMode } = useContext(DarkModeContext);
 
-  // useEffect(() => {
-  //   console.log("IS DARK MODE IN SUB: ", isDarkMode)
-  // }, [isDarkMode])
-
-  console.log("IS DARK MODE IN SUB: ", isDarkMode)
-
   return (
     <html
       lang="en"

@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
@@ -28,7 +28,7 @@ export default function ForgotPasswordPage() {
     }
   }, [email])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
     if (isFormValid) {
       // Handle form submission (e.g., send reset password email)

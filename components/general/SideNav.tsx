@@ -10,6 +10,7 @@ import React, { useEffect, useState } from 'react'
 interface SideNavProps {
   isCollapsed: boolean
   isMobile?: boolean
+  onClose?: () => void
 }
 
 interface MenuItem {

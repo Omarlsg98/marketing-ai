@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label"
 import { Eye, EyeOff } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 
 import { createClient } from '@/lib/client/supabase'
 import { useRouter } from 'next/navigation'
@@ -68,7 +68,7 @@ export default function SignUpPage() {
     setIsFormValid(validateName(name) && validateEmail(email) && validatePassword(password) && password === confirmPassword)
   }, [name, email, password, confirmPassword]) 
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     if (isFormValid) {
       // Handle form submission

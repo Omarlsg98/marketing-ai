@@ -8,7 +8,7 @@ import { Eye, EyeOff } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -47,7 +47,7 @@ export default function LoginPage() {
     setIsFormValid(validateEmail(email) && validatePassword(password))
   }, [email, password])
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
 
     if (isFormValid) {
