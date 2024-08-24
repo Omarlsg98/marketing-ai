@@ -1,5 +1,4 @@
 import { MetadataRoute } from "next";
-import { articles } from "./blog/_assets/content";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
@@ -39,11 +38,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "daily",
       priority: 0.8,
     },
-    ...articles.map((article) => ({
-      url: `https://nextstarter.ai/blog/${article.slug}`,
-      lastModified: new Date(),
-      changeFrequency: "weekly" as any,
-      priority: 0.7,
-    })),
   ];
 }

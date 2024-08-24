@@ -1,6 +1,6 @@
 import { Database } from '@/types/supabase';
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
-import { AuthError, createClient, PostgrestError } from '@supabase/supabase-js';
+import { AuthError, PostgrestError } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -34,12 +34,6 @@ const getSupabaseClient = () => {
   return createRouteHandlerClient<Database>({ cookies: () => cookieStore });
 };
 
-const getSupabaseAdminClient = () => {
-  return createClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-    process.env.SUPABASE_SERVICE_ROLE_KEY || ''
-  );
-};
 
 export const getSession: () => any = async () => {
   const supabase = getSupabaseClient();
