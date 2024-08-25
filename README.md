@@ -18,13 +18,20 @@ yarn run build
 ## Managing Supabase
 
 ```bash
+# login to supabase
 npx supabase login
+
+# init the project (do this only once)
+npx supabase init
+
+# create a migration
+npx supabase migration new schema_test
 
 # Select the project
 npx supabase link
 
 # get cahnges from upstream
-npx supabase pull
+npx supabase db pull
 
 # reset the database (apply migrations and seed data)
 npx supabase db reset

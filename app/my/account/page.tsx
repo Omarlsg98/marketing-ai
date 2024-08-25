@@ -9,16 +9,14 @@ export  default async function Component() {
     let id = '';
     const loadInfo = async () => {
         const user = await getSession();
-        console.log(user);
         const data = await getUserInfo(user.id);
-        console.log(data);
 
         name = data.full_name;
         email = data.email;
-        id = data.id;
+        id = user.id;
     }
     await loadInfo();
-     
+      
 
   return (
     <div>
@@ -27,7 +25,6 @@ export  default async function Component() {
         <p>{
             id
         }</p>
-        <button onClick={() => window.history.back()}>Back</button>
     </div>
   );
 }

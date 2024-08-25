@@ -1,11 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
 import {
   getAllQuestion,
-  getAllQuestionsInfo,
   getChat,
   getMessages,
-  getQuestionOptions,
-} from "../database";
+  getQuestionOptions
+} from "@/lib/server/database";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
   req: NextRequest,
@@ -19,7 +18,6 @@ export async function GET(
 
   const { chat } = await getChat(chatId);
   const allMessages = await getMessages(chatId, true);
-  const { outstandingQuestions } = await getAllQuestionsInfo(chat, false);
   const questions = await getAllQuestion(chat.category);
 
   const lastQuestion = questions.find((q) => q.id === chat.last_question_id);
@@ -34,7 +32,7 @@ export async function GET(
 
   return NextResponse.json({
     output: allMessages,
-    progress: (1 - outstandingQuestions.length / questions.length) * 100,
+    progress: chat.progress,
     lastQuestion: lastQuestion,
     options: q_options,
   });

@@ -40,6 +40,7 @@ async function getSessionUser() {
     const {
       data: { user }
     } = await supabase.auth.getUser();
+    
     return user;
   } catch (error) {
     console.error('Error:', error);

@@ -1,6 +1,6 @@
 import { Database } from "@/types/supabase";
 import { NextRequest, NextResponse } from "next/server";
-import { getUserId, insertRecord } from "../database";
+import { getUserId, insertRecord } from "../../../../lib/server/database";
 
 export const maxDuration = 300;
 
@@ -16,12 +16,25 @@ export async function POST(req: NextRequest) {
         category: requestBody.category,
         id: '' // This will be added by the database
     };
-    
+       
     const chat = await insertRecord("llm_chats", NewChat);
 
-    // Register the intro message
+    const NewPersona: Database['public']['Tables']['persona']['Insert'] = {
+        user_id: await getUserId(),
+        name: 'Unknown Customer',
+        about_me: 'In progress!',
+        id: chat.id,
+        coverage: 0,
+        information_version: 'v1',
+        chat_id: chat.id,
+        short_description: "A wonderful customer, we need more details!"
+    };
 
+    const persona = await insertRecord("persona", NewPersona);
+
+    // Register the intro message
     return NextResponse.json({
-        output: chat,
+        chat: chat,
+        persona: persona
     });
 }
