@@ -1,7 +1,6 @@
+import { createServerSupabaseClient, getSession } from '@/lib/server/supabase';
 import { Database } from '@/types/supabase';
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { AuthError, PostgrestError } from '@supabase/supabase-js';
-import { cookies } from 'next/headers';
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -29,35 +28,13 @@ const handleError: (error: PostgrestError | AuthError | null) => boolean = (
   }
 };
 
-const getSupabaseClient = () => {
-  const cookieStore = cookies();
-  return createRouteHandlerClient<Database>({ cookies: () => cookieStore });
-};
-
-
-export const getSession: () => any = async () => {
-  const supabase = getSupabaseClient();
-
-  const {
-    data: { session },
-    error
-  } = await supabase.auth.getSession();
-
-  handleError(error);
-
-  if (session) {
-    return session;
-  }
-  return null;
-};
-
 export const getUserId = async () => {
   const session = await getSession();
-  return session?.user.id;
+  return session?.id;
 };
 
 export const getLastMessages: (chatId: string) => any = async (chatId) => {
-  const supabase = getSupabaseClient();
+  const supabase = createServerSupabaseClient();
   const userId = await getUserId();
 
   const { data, error } = await supabase
@@ -75,7 +52,7 @@ export const getLastMessages: (chatId: string) => any = async (chatId) => {
 // LLM Specific
 export const getAllQuestionsInfo: (chat: chatType, returnLastMessages: boolean) => any = async (
   chat, returnLastMessages=true) => {
-  const supabase = getSupabaseClient();
+  const supabase = createServerSupabaseClient();
   const userId = await getUserId();
 
   // Get user_answers for the user
@@ -115,7 +92,7 @@ export const getAllQuestionsInfo: (chat: chatType, returnLastMessages: boolean) 
 };
 
 export const getAllQuestion: (category: string) => Promise<Database["public"]["Tables"]["questions"]["Row"][]> = async (category) => {
-  const supabase = getSupabaseClient();
+  const supabase = createServerSupabaseClient();
   const { data, error } = await supabase
     .from('questions')
     .select('*')
@@ -173,7 +150,7 @@ export const getChat: (chatId: string) => Promise<{
   chat: Database['public']['Tables']['llm_chats']['Row'];
   prevQuestion: Database['public']['Tables']['questions']['Row'] | null;
 }> = async (chatId) => {
-  const supabase = getSupabaseClient();
+  const supabase = createServerSupabaseClient();
   const { data, error } = await supabase
     .from('llm_chats')
     .select('*, questions(*)')
@@ -199,7 +176,7 @@ export const getChat: (chatId: string) => Promise<{
 export const getQuestionOptions: (questionId: number) => Promise<
   string[] | null
 > = async (questionId) => {
-  const supabase = getSupabaseClient();
+  const supabase = createServerSupabaseClient();
   const { data, error } = await supabase
     .from('question_options')
     .select('q_option')
@@ -210,7 +187,7 @@ export const getQuestionOptions: (questionId: number) => Promise<
 };
 
 export const getChats: () => any = async () => {
-  const supabase = getSupabaseClient();
+  const supabase = createServerSupabaseClient();
   const { data, error } = await supabase
     .from('llm_chats')
     .select('*')
@@ -228,7 +205,7 @@ export const getMessages: (
   chatId: string,
   excludeSystem: boolean
 ) => any = async (chatId, excludeSystem) => {
-  const supabase = getSupabaseClient();
+  const supabase = createServerSupabaseClient();
   let query = supabase.from('llm_messages').select('*').eq('chat_id', chatId);
   if (excludeSystem) {
     query = query.not('role', 'eq', 'system');
@@ -263,7 +240,7 @@ export const insertRecord: (table: tableType, record: any) => any = async (
   table,
   record
 ) => {
-  const supabase = getSupabaseClient();
+  const supabase = createServerSupabaseClient();
 
   const final_record = addUUID(table, record);
 
@@ -283,7 +260,7 @@ export const updateRecord: (table: tableType, record: any) => any = async (
   table,
   record
 ) => {
-  const supabase = getSupabaseClient();
+  const supabase = createServerSupabaseClient();
 
   console.log('Updating record in ' + table + ':', record);
 
@@ -302,7 +279,7 @@ export const getRecords: (table: tableType, id: string) => any = async (
   table,
   id
 ) => {
-  const supabase = getSupabaseClient();
+  const supabase = createServerSupabaseClient();
 
   const { data, error } = await supabase.from(table).select().eq('id', id);
 
