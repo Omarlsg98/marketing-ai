@@ -60,8 +60,20 @@ export default function Component() {
   }
 
   const removeQuestion = (id) => {
-    const updatedQuestions = questions.filter(q => q.id !== id)
-    setQuestions(updatedQuestions)
+    if (questions.length > 1) {
+      const updatedQuestions = questions.filter(q => q.id !== id)
+      setQuestions(updatedQuestions)
+      // Ensure currentQuestion is within bounds after removal
+      if (currentQuestion >= updatedQuestions.length) {
+        setCurrentQuestion(updatedQuestions.length - 1)
+      }
+    } else {
+      toast({
+        title: "Cannot remove last question",
+        description: "You must have at least one question in the survey.",
+        variant: "destructive",
+      })
+    }
   }
 
   const addOption = (questionId) => {
@@ -268,6 +280,7 @@ export default function Component() {
                 variant="ghost"
                 size="icon"
                 onClick={() => removeQuestion(q.id)}
+                disabled={questions.length === 1}
                 aria-label="Remove question"
               >
                 <Trash2 className="h-4 w-4" />
