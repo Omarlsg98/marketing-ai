@@ -1,6 +1,8 @@
-import React from 'react'
+import { PersonaInformation } from "@/types/persona";
 
-export default function CustomerJourneyProfile() {
+export default function CustomerJourneyProfile(
+  personaInformation: PersonaInformation['v1']  
+) {
   return (
     <div className="space-y-4">
       <h2 className="text-2xl font-bold">Customer Profile</h2>

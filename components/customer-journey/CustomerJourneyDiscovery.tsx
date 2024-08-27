@@ -1,16 +1,16 @@
 "use client"
 
-import React, { useState, useCallback } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Separator } from "@/components/ui/separator"
-import { Search, BookOpen, MessageCircle, Edit2, Plus, Minus, Info, Activity, BarChart, CheckCircle, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { Separator } from "@/components/ui/separator"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { PersonaInformation } from '@/types/persona'
+import { Activity, BarChart, BookOpen, CheckCircle, Edit2, FileText, Info, MessageCircle, Minus, Plus, Search } from "lucide-react"
+import React, { useCallback, useState } from 'react'
 
 interface ListItemProps {
   term: string
@@ -94,7 +94,9 @@ const ProfileCard: React.FC<ProfileCardProps> = React.memo(({
   </Card>
 ))
 
-export default function CustomerJourneyDiscoveryComponent() {
+export default function CustomerJourneyDiscoveryComponent(
+  personaInformation: PersonaInformation['v1'] 
+) {
   const [cardData, setCardData] = useState<CardData>({
     customerGoals: [
       'Identify potential solutions to their problem.',

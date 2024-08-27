@@ -226,7 +226,7 @@ export type Database = {
           deleted_at: string | null
           finished: boolean
           id: string
-          image_id: string | null
+          image_path: string | null
           information: Json | null
           information_version:
             | Database["public"]["Enums"]["persona_info_version"]
@@ -244,13 +244,13 @@ export type Database = {
           deleted_at?: string | null
           finished?: boolean
           id: string
-          image_id?: string | null
+          image_path?: string | null
           information?: Json | null
           information_version?:
             | Database["public"]["Enums"]["persona_info_version"]
             | null
           name: string
-          short_description: string
+          short_description?: string
           updated_at?: string
           user_id: string
         }
@@ -262,7 +262,7 @@ export type Database = {
           deleted_at?: string | null
           finished?: boolean
           id?: string
-          image_id?: string | null
+          image_path?: string | null
           information?: Json | null
           information_version?:
             | Database["public"]["Enums"]["persona_info_version"]
@@ -278,13 +278,6 @@ export type Database = {
             columns: ["chat_id"]
             isOneToOne: false
             referencedRelation: "llm_chats"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "persona_image_id_fkey"
-            columns: ["image_id"]
-            isOneToOne: false
-            referencedRelation: "objects"
             referencedColumns: ["id"]
           },
           {

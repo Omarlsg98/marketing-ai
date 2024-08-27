@@ -24,7 +24,7 @@ ALTER TABLE public.persona ADD COLUMN chat_id UUID;
 ALTER TABLE public.persona ADD COLUMN short_description TEXT NOT NULL DEFAULT 'A wonderful customer, we need more details!';
 ALTER TABLE public.persona ADD COLUMN finished boolean NOT NULL DEFAULT false;
 
-ALTER TABLE public.persona ADD COLUMN image_id UUID;
+ALTER TABLE public.persona ADD COLUMN image_path text;
 ALTER TABLE public.persona ADD COLUMN coverage real DEFAULT 0;
 ALTER TABLE public.persona ADD COLUMN information JSONB;
 ALTER TABLE public.persona ADD COLUMN information_version public.persona_info_version DEFAULT 'v1';
@@ -32,9 +32,6 @@ ALTER TABLE public.persona ADD COLUMN information_version public.persona_info_ve
 -- add relationship between persona and chat
 ALTER TABLE ONLY public.persona
     ADD CONSTRAINT persona_chat_id_fkey FOREIGN KEY (chat_id) REFERENCES public.llm_chats(id);
-
-ALTER TABLE ONLY public.persona
-    ADD CONSTRAINT persona_image_id_fkey FOREIGN KEY (image_id) REFERENCES storage.objects(id);
 
 -- move persona_id from chat to persona
 UPDATE public.persona
@@ -68,7 +65,18 @@ ON storage.objects FOR INSERT WITH CHECK (
 );
 
 CREATE POLICY "can update own storage"
-ON storage.objects FOR UPDATE WITH CHECK (
+ON storage.objects FOR UPDATE USING (
+    bucket_id = 'persona_images'
+    and (select auth.uid()::text) = (storage.foldername(name))[1]
+)
+WITH CHECK (
+    bucket_id = 'persona_images'
+    and (select auth.uid()::text) = (storage.foldername(name))[1]
+);
+  
+
+CREATE POLICY "can delete own storage"
+ON storage.objects FOR DELETE USING (
     bucket_id = 'persona_images'
     and (select auth.uid()::text) = (storage.foldername(name))[1]
 );

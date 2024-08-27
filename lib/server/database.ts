@@ -256,7 +256,7 @@ export const getPersonas: (
 
   handleError(error);
 
-  const output:PersonaInformation["v1"][] = data.map((persona) => {
+  const output: PersonaInformation["v1"][] = data.map((persona) => {
     return {
       ...persona,
       chat_progress: persona.llm_chats.progress,
@@ -264,6 +264,55 @@ export const getPersonas: (
   });
 
   return output;
+};
+
+export const getPersonaFormatted: (
+  personaId: string
+) => Promise<PersonaInformation["v1"]> = async (personaId) => {
+  const supabase = createServerSupabaseClient();
+
+  const { data, error } = await supabase
+    .from("persona")
+    .select(
+      `
+    id,
+    name,
+    short_description,
+    finished,
+    llm_chats(progress),
+    primaryGoal: information->>primaryGoal,
+    keyChallenge: information->>keyChallenge,
+    mainBuyingMotivation: information->>mainBuyingMotivation,
+    image_path
+    `
+    )
+    .eq("id", personaId)
+    .single();
+
+  handleError(error);
+
+  return {
+    ...data,
+    chat_progress: data.llm_chats.progress,
+  };
+};
+
+export const getPersonaRecord: (
+  personaId: string
+) => Promise<Database["public"]["Tables"]["persona"]["Row"]> = async (
+  personaId
+) => {
+  const supabase = createServerSupabaseClient();
+
+  const { data, error } = await supabase
+    .from("persona")
+    .select(`*`)
+    .eq("id", personaId)
+    .single();
+
+  handleError(error);
+
+  return data;
 };
 
 // Insert functions
