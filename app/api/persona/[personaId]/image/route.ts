@@ -33,14 +33,14 @@ export async function POST(req: NextRequest) {
   const formData = await req.formData();
 
   const userId = await getUserId();
-  const personaId = formData.get("id");
-  const chat_id = formData.get("chat_id");
-  const update_mode = formData.get("update_mode");
+  const personaId = formData.get("id") as string;
+  const chat_id = formData.get("chat_id") as string;
+  const update_mode = formData.get("update_mode") as string;
 
   let image;
   if (update_mode === "image_upload") {
     // upload image to persona record
-    image = formData.get("file");
+    image = formData.get("file") as File;
     if (!image) {
       return NextResponse.json({
         output: "Please upload an image",
@@ -49,7 +49,7 @@ export async function POST(req: NextRequest) {
   } else {
     //temporal
     const { chat } = await getChat(chat_id);
-    const ethnicity = formData.get("ethnicity");
+    const ethnicity = formData.get("ethnicity") as string;
     const context = chat.context + " The user says the customer has the following ethnicity: " + ethnicity;
 
     const promptMainDescription = prompts.getMainDescriptionPrompt(context);

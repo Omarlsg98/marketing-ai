@@ -71,7 +71,12 @@ export default function Component({
     fetchPersona();
   }, [params.personaId]);
 
-  const updateImage = async (update_mode, file, ethnicity, style) => {
+  const updateImage: (
+    update_mode: "image_upload" | "image_generate",
+    file: File | null,
+    ethnicity: string | null,
+    style: string | null
+  ) => Promise<string> = async (update_mode, file, ethnicity, style) => {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("update_mode", update_mode);
@@ -208,11 +213,10 @@ export default function Component({
             <div className="h-full p-6 bg-white rounded-lg shadow">
               <h2 className="mb-4 text-2xl font-bold">About Me</h2>
               <div className="space-y-4 text-muted-foreground">
-                {personaInformation.about_me && personaInformation.about_me
-                  .split("\n")
-                  .map((paragraph, index) => (
-                    <p key={index}>{paragraph}</p>
-                  ))}
+                {personaInformation.about_me &&
+                  personaInformation.about_me
+                    .split("\n")
+                    .map((paragraph, index) => <p key={index}>{paragraph}</p>)}
               </div>
             </div>
           </div>

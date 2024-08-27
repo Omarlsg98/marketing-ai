@@ -23,7 +23,8 @@ export default function Component() {
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
         {personas.map((persona, index) => (
           <CustomerPersonaCard
-           persona={persona}
+            key = {index}
+            persona={persona}
           />
         ))}
       </div>

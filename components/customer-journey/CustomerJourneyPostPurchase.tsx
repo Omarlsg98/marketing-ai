@@ -23,6 +23,8 @@ const ListItem: React.FC<ListItemProps> = React.memo(({ term, description }) => 
   </div>
 ))
 
+ListItem.displayName = 'ListItem'
+
 interface CardData {
   customerGoals: string[];
   customerThoughts: string[];
@@ -90,8 +92,12 @@ const ProfileCard: React.FC<ProfileCardProps> = React.memo(({
   </Card>
 ))
 
+ProfileCard.displayName = 'ProfileCard'
+
 export default function CustomerJourneyPostPurchase(
-  personaInformation: PersonaInformation['v1'] 
+  personaInformation: {
+    personaInformation: PersonaInformation['v1'] 
+  } 
 ) {
   const [cardData, setCardData] = useState<CardData>({
     customerGoals: [

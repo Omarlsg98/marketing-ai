@@ -229,7 +229,7 @@ export const getMessages: (
 
 export const getPersonas: (
   numRecords: number | null
-) => Promise<PersonaInformation["v1"][]> = async (numRecords) => {
+) => Promise<PersonaInformation["v1_short"][]> = async (numRecords) => {
   const supabase = createServerSupabaseClient();
 
   if (!numRecords) {
@@ -256,7 +256,7 @@ export const getPersonas: (
 
   handleError(error);
 
-  const output: PersonaInformation["v1"][] = data.map((persona) => {
+  const output: PersonaInformation["v1_short"][] = data.map((persona) => {
     return {
       ...persona,
       chat_progress: persona.llm_chats.progress,
@@ -283,7 +283,8 @@ export const getPersonaFormatted: (
     primaryGoal: information->>primaryGoal,
     keyChallenge: information->>keyChallenge,
     mainBuyingMotivation: information->>mainBuyingMotivation,
-    image_path
+    image_path,
+    about_me
     `
     )
     .eq("id", personaId)

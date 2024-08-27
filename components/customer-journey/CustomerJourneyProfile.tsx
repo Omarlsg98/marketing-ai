@@ -1,7 +1,9 @@
 import { PersonaInformation } from "@/types/persona";
 
 export default function CustomerJourneyProfile(
-  personaInformation: PersonaInformation['v1']  
+  personaInformation: {
+    personaInformation: PersonaInformation['v1'] 
+  } 
 ) {
   return (
     <div className="space-y-4">

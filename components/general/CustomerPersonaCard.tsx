@@ -14,7 +14,7 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 interface CustomerPersonaCardProps {
-  persona: PersonaInformation["v1"];
+  persona: PersonaInformation["v1_short"];
 }
 
 export default function Component({ persona }: CustomerPersonaCardProps) {
