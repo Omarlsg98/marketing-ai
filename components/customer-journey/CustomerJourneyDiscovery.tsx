@@ -305,9 +305,6 @@ export default function CustomerJourneyDiscoveryComponent(
 
   return (
     <div className="space-y-6">
-      <Card className="p-6">
-        <CardTitle className="mb-4">Discovery/Research Phase</CardTitle>
-        <Separator className="my-4" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <ProfileCard 
             title="Customer Goals" 
@@ -447,7 +444,6 @@ export default function CustomerJourneyDiscoveryComponent(
             </ul>
           </ProfileCard>
         </div>
-      </Card>
 
       <Dialog open={editingCard !== null} onOpenChange={(open) => !open && setEditingCard(null)}>
         <DialogContent className="max-w-3xl">

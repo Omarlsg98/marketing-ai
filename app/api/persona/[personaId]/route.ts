@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-
-import { getPersonaFormatted } from "@/lib/server/database";
+import { getChat, getPersonaFormatted, getUserAnswers, updateRecord } from "@/lib/server/database";
+import { getPersonaInformation } from "@/lib/server/persona/customerJourneyBuilder";
 import { getFileUrl } from "@/lib/server/supabase";
+import { NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 300;
 
@@ -26,16 +26,30 @@ export async function GET(
   });
 }
 
-export async function POST(req: NextRequest) {
+export async function PUT(req: NextRequest,
+  {
+    params,
+  }: {
+    params: { personaId: string };
+  }
+) {
   const requestBody = await req.json();
+
+  const personaId = params.personaId;
+
+  const {chat} = await getChat(personaId);
+  const userAnswers = await getUserAnswers(chat.id);
+  const persona = await getPersonaFormatted(personaId);
+
   // use persona creator agent to get all information for persona
   // transform answers in sections
-  // generate image and about me
-
+  const personaInformation = await getPersonaInformation(chat, userAnswers, persona);
+  
   // update persona record with image and about me information and mark it as finished
+  await updateRecord('persona', personaInformation);
 
   // Register the intro message
   return NextResponse.json({
-    output: null,
+    output: personaInformation,
   });
 }

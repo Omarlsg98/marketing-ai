@@ -5,8 +5,8 @@ import { AuthError, PostgrestError } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { v4 as uuidv4 } from "uuid";
 
-type questionType = Database["public"]["Tables"]["questions"]["Row"];
-type userAnswerType = Database["public"]["Tables"]["user_answers"]["Row"];
+type QuestionType = Database["public"]["Tables"]["questions"]["Row"];
+type UserAnswerType = Database["public"]["Tables"]["user_answers"]["Row"];
 type chatType = Database["public"]["Tables"]["llm_chats"]["Row"];
 type messageType = Database["public"]["Tables"]["llm_messages"]["Row"];
 type roles = Database["public"]["Tables"]["llm_messages"]["Row"]["role"];
@@ -156,6 +156,24 @@ export const saveUserAnswer: (
 };
 
 // General get functions
+export const getUserAnswers: (
+  chatId: string
+) => Promise<(UserAnswerType & { questions: QuestionType })[]> = async (
+  chatId
+) => {
+  const supabase = createServerSupabaseClient();
+  const userId = await getUserId();
+
+  const { data, error } = await supabase
+    .from("user_answers")
+    .select("*, questions(*)")
+    .eq("chat_id", chatId)
+    .eq("user_id", userId);
+
+  handleError(error);
+
+  return data;
+};
 
 export const getChat: (chatId: string) => Promise<{
   chat: Database["public"]["Tables"]["llm_chats"]["Row"];
@@ -250,9 +268,9 @@ export const getPersonas: (
     short_description,
     finished,
     llm_chats(progress),
-    primaryGoal: information->>primaryGoal,
-    keyChallenge: information->>keyChallenge,
-    mainBuyingMotivation: information->>mainBuyingMotivation,
+    primary_goal,
+    key_challenge,
+    main_buying_motivation,
     image_path
     `
     )
@@ -286,11 +304,21 @@ export const getPersonaFormatted: (
     short_description,
     finished,
     llm_chats(progress),
-    primaryGoal: information->>primaryGoal,
-    keyChallenge: information->>keyChallenge,
-    mainBuyingMotivation: information->>mainBuyingMotivation,
+    primary_goal,
+    key_challenge,
+    main_buying_motivation,
     image_path,
-    about_me
+    about_me,
+    gender,
+    ethnicity,
+    location,
+    occupation,
+    profile: information->profile,
+    discovery: information->discovery,
+    evaluation: information->evaluation,
+    purchase: information->purchase,
+    implementation: information->implementation,
+    renewal: information->renewal
     `
     )
     .eq("id", personaId)
@@ -301,6 +329,12 @@ export const getPersonaFormatted: (
   return {
     ...data,
     chat_progress: data.llm_chats.progress,
+    profile: data.profile as any,
+    discovery: data.discovery as any,
+    evaluation: data.evaluation as any,
+    purchase: data.purchase as any,
+    implementation: data.implementation as any,
+    renewal: data.renewal as any,
   };
 };
 

@@ -42,9 +42,9 @@ export default function Component({
     short_description: "Tech enthusiast and software engineer",
     finished: false,
     chat_progress: 0,
-    primaryGoal: "...",
-    keyChallenge: "...",
-    mainBuyingMotivation: "...",
+    primary_goal: "...",
+    key_challenge: "...",
+    main_buying_motivation: "...",
     image_path: "",
     about_me: "I'm your wonderful persona... loading..",
   });

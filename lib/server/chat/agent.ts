@@ -1,7 +1,7 @@
+import prompts from '@/lib/server/chat/prompts';
 import { getAllQuestionsInfo, saveUserAnswer, updateRecord } from '@/lib/server/database';
+import { sendChatGPT } from '@/lib/server/llms';
 import { Database } from '@/types/supabase';
-import { sendChatGPT } from '../llms';
-import prompts from './prompts';
 
 type questionType = Database['public']['Tables']['questions']['Row'];
 type userAnswerType = Database['public']['Tables']['user_answers']['Row'];

@@ -61,7 +61,7 @@ export const sendChatGPTCompletion = async (
     retryDelay: (retryCount) => {
       return retryCount * 1;
     },
-    retries: 15,
+    retries: 5,
   });
 
   const res = await axios.post(url, body, options);
