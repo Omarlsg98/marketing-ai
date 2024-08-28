@@ -1,6 +1,6 @@
+import { getAllQuestionsInfo, saveUserAnswer, updateRecord } from '@/lib/server/database';
 import { Database } from '@/types/supabase';
-import { getAllQuestionsInfo, saveUserAnswer, updateRecord } from './database';
-import { sendChatGPT } from './llms';
+import { sendChatGPT } from '../llms';
 import prompts from './prompts';
 
 type questionType = Database['public']['Tables']['questions']['Row'];
@@ -230,7 +230,6 @@ export const getAgentAnswer: (
   role: roles;
   question: questionType | null;
   actionTakenMessage: string;
-  outstandingQuestions: questionType[];
 }> = async (chat, userMessage, prevQuestion) => {
   const { outstandingQuestions, answeredQuestions, lastMessages } =
     await getAllQuestionsInfo(chat, true);
@@ -289,7 +288,7 @@ export const getAgentAnswer: (
   if (chatIsNew) {
     chat.context = 'This is the beginning of the conversation. ';
   }
-
+  chat.progress = answeredQuestions.length / (answeredQuestions.length + outstandingQuestions.length) * 100;
   chat.last_question_id = nextQuestion?.id || null;
 
   await updateRecord('llm_chats', chat);
@@ -297,7 +296,6 @@ export const getAgentAnswer: (
     messageAgent: newMessage,
     role: agentAction['role'],
     question: nextQuestion,
-    actionTakenMessage: `You decided to ${agentAction.name}`,
-    outstandingQuestions: outstandingQuestions 
+    actionTakenMessage: `You decided to ${agentAction.name}`
   };
 };

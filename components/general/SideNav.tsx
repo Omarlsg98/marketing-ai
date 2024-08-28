@@ -188,10 +188,10 @@ export default function Component({ isCollapsed, isMobile = false }: SideNavProp
           </Button>
         </div>
         <Link
-          href="/account"
+          href="/my/account"
           className={`w-full text-left py-2 px-4 flex items-center text-muted-foreground hover:text-secondary-foreground hover:bg-secondary mt-2 rounded-md ${
             isCollapsed && !isMobile ? 'justify-center' : ''
-          } ${pathname === '/account' ? 'bg-secondary text-secondary-foreground' : ''}`}
+          } ${pathname === '/my/account' ? 'bg-secondary text-secondary-foreground' : ''}`}
           aria-label="Account"
         >
           <User className="w-5 h-5" />

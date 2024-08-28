@@ -8,7 +8,6 @@ export const config = {
   matcher: [
     /*
      * Match all request paths except for the ones starting with:
-     * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
@@ -17,7 +16,7 @@ export const config = {
      * - sitemap.xml (SEO)
      */
     {
-      source: '/((?!api|_next/static|_next/image|assets/|robots.txt|favicon.ico|sitemap.xml).*)',
+      source: '/((?!_next/static|_next/image|assets/|robots.txt|favicon.ico|sitemap.xml).*)',
       missing: [
         { type: 'header', key: 'next-router-prefetch' },
         { type: 'header', key: 'purpose', value: 'prefetch' },
@@ -55,8 +54,6 @@ export async function middleware(request: NextRequest) {
       }
     }
   );
-
-  await supabase.auth.getUser();
 
   return supabaseResponse;
 }
