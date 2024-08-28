@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
       ...persona,
       image_url:  image_url,
     });
-  };
+  }
 
   return NextResponse.json(output);
 }

@@ -9,12 +9,12 @@ import {
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { PersonaInformation } from "@/types/persona";
+import { PersonaListOutRecord } from "@/types/api/persona";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 interface CustomerPersonaCardProps {
-  persona: PersonaInformation["v1_short"];
+  persona: PersonaListOutRecord;
 }
 
 export default function Component({ persona }: CustomerPersonaCardProps) {
