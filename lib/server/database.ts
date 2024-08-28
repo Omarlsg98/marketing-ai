@@ -2,6 +2,7 @@ import { createServerSupabaseClient, getSession } from "@/lib/server/supabase";
 import { PersonaInformation } from "@/types/persona";
 import { Database } from "@/types/supabase";
 import { AuthError, PostgrestError } from "@supabase/supabase-js";
+import { cookies } from "next/headers";
 import { v4 as uuidv4 } from "uuid";
 
 type questionType = Database["public"]["Tables"]["questions"]["Row"];
@@ -29,8 +30,12 @@ const handleError: (error: PostgrestError | AuthError | null) => boolean = (
 };
 
 export const getUserId = async () => {
-  const session = await getSession();
-  return session?.id;
+  let session = await getSession();
+  if (!session) {
+    throw new Error("No session found for " + cookies().getAll);
+  }
+
+  return session.id;
 };
 
 export const getLastMessages: (chatId: string) => any = async (chatId) => {
