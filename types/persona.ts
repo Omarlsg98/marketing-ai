@@ -18,7 +18,7 @@ export type PersonaInformation = {
     profile: {
       demographics: string[];
       psychographics: string[];
-      goalsPaintPoints: string[];
+      goalsPainPoints: string[];
     };
     discovery: {
       informationSeekingBehavior: string[];

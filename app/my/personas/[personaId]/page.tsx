@@ -10,21 +10,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RefreshCw, Upload } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { Suspense, useEffect, useRef, useState } from "react";
 
-import CustomerJourneyDiscovery from "@/components/customer-journey/CustomerJourneyDiscovery";
-import CustomerJourneyEvaluation from "@/components/customer-journey/CustomerJourneyEvaluation";
-import CustomerJourneyPostPurchase from "@/components/customer-journey/CustomerJourneyPostPurchase";
-import CustomerJourneyProfile from "@/components/customer-journey/CustomerJourneyProfile";
-import CustomerJourneyPurchase from "@/components/customer-journey/CustomerJourneyPurchase";
-
+import CustomerJourneyTabComponent from "@/components/customer-journey/CustomerJourneyTab";
+import { CustomerJourneyInfo } from "@/lib/personaConstants";
 import { PersonaInformation } from "@/types/persona";
-type TabName =
-  | "profile"
-  | "discovery"
-  | "evaluation"
-  | "purchase"
-  | "post-purchase";
+
 
 export default function Component({
   params,
@@ -37,21 +28,74 @@ export default function Component({
   const [personaInformation, setPersonaInformation] = useState<
     PersonaInformation["v1"]
   >({
-    id: "",
-    name: "John Doe",
-    short_description: "Tech enthusiast and software engineer",
-    finished: false,
-    chat_progress: 0,
-    primary_goal: "...",
-    key_challenge: "...",
-    main_buying_motivation: "...",
-    image_path: "",
-    about_me: "I'm your wonderful persona... loading..",
+    id: "loading...",
+    name: "loading...",
+    short_description: "loading...",
+    finished: true,
+    chat_progress: 100,
+    primary_goal: "loading...",
+    key_challenge: "loading...",
+    main_buying_motivation: "loading...",
+    image_path: "loading...",
+    about_me: "loading...",
+    gender: "loading...",
+    ethnicity: "loading...",
+    location: "loading...",
+    occupation: "loading...",
+    profile: {
+      demographics: ["loading..."],
+      psychographics: ["loading..."],
+      goalsPainPoints: ["loading..."],
+    },
+    discovery: {
+      informationSeekingBehavior: ["loading..."],
+      preferredContentTypes: ["loading..."],
+      engagementPreferences: ["loading..."],
+      influentialFactors: ["loading..."],
+      primarySources: ["loading..."],
+      initialExpectations: ["loading..."],
+    },
+    evaluation: {
+      comparisonCriteria: ["loading..."],
+      preferredComparisonMethods: ["loading..."],
+      influentialFactors: ["loading..."],
+      primarySources: ["loading..."],
+      engagementPreferences: ["loading..."],
+      painPointsInEvaluation: ["loading..."],
+      decisionCriteria: ["loading..."],
+    },
+    purchase: {
+      decisionMakingProcess: ["loading..."],
+      preferredPurchasingChannels: ["loading..."],
+      influentialFactors: ["loading..."],
+      painPointsInPurchasing: ["loading..."],
+      riskConsiderations: ["loading..."],
+      supportAndAssuranceNeeds: ["loading..."],
+      expectationsPostPurchase: ["loading..."],
+    },
+    implementation: {
+      setupProcess: ["loading..."],
+      preferredOnboardingMethods: ["loading..."],
+      potentialBarriers: ["loading..."],
+      supportNeeds: ["loading..."],
+      resourceUtilization: ["loading..."],
+      successCriteria: ["loading..."],
+      feedbackMechanisms: ["loading..."],
+    },
+    renewal: {
+      renewalCriteria: ["loading..."],
+      preferredRenewalMethods: ["loading..."],
+      supportNeedsDuringRenewal: ["loading..."],
+      incentivesForRenewal: ["loading..."],
+      challengesInRenewal: ["loading..."],
+      feedbackAndImprovement: ["loading..."],
+      loyaltyAndEngagement: ["loading..."],
+    },
   });
 
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [isImagePopupOpen, setIsImagePopupOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabName>("profile");
+  const [activeTab, setActiveTab] = useState<number>(0);
   const [imageGenOptions, setImageGenOptions] = useState({
     ethnicity: "",
     style: "realistic",
@@ -60,7 +104,7 @@ export default function Component({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    // Fetch persona image
+    // Fetch persona
     const fetchPersona = async () => {
       const response = await fetch(`/api/persona/${params.personaId}`);
       const data = await response.json();
@@ -131,204 +175,188 @@ export default function Component({
     }
   };
 
-  const tabContent: Record<TabName, React.ReactNode> = {
-    profile: <CustomerJourneyProfile personaInformation={personaInformation} />,
-    discovery: (
-      <CustomerJourneyDiscovery personaInformation={personaInformation} />
-    ),
-    evaluation: (
-      <CustomerJourneyEvaluation personaInformation={personaInformation} />
-    ),
-    purchase: (
-      <CustomerJourneyPurchase personaInformation={personaInformation} />
-    ),
-    "post-purchase": (
-      <CustomerJourneyPostPurchase personaInformation={personaInformation} />
-    ),
-  };
-
   return (
-    <div className="flex-1 overflow-y-auto bg-white rounded-lg">
-      <div className="p-6">
-        <div className="mb-6 flex flex-col lg:flex-row gap-6">
-          {/* Left column: Persona's image and info */}
-          <div className="w-full lg:w-96 flex-shrink-0">
-            <div className="mb-4 overflow-hidden rounded-lg shadow">
-              <img
-                src={personaImage}
-                alt="Persona portrait"
-                className="h-96 w-full object-cover"
-              />
-            </div>
-            <div className="flex gap-4 mb-6">
-              <Button
-                className="flex-1"
-                onClick={() => setIsImagePopupOpen(true)}
-              >
-                <RefreshCw className="mr-2 h-4 w-4" />
-                Generate New Image
-              </Button>
-              <Button
-                variant="secondary"
-                className="flex-1"
-                onClick={handleUploadClick}
-              >
-                <Upload className="mr-2 h-4 w-4" />
-                Upload Image
-              </Button>
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileChange}
-                accept="image/*"
-                className="hidden"
-              />
-            </div>
-            <div className="p-6 bg-white rounded-lg shadow">
-              <h2 className="mb-2 text-2xl font-bold">
-                {personaInformation.name}
-              </h2>
-              <p className="mb-4 text-sm text-muted-foreground">
-                {personaInformation.short_description}
-              </p>
-              <div className="space-y-2">
-                <p>
-                  <strong>Gender:</strong> Male
-                </p>
-                <p>
-                  <strong>Ethnicity:</strong> Caucasian
-                </p>
-                <p>
-                  <strong>Location:</strong> San Francisco, USA
-                </p>
-                <p>
-                  <strong>Occupation:</strong> Software Engineer
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Right column: About Me */}
-          <div className="w-full lg:flex-1 lg:min-w-[400px]">
-            <div className="h-full p-6 bg-white rounded-lg shadow">
-              <h2 className="mb-4 text-2xl font-bold">About Me</h2>
-              <div className="space-y-4 text-muted-foreground">
-                {personaInformation.about_me &&
-                  personaInformation.about_me
-                    .split("\n")
-                    .map((paragraph, index) => <p key={index}>{paragraph}</p>)}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Tabs */}
-        <div className="mb-8">
-          <div className="flex flex-wrap bg-muted p-1 rounded-lg">
-            {(
-              [
-                "profile",
-                "discovery",
-                "evaluation",
-                "purchase",
-                "post-purchase",
-              ] as TabName[]
-            ).map((tab) => (
-              <Button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                variant={activeTab === tab ? "default" : "ghost"}
-                className="flex-grow sm:flex-grow-0"
-              >
-                {tab
-                  .split("-")
-                  .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-                  .join(" ")}
-              </Button>
-            ))}
-          </div>
-          <div className="mt-4 p-4 bg-white rounded-lg shadow">
-            {tabContent[activeTab]}
-          </div>
-        </div>
-      </div>
-
-      {/* Image Generation Popup */}
-      {isImagePopupOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-background rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">
-              Generate New Persona Image
-            </h2>
-            <p className="mb-4 text-muted-foreground">
-              Customize the options below to generate a new image for your
-              persona.
-            </p>
-            <div className="space-y-4">
-              <div>
-                <label
-                  htmlFor="ethnicity"
-                  className="block text-sm font-medium mb-1"
-                >
-                  Ethnicity
-                </label>
-                <Input
-                  id="ethnicity"
-                  value={imageGenOptions.ethnicity}
-                  onChange={(e) =>
-                    setImageGenOptions({
-                      ...imageGenOptions,
-                      ethnicity: e.target.value,
-                    })
-                  }
+    <Suspense fallback={<div>Loading...</div>}>
+      <div className="flex-1 overflow-y-auto bg-white rounded-lg">
+        <div className="p-6">
+          <div className="mb-6 flex flex-col lg:flex-row gap-6">
+            {/* Left column: Persona's image and info */}
+            <div className="w-full lg:w-96 flex-shrink-0">
+              <div className="mb-4 overflow-hidden rounded-lg shadow">
+                <img
+                  src={personaImage}
+                  alt="Persona portrait"
+                  className="h-96 w-full object-cover"
                 />
               </div>
-              <div>
-                <label
-                  htmlFor="style"
-                  className="block text-sm font-medium mb-1"
+              <div className="flex gap-4 mb-6">
+                <Button
+                  className="flex-1"
+                  onClick={() => setIsImagePopupOpen(true)}
                 >
-                  Style
-                </label>
-                <Select
-                  disabled={true}
-                  value={imageGenOptions.style}
-                  onValueChange={(value) =>
-                    setImageGenOptions({ ...imageGenOptions, style: value })
-                  }
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  Generate New Image
+                </Button>
+                <Button
+                  variant="secondary"
+                  className="flex-1"
+                  onClick={handleUploadClick}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a style" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="realistic">Realistic</SelectItem>
-                    <SelectItem value="cartoon">Cartoon</SelectItem>
-                    <SelectItem value="anime">Anime</SelectItem>
-                  </SelectContent>
-                </Select>
+                  <Upload className="mr-2 h-4 w-4" />
+                  Upload Image
+                </Button>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  accept="image/*"
+                  className="hidden"
+                />
+              </div>
+              <div className="p-6 bg-white rounded-lg shadow">
+                <h2 className="mb-2 text-2xl font-bold">
+                  {personaInformation.name}
+                </h2>
+                <p className="mb-4 text-sm text-muted-foreground">
+                  {personaInformation.short_description}
+                </p>
+                <div className="space-y-2">
+                  <p>
+                    <strong>Gender:</strong> {personaInformation.gender}
+                  </p>
+                  <p>
+                    <strong>Ethnicity:</strong>  {personaInformation.ethnicity}
+                  </p>
+                  <p>
+                    <strong>Location:</strong> {personaInformation.location}
+                  </p>
+                  <p>
+                    <strong>Occupation:</strong> {personaInformation.occupation}
+                  </p>
+                </div>
               </div>
             </div>
-            <div className="mt-6 flex justify-end space-x-4">
-              <Button
-                variant="outline"
-                onClick={() => setIsImagePopupOpen(false)}
-              >
-                Cancel
-              </Button>
-              <Button onClick={generateNewImage} disabled={isGeneratingImage}>
-                {isGeneratingImage ? (
-                  <>
-                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  "Generate"
-                )}
-              </Button>
+
+            {/* Right column: About Me */}
+            <div className="w-full lg:flex-1 lg:min-w-[400px]">
+              <div className="h-full p-6 bg-white rounded-lg shadow">
+                <h2 className="mb-4 text-2xl font-bold">About Me</h2>
+                <div className="space-y-4 text-muted-foreground">
+                  {personaInformation.about_me &&
+                    personaInformation.about_me
+                      .split("\n")
+                      .map((paragraph, index) => (
+                        <p key={index}>{paragraph}</p>
+                      ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Tabs */}
+          <div className="mb-8">
+            <div className="flex flex-wrap bg-muted p-1 rounded-lg">
+              {CustomerJourneyInfo.map((tab, tabIndex) => (
+                console.log(tab, tabIndex),
+                <Button
+                  key={tab.title}
+                  onClick={() => setActiveTab(tabIndex)}
+                  variant={activeTab === tabIndex ? "default" : "ghost"}
+                  className="flex-grow sm:flex-grow-0"
+                >
+                  {tab.title
+                    .split("-")
+                    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(" ")}
+                </Button>
+              ))}
+            </div>
+            <div className="mt-4 p-4 bg-white rounded-lg shadow">
+              <CustomerJourneyTabComponent 
+                personaInformation={personaInformation} 
+                currentTabInfo={CustomerJourneyInfo[activeTab]}
+              />
             </div>
           </div>
         </div>
-      )}
-    </div>
+
+        {/* Image Generation Popup */}
+        {isImagePopupOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+            <div className="bg-background rounded-lg p-6 w-full max-w-md">
+              <h2 className="text-xl font-bold mb-4">
+                Generate New Persona Image
+              </h2>
+              <p className="mb-4 text-muted-foreground">
+                Customize the options below to generate a new image for your
+                persona.
+              </p>
+              <div className="space-y-4">
+                <div>
+                  <label
+                    htmlFor="ethnicity"
+                    className="block text-sm font-medium mb-1"
+                  >
+                    Ethnicity
+                  </label>
+                  <Input
+                    id="ethnicity"
+                    value={imageGenOptions.ethnicity}
+                    onChange={(e) =>
+                      setImageGenOptions({
+                        ...imageGenOptions,
+                        ethnicity: e.target.value,
+                      })
+                    }
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="style"
+                    className="block text-sm font-medium mb-1"
+                  >
+                    Style
+                  </label>
+                  <Select
+                    disabled={true}
+                    value={imageGenOptions.style}
+                    onValueChange={(value) =>
+                      setImageGenOptions({ ...imageGenOptions, style: value })
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a style" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="realistic">Realistic</SelectItem>
+                      <SelectItem value="cartoon">Cartoon</SelectItem>
+                      <SelectItem value="anime">Anime</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="mt-6 flex justify-end space-x-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsImagePopupOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button onClick={generateNewImage} disabled={isGeneratingImage}>
+                  {isGeneratingImage ? (
+                    <>
+                      <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    "Generate"
+                  )}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </Suspense>
   );
 }

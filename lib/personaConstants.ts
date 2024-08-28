@@ -1,11 +1,73 @@
-interface CustomerJourneyInfoInterface {
+import { PersonaInformation } from "@/types/persona";
+
+export interface CustomerJourneyInfoInterface {
   title: string;
-  dataFieldName: string;
+  dataFieldName:
+    | "profile"
+    | "discovery"
+    | "evaluation"
+    | "purchase"
+    | "implementation"
+    | "renewal";
   sections: {
     title: string;
     description: string;
-    icon: string;
-    dataFieldName: string;
+    icon:
+      | "user"
+      | "brain"
+      | "heart"
+      | "search"
+      | "file"
+      | "chat"
+      | "star"
+      | "book"
+      | "lightbulb"
+      | "balance-scale"
+      | "chart-bar"
+      | "frown"
+      | "check"
+      | "shopping-cart"
+      | "exclamation-triangle"
+      | "life-ring"
+      | "clock"
+      | "cogs"
+      | "users"
+      | "comments"
+      | "redo"
+      | "refresh"
+      | "gift"
+      | "ban"
+      | "heart"
+      | "check-square"
+      | "frown"
+      | "star"
+      | "chat"
+      | "book"
+      | "search"
+      | "balance-scale"
+      | "chart-bar"
+      | "star"
+      | "book"
+      | "chat"
+      | "frown"
+      | "check"
+      | "life-ring"
+      | "clock"
+      | "redo"
+      | "refresh"
+      | "life-ring"
+      | "gift"
+      | "frown"
+      | "comments"
+      | "heart";
+
+    dataFieldName:
+      | keyof PersonaInformation["v1"]["profile"]
+      | keyof PersonaInformation["v1"]["discovery"]
+      | keyof PersonaInformation["v1"]["evaluation"]
+      | keyof PersonaInformation["v1"]["purchase"]
+      | keyof PersonaInformation["v1"]["implementation"]
+      | keyof PersonaInformation["v1"]["renewal"];
   }[];
 }
 
@@ -31,7 +93,7 @@ export const CustomerJourneyInfo: CustomerJourneyInfoInterface[] = [
         title: "Goals & Pain Points",
         description: "Describe the persona's goals and pain points.",
         icon: "heart",
-        dataFieldName: "goalsPaintPoints",
+        dataFieldName: "goalsPainPoints",
       },
     ],
   },
