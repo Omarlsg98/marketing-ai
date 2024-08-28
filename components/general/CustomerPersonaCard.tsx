@@ -9,12 +9,12 @@ import {
 } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { PersonaInformation } from "@/types/persona";
+import { PersonaListOutRecord } from "@/types/api/persona";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 interface CustomerPersonaCardProps {
-  persona: PersonaInformation["v1_short"];
+  persona: PersonaListOutRecord;
 }
 
 export default function Component({ persona }: CustomerPersonaCardProps) {
@@ -33,7 +33,7 @@ export default function Component({ persona }: CustomerPersonaCardProps) {
         <CardHeader className="flex flex-col items-center space-y-4 px-8 pt-8">
           <Avatar className="h-32 w-32">
             <AvatarImage
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image%207-87GGH2i2fz32bZgVTGAUCwAud8Vs1T.png"
+              src={ persona.image_url || "/placeholder.svg?height=400&width=400"}
               alt={persona.name}
             />
             <AvatarFallback>BB</AvatarFallback>

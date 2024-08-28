@@ -21,5 +21,6 @@ export type PersonaInformation = {
       primaryGoal: string;
       keyChallenge: string;
       mainBuyingMotivation: string;
+      image_path: string;
     };
 };

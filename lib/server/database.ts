@@ -252,7 +252,8 @@ export const getPersonas: (
     llm_chats(progress),
     primaryGoal: information->>primaryGoal,
     keyChallenge: information->>keyChallenge,
-    mainBuyingMotivation: information->>mainBuyingMotivation
+    mainBuyingMotivation: information->>mainBuyingMotivation,
+    image_path
     `
     )
     .order("finished", { ascending: false })
