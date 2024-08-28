@@ -26,6 +26,15 @@ ALTER TABLE public.persona ADD COLUMN finished boolean NOT NULL DEFAULT false;
 
 ALTER TABLE public.persona ADD COLUMN image_path text;
 ALTER TABLE public.persona ADD COLUMN coverage real DEFAULT 0;
+
+ALTER TABLE public.persona ADD COLUMN primary_goal text;
+ALTER TABLE public.persona ADD COLUMN key_challenge text;
+ALTER TABLE public.persona ADD COLUMN main_buying_motivation text;
+ALTER TABLE public.persona ADD COLUMN gender text;
+ALTER TABLE public.persona ADD COLUMN ethnicity text;
+ALTER TABLE public.persona ADD COLUMN location text;
+ALTER TABLE public.persona ADD COLUMN occupation text;
+
 ALTER TABLE public.persona ADD COLUMN information JSONB;
 ALTER TABLE public.persona ADD COLUMN information_version public.persona_info_version DEFAULT 'v1';
 
