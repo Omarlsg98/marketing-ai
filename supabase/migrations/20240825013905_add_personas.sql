@@ -46,7 +46,7 @@ ALTER TABLE public.llm_chats ADD progress real NOT NULL DEFAULT 0;
 ALTER TABLE public.llm_chats DROP COLUMN persona_id;
 
 --RLS policies
-CREATE POLICY "Can insert own user data" ON public.persona FOR SELECT USING ((auth.uid() = user_id));
+CREATE POLICY "Can insert own user data" ON public.persona FOR INSERT WITH CHECK ((auth.uid() = user_id));
 
 --for storage
 INSERT INTO storage.buckets (id, name, created_at, updated_at) VALUES ('persona_images', 'persona_images', now(), now());

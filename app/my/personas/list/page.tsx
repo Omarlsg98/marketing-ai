@@ -2,6 +2,7 @@
 
 import CustomerPersonaCard from "@/components/general/CustomerPersonaCard";
 import { PersonaListOut } from "@/types/api/persona";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Component() {
@@ -46,7 +47,16 @@ export default function Component() {
           <div className="mb-8">
             <div className="mt-4 p-4 bg-white rounded-lg">
               {loading && <p>Loading...</p>}
-              {!loading && <PersonaOverview />}
+              {!loading &&  personas.length > 0 &&<PersonaOverview />}
+              {!loading && personas.length === 0 && (
+                <div className="items-center">
+                <h4  className="text-l text-gray-800">No personas found. Create a new persona to get started.</h4>
+                <br />
+                <Link href="/my/personas/create" className="bg-[#75C5D5] text-white px-4 py-2 rounded-md w-full sm:w-auto">
+                  Create Persona 
+                </Link>
+               </div>
+              )}
             </div>
           </div>
         </section>

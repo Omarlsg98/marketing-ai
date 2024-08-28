@@ -231,7 +231,7 @@ export const getAgentAnswer: (
   question: questionType | null;
   actionTakenMessage: string;
 }> = async (chat, userMessage, prevQuestion) => {
-  const { outstandingQuestions, answeredQuestions, lastMessages } =
+  const { outstandingQuestions, userAnswers, lastMessages } =
     await getAllQuestionsInfo(chat, true);
 
   let agentAction: agentActionType = agentActions[0];
@@ -288,12 +288,14 @@ export const getAgentAnswer: (
   if (chatIsNew) {
     chat.context = 'This is the beginning of the conversation. ';
   }
-  chat.progress = answeredQuestions.length / (answeredQuestions.length + outstandingQuestions.length) * 100;
+
+  const userAnswersLength = userAnswers?.length || 0;
+  chat.progress = userAnswersLength / (userAnswersLength + outstandingQuestions.length) * 100;
   chat.last_question_id = nextQuestion?.id || null;
 
   await updateRecord('llm_chats', chat);
   return {
-    messageAgent: newMessage,
+    messageAgent: newMessage.replace("Ethan:", ""), //failsafe to remove the name
     role: agentAction['role'],
     question: nextQuestion,
     actionTakenMessage: `You decided to ${agentAction.name}`
