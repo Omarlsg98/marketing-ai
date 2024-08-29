@@ -35,11 +35,18 @@ export async function PUT(req: NextRequest,
 ) {
   const requestBody = await req.json();
 
+
   const personaId = params.personaId;
 
   const {chat} = await getChat(personaId);
   const userAnswers = await getUserAnswers(chat.id);
   const persona = await getPersonaFormatted(personaId);
+  
+  if (persona.finished && requestBody.force !== true) {
+    return NextResponse.json({
+      output: "Persona already generated",
+    });
+  }
 
   // use persona creator agent to get all information for persona
   // transform answers in sections
