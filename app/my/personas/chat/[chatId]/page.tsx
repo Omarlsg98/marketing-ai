@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/select";
 import { ChatGetOut, ChatSendOut } from "@/types/api/chat";
 import { Database } from "@/types/supabase";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { ChangeEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
 
 type Message = Database["public"]["Tables"]["llm_messages"]["Row"];
@@ -348,10 +348,11 @@ export default function Component({ params }: { params: { chatId: string } }) {
   const handleViewPersona = async () => {
     console.log('Generating persona...');
     const data = await fetch(`/api/persona/${params.chatId}`, {
-      method: "PUT"
+      method: "PUT",
+      body: JSON.stringify({}),
     });
     const response = await data.json();
-    router.push(`/my/personas/${response.id}`);
+    router.push(`/my/personas/${params.chatId}`);
   };
 
   return (
