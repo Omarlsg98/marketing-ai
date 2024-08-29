@@ -186,7 +186,7 @@ export const getPersonaInformation = async (
             let resultsArray = results[i].split('\n');
             resultsArray = resultsArray.filter((result) => result.length > 0);
             // remove bullet points
-            resultsArray = resultsArray.map((result) => result.replace(/^\s*[•\*-]\s*/, ''));
+            resultsArray = resultsArray.map((result) => result.replace(/^\s*[•*-]\s*/, ''));
             resultsArray = resultsArray.map((result) => result.trim());
             if (!newPersonaInformation['information'][tabField]) {
                 newPersonaInformation['information'][tabField] = {};

@@ -80,7 +80,7 @@ const getIcon = (icon: CustomerJourneyInfoInterface['sections'][0]['icon']) => {
       return <Scale className="h-5 w-5" />;
     default:
       return <Activity className="h-5 w-5" />;
-    };
+    }
 }
 
 ListItem.displayName = "ListItem";
@@ -152,11 +152,9 @@ interface CustomerJourneyTabProps {
 const sectionToCardData = (
   sections: CustomerJourneyInfoInterface["sections"],
   personaInformation: PersonaInformation["v1"],
-  dataFieldName: string
+  dataFieldName: CustomerJourneyInfoInterface["dataFieldName"]
 ): CardData[] => {
   return sections.map((section) => {
-    console.log(dataFieldName);
-    console.log(section.dataFieldName);
     const content =
       hasProperty(personaInformation, dataFieldName) &&
       hasProperty(personaInformation[dataFieldName], section.dataFieldName)
@@ -168,8 +166,8 @@ const sectionToCardData = (
       icon: section.icon,
       content,
     };
-  });
-};
+  })
+}
 
 export default function CustomerJourneyTabComponent({
   currentTabInfo,
