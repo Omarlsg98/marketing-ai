@@ -1,8 +1,8 @@
 import {
-    getChat,
-    getPersonaRecord,
-    getUserId,
-    updateRecord,
+  getChat,
+  getPersonaRecord,
+  getUserId,
+  updateRecord,
 } from "@/lib/server/database";
 import { sendChatGPT, sendDalle } from "@/lib/server/llms";
 import prompts from "@/lib/server/persona/prompts";
@@ -52,11 +52,11 @@ export async function POST(req: NextRequest) {
     const ethnicity = formData.get("ethnicity") as string;
     const context = chat.context + " The user says the customer has the following ethnicity: " + ethnicity;
 
-    const promptMainDescription = prompts.getMainDescriptionPrompt(context);
-    const promptApparel = prompts.getApparelPrompt(context);
+    const promptMainDescription = prompts.image.getMainDescriptionPrompt(context);
+    const promptApparel = prompts.image.getApparelPrompt(context);
     const description = await sendChatGPT(promptMainDescription, 200);
     const apparel = await sendChatGPT(promptApparel, 200);
-    const fullPrompt = prompts.getGenerateImagePrompt(description, apparel);
+    const fullPrompt = prompts.image.getGenerateImagePrompt(description, apparel);
     const b64JsonData = await sendDalle(fullPrompt);
     image = b64ToFile(b64JsonData, "persona.png", "image/png");
   }

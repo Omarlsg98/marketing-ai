@@ -59,19 +59,19 @@ export default function Component({ persona }: CustomerPersonaCardProps) {
             <h3 className="text-sm font-semibold uppercase text-muted-foreground">
               Primary Goal
             </h3>
-            <p>{persona.primaryGoal || "N/A"}</p>
+            <p>{persona.primary_goal || "N/A"}</p>
           </div>
           <div className="space-y-2">
             <h3 className="text-sm font-semibold uppercase text-muted-foreground">
               Key Challenge
             </h3>
-            <p>{persona.keyChallenge || "N/A"}</p>
+            <p>{persona.key_challenge || "N/A"}</p>
           </div>
           <div className="space-y-2">
             <h3 className="text-sm font-semibold uppercase text-muted-foreground">
               Main Buying Motivation
             </h3>
-            <p>{persona.mainBuyingMotivation || "N/A"}</p>
+            <p>{persona.main_buying_motivation || "N/A"}</p>
           </div>
         </CardContent>
         <CardFooter className="flex flex-col items-start px-8 pb-8 pt-6">

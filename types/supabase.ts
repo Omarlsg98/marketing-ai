@@ -224,14 +224,21 @@ export type Database = {
           coverage: number | null
           created_at: string
           deleted_at: string | null
+          ethnicity: string | null
           finished: boolean
+          gender: string | null
           id: string
           image_path: string | null
           information: Json | null
           information_version:
             | Database["public"]["Enums"]["persona_info_version"]
             | null
+          key_challenge: string | null
+          location: string | null
+          main_buying_motivation: string | null
           name: string
+          occupation: string | null
+          primary_goal: string | null
           short_description: string
           updated_at: string
           user_id: string
@@ -242,14 +249,21 @@ export type Database = {
           coverage?: number | null
           created_at?: string
           deleted_at?: string | null
+          ethnicity?: string | null
           finished?: boolean
+          gender?: string | null
           id: string
           image_path?: string | null
           information?: Json | null
           information_version?:
             | Database["public"]["Enums"]["persona_info_version"]
             | null
+          key_challenge?: string | null
+          location?: string | null
+          main_buying_motivation?: string | null
           name: string
+          occupation?: string | null
+          primary_goal?: string | null
           short_description?: string
           updated_at?: string
           user_id: string
@@ -260,14 +274,21 @@ export type Database = {
           coverage?: number | null
           created_at?: string
           deleted_at?: string | null
+          ethnicity?: string | null
           finished?: boolean
+          gender?: string | null
           id?: string
           image_path?: string | null
           information?: Json | null
           information_version?:
             | Database["public"]["Enums"]["persona_info_version"]
             | null
+          key_challenge?: string | null
+          location?: string | null
+          main_buying_motivation?: string | null
           name?: string
+          occupation?: string | null
+          primary_goal?: string | null
           short_description?: string
           updated_at?: string
           user_id?: string
