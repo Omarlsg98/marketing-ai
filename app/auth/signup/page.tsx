@@ -6,87 +6,119 @@ import { Label } from "@/components/ui/label"
 import { Eye, EyeOff } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { FormEvent, useEffect, useState } from 'react'
-
+import { FormEvent, useEffect, useState, useMemo, useCallback } from 'react'
 import { createClient } from '@/lib/client/supabase'
 import { useRouter } from 'next/navigation'
 
+// Create Supabase client outside the component
+const supabase = createClient()
+
+// Custom debounce function
+function debounce<T extends (...args: any[]) => any>(func: T, wait: number): (...args: Parameters<T>) => void {
+  let timeout: NodeJS.Timeout | null = null
+  return (...args: Parameters<T>) => {
+    if (timeout) clearTimeout(timeout)
+    timeout = setTimeout(() => func(...args), wait)
+  }
+}
+
+// Custom hook for form validation
+function useFormValidation() {
+  const validateForm = useCallback((name: string, email: string, password: string, confirmPassword: string) => {
+    const errors: { [key: string]: string } = {}
+    
+    if (name.length < 2) {
+      errors.name = 'Name must be at least 2 characters long'
+    }
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+    if (!emailRegex.test(email)) {
+      errors.email = 'Please enter a valid email address'
+    }
+
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,}$/
+    if (!passwordRegex.test(password)) {
+      errors.password = 'Password must be at least 8 characters long and include an uppercase letter, a number, and a symbol'
+    }
+
+    if (password !== confirmPassword) {
+      errors.confirmPassword = 'Passwords do not match'
+    }
+
+    return {
+      errors,
+      isValid: Object.keys(errors).length === 0
+    }
+  }, [])
+
+  return useMemo(() => debounce(validateForm, 300), [validateForm])
+}
+
 export default function SignUpPage() {
-  const router = useRouter();
-  const supabase = createClient();
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
+  const router = useRouter()
+  const validateForm = useFormValidation()
+  
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  })
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [nameError, setNameError] = useState('')
-  const [emailError, setEmailError] = useState('')
-  const [passwordError, setPasswordError] = useState('')
-  const [confirmPasswordError, setConfirmPasswordError] = useState('')
+  const [errors, setErrors] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  })
   const [isFormValid, setIsFormValid] = useState(false)
 
-  const validateName = (name: string) => {
-    return name.length >= 2
-  }
-
-  const validateEmail = (email: string) => {
-    const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
-    return re.test(String(email).toLowerCase())
-  }
-
-  const validatePassword = (password: string) => {
-    const re = /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,}$/
-    return re.test(password)
-  }
-
   useEffect(() => {
-    if (name && !validateName(name)) {
-      setNameError('Name must be at least 2 characters long')
-    } else {
-      setNameError('')
-    }
+    const { name, email, password, confirmPassword } = formData
+    validateForm(name, email, password, confirmPassword, (result) => {
+      setErrors(result.errors)
+      setIsFormValid(result.isValid)
+    })
+  }, [formData, validateForm])
 
-    if (email && !validateEmail(email)) {
-      setEmailError('Please enter a valid email address')
-    } else {
-      setEmailError('')
-    }
-
-    if (password && !validatePassword(password)) {
-      setPasswordError('Password must be at least 8 characters long and include an uppercase letter, a number, and a symbol')
-    } else {
-      setPasswordError('')
-    }
-
-    if (confirmPassword && password !== confirmPassword) {
-      setConfirmPasswordError('Passwords do not match')
-    } else {
-      setConfirmPasswordError('')
-    }
-
-    setIsFormValid(validateName(name) && validateEmail(email) && validatePassword(password) && password === confirmPassword)
-  }, [name, email, password, confirmPassword]) 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     if (isFormValid) {
-      // Handle form submission
-      const { data, error } = await supabase.auth.signUp({
-        email: email,
-        password: password,
-        options: {
-          emailRedirectTo: 'http://localhost:3000/dashboard'
+      try {
+        const { data, error } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            data: {
+              full_name: formData.name
+            },
+            emailRedirectTo: `${window.location.origin}/auth/callback`
+          }
+        })
+
+        if (error) {
+          console.error('Error signing up:', error.message)
+          alert(`Sign up failed: ${error.message}`)
+        } else {
+          console.log('Sign up successful', data)
+          if (data.user?.confirmationSentAt) {
+            alert('Please check your email to confirm your account before logging in.')
+          } else {
+            router.push('/my/personas')
+          }
         }
-      });
-
-      if (error) {
-        console.error('Error signing up:', error.message)
-        throw error;
+      } catch (err) {
+        console.error('Unexpected error during sign up:', err)
+        alert('An unexpected error occurred. Please try again.')
       }
-
-      console.log('Form submitted')
-      router.push('/my/personas');
+    } else {
+      alert('Please fill out all fields correctly before submitting.')
     }
   }
 
@@ -94,11 +126,11 @@ export default function SignUpPage() {
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-md shadow-sm">
         <div className="text-center">
-          <Image src="/logo-icon.svg" alt="Logo" width={64} height={64} className="mx-auto mb-4" />
+          <Image src="/logo.png" alt="Interseed Logo" width={64} height={64} className="mx-auto mb-4" />
           <h1 className="text-4xl font-bold text-gray-900">Create an account</h1>
           <p className="mt-2 text-sm text-gray-600">
             {"Already have an account? "}
-            <Link href="/auth/login" className="font-medium text-indigo-600 hover:text-indigo-500 hover:underline">
+            <Link href="/auth/login" className="font-medium text-primary hover:text-primary/90 hover:underline">
               Sign in here
             </Link>
           </p>
@@ -115,29 +147,29 @@ export default function SignUpPage() {
               type="text"
               autoComplete="name"
               required
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 hover:border-indigo-400 transition duration-150 ease-in-out sm:text-sm"
+              className="mt-1"
               placeholder="Full Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={formData.name}
+              onChange={handleInputChange}
             />
-            {nameError && <p className="mt-2 text-sm text-red-600">{nameError}</p>}
+            {errors.name && <p className="mt-2 text-sm text-red-600">{errors.name}</p>}
           </div>
           <div>
-            <Label htmlFor="email-address" className="block text-sm font-medium text-gray-700">
+            <Label htmlFor="email" className="block text-sm font-medium text-gray-700">
               Email address
             </Label>
             <Input
-              id="email-address"
+              id="email"
               name="email"
               type="email"
               autoComplete="email"
               required
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 hover:border-indigo-400 transition duration-150 ease-in-out sm:text-sm"
+              className="mt-1"
               placeholder="Email address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={formData.email}
+              onChange={handleInputChange}
             />
-            {emailError && <p className="mt-2 text-sm text-red-600">{emailError}</p>}
+            {errors.email && <p className="mt-2 text-sm text-red-600">{errors.email}</p>}
           </div>
           <div>
             <Label htmlFor="password" className="block text-sm font-medium text-gray-700">
@@ -150,10 +182,10 @@ export default function SignUpPage() {
                 type={showPassword ? 'text' : 'password'}
                 autoComplete="new-password"
                 required
-                className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 hover:border-indigo-400 transition duration-150 ease-in-out sm:text-sm"
+                className="pr-10"
                 placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                value={formData.password}
+                onChange={handleInputChange}
               />
               <button
                 type="button"
@@ -167,23 +199,23 @@ export default function SignUpPage() {
                 )}
               </button>
             </div>
-            {passwordError && <p className="mt-2 text-sm text-red-600">{passwordError}</p>}
+            {errors.password && <p className="mt-2 text-sm text-red-600">{errors.password}</p>}
           </div>
           <div>
-            <Label htmlFor="confirm-password" className="block text-sm font-medium text-gray-700">
+            <Label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
               Confirm Password
             </Label>
             <div className="mt-1 relative rounded-md shadow-sm">
               <Input
-                id="confirm-password"
-                name="confirm-password"
+                id="confirmPassword"
+                name="confirmPassword"
                 type={showConfirmPassword ? 'text' : 'password'}
                 autoComplete="new-password"
                 required
-                className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 hover:border-indigo-400 transition duration-150 ease-in-out sm:text-sm"
+                className="pr-10"
                 placeholder="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
+                value={formData.confirmPassword}
+                onChange={handleInputChange}
               />
               <button
                 type="button"
@@ -197,12 +229,12 @@ export default function SignUpPage() {
                 )}
               </button>
             </div>
-            {confirmPasswordError && <p className="mt-2 text-sm text-red-600">{confirmPasswordError}</p>}
+            {errors.confirmPassword && <p className="mt-2 text-sm text-red-600">{errors.confirmPassword}</p>}
           </div>
           <div>
             <Button
               type="submit"
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out"
+              className="w-full"
               disabled={!isFormValid}
             >
               Sign up
@@ -219,7 +251,7 @@ export default function SignUpPage() {
             </div>
           </div>
           <div className="mt-6 flex justify-center space-x-4">
-            <Button variant="outline" className="w-12 h-12 rounded-full p-0 flex items-center justify-center hover:bg-gray-50 transition duration-150 ease-in-out">
+            <Button variant="outline" className="w-12 h-12 rounded-full p-0">
               <svg className="w-5 h-5" viewBox="0 0 24 24">
                 <path
                   fill="currentColor"
@@ -239,19 +271,14 @@ export default function SignUpPage() {
                 />
               </svg>
             </Button>
-            <Button variant="outline" className="w-12 h-12 rounded-full p-0 flex items-center justify-center hover:bg-gray-50 transition duration-150 ease-in-out">
+            <Button variant="outline" className="w-12 h-12 rounded-full p-0">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.164 6.839 9.49.5.09.682-.218.682-.486 0-.236-.008-.864-.013-1.695-2.782.602-3.369-1.34-3.369-1.34-.454-1.157-1.11-1.465-1.11-1.465-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.592 1.028 2.683 0 3.841-2.337 4.687-4.565 4.935.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12c0-5.523-4.477-10-10-10z" />
               </svg>
             </Button>
-            <Button variant="outline" className="w-12 h-12 rounded-full p-0 flex items-center justify-center hover:bg-gray-50 transition duration-150 ease-in-out">
+            <Button variant="outline" className="w-12 h-12 rounded-full p-0">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-              </svg>
-            </Button>
-            <Button variant="outline" className="w-12 h-12 rounded-full p-0 flex items-center justify-center hover:bg-gray-50 transition duration-150 ease-in-out">
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M21.35 11.1h-9.17v2.73h6.51c-.33 3.81-3.5 5.44-6.5 5.44C8.36 19.27 5 16.25 5 12c0-4.1 3.2-7.27 7.2-7.27 3.09 0 4.9 1.97 4.9 1.97L19 4.72S16.56 2 12.1 2C6.42 2 2.03 6.8 2.03 12c0 5.05 4.13 10 10.22 10 5.35 0 9.25-3.67 9.25-9.09 0-1.15-.15-1.81-.15-1.81z" />
               </svg>
             </Button>
           </div>
