@@ -1,5 +1,5 @@
 import { getChat, getPersonaFormatted, getUserAnswers, updateRecord } from "@/lib/server/database";
-import { getPersonaInformation } from "@/lib/server/persona/customerJourneyBuilder";
+import { getPersonaInformation } from "@/lib/server/generation/customerJourneyBuilder";
 import { getFileUrl } from "@/lib/server/supabase";
 import { NextRequest, NextResponse } from "next/server";
 

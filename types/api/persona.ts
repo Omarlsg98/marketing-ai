@@ -1,4 +1,4 @@
-import { PersonaInformation } from "../persona";
+import { PersonaInformation } from "../database";
 
 export type PersonaListOutRecord = PersonaInformation['v1_short'] & {image_url: string};
 export type PersonaListOut = (PersonaListOutRecord)[] ;

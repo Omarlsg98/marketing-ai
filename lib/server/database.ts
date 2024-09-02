@@ -1,5 +1,5 @@
 import { createServerSupabaseClient, getSession } from "@/lib/server/supabase";
-import { PersonaInformation } from "@/types/persona";
+import { PersonaInformation } from "@/types/interseed/persona";
 import { Database } from "@/types/supabase";
 import { AuthError, PostgrestError } from "@supabase/supabase-js";
 import { cookies } from "next/headers";

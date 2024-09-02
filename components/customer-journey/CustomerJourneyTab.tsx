@@ -20,7 +20,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { hasProperty } from "@/lib/utils";
-import { PersonaInformation } from "@/types/persona";
+import { PersonaInformation } from "@/types/interseed/persona";
 
 import {
   Activity,
@@ -40,7 +40,7 @@ import {
 } from "lucide-react";
 import React, { useCallback, useEffect, useState } from "react";
 
-import { CustomerJourneyInfoInterface } from "@/lib/personaConstants";
+import { CustomerJourneyInfoInterface } from "@/lib/constants/personaConstants";
 
 interface ListItemProps {
   term: string;

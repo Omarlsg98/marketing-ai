@@ -1,3 +1,7 @@
+/* This file is generated manually from the database schema. 
+  * It is used to generate types for the API and components.
+*/
+
 export type PersonaInformation = {
 
   v1: {

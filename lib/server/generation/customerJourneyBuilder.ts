@@ -1,7 +1,7 @@
-import { CustomerJourneyInfo } from "@/lib/personaConstants";
+import { CustomerJourneyInfo } from "@/lib/constants/personaConstants";
+import prompts from "@/lib/server/generation/prompts";
 import { sendChatGPT } from "@/lib/server/llms";
-import prompts from "@/lib/server/persona/prompts";
-import { PersonaInformation } from "@/types/persona";
+import { PersonaInformation } from "@/types/interseed/persona";
 import { Database } from "@/types/supabase";
 
 

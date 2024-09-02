@@ -4,8 +4,8 @@ import {
   getUserId,
   updateRecord,
 } from "@/lib/server/database";
+import prompts from "@/lib/server/generation/prompts";
 import { sendChatGPT, sendDalle } from "@/lib/server/llms";
-import prompts from "@/lib/server/persona/prompts";
 import { uploadFile } from "@/lib/server/supabase";
 import { NextRequest, NextResponse } from "next/server";
 

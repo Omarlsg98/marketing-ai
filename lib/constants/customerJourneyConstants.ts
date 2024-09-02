@@ -1,4 +1,5 @@
-import { PersonaInformation } from "@/types/persona";
+import { cardIcons } from "@/types/components/card";
+import { PersonaInformation } from "@/types/interseed/persona";
 
 export interface CustomerJourneyInfoInterface {
   title: string;
@@ -12,55 +13,7 @@ export interface CustomerJourneyInfoInterface {
   sections: {
     title: string;
     description: string;
-    icon:
-      | "user"
-      | "brain"
-      | "heart"
-      | "search"
-      | "file"
-      | "chat"
-      | "star"
-      | "book"
-      | "lightbulb"
-      | "balance-scale"
-      | "chart-bar"
-      | "frown"
-      | "check"
-      | "shopping-cart"
-      | "exclamation-triangle"
-      | "life-ring"
-      | "clock"
-      | "cogs"
-      | "users"
-      | "comments"
-      | "redo"
-      | "refresh"
-      | "gift"
-      | "ban"
-      | "heart"
-      | "check-square"
-      | "frown"
-      | "star"
-      | "chat"
-      | "book"
-      | "search"
-      | "balance-scale"
-      | "chart-bar"
-      | "star"
-      | "book"
-      | "chat"
-      | "frown"
-      | "check"
-      | "life-ring"
-      | "clock"
-      | "redo"
-      | "refresh"
-      | "life-ring"
-      | "gift"
-      | "frown"
-      | "comments"
-      | "heart";
-
+    icon: cardIcons;
     dataFieldName:
       | keyof PersonaInformation["v1"]["profile"]
       | keyof PersonaInformation["v1"]["discovery"]

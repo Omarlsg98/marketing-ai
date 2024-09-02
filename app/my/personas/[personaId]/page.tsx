@@ -13,8 +13,8 @@ import { RefreshCw, Upload } from "lucide-react";
 import React, { Suspense, useEffect, useRef, useState } from "react";
 
 import CustomerJourneyTabComponent from "@/components/customer-journey/CustomerJourneyTab";
-import { CustomerJourneyInfo } from "@/lib/personaConstants";
-import { PersonaInformation } from "@/types/persona";
+import { CustomerJourneyInfo } from "@/lib/constants/personaConstants";
+import { PersonaInformation } from "@/types/interseed/persona";
 
 
 export default function Component({

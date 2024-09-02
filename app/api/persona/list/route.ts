@@ -1,7 +1,7 @@
 import { getPersonas } from "@/lib/server/database";
 import { getFileUrl } from "@/lib/server/supabase";
 import { PersonaListOut } from "@/types/api/persona";
-import { PersonaInformation } from "@/types/persona";
+import { PersonaInformation } from "@/types/interseed/persona";
 import { NextRequest, NextResponse } from "next/server";
 
 export const maxDuration = 300;

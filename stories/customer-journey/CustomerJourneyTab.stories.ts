@@ -1,5 +1,5 @@
 import CustomerJourneyTabComponent from "@/components/customer-journey/CustomerJourneyTab";
-import { CustomerJourneyInfo } from "@/lib/personaConstants";
+import { CustomerJourneyInfo } from "@/lib/constants/personaConstants";
 import type { Meta, StoryObj } from "@storybook/react";
 
 const personaInformationExample = {
