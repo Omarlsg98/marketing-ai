@@ -1,7 +1,7 @@
 "use client";
 
 import "@/app/globals.css";
-import Header from "@/components/chat-components/Header";
+import Header from "@/components/general/Header";
 import SideNav from "@/components/general/SideNav";
 import { ReactNode, useState } from "react";
 
