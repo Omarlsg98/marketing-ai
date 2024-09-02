@@ -1,100 +1,111 @@
-"use client"
+"use client";
 
-import { useState, useRef, KeyboardEvent } from 'react'
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Send, Paperclip, Upload, X } from 'lucide-react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Button } from "@/components/ui/button";
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { Paperclip, Send, Upload, X } from "lucide-react";
+import { ChangeEvent, DragEvent, KeyboardEvent, useRef, useState } from "react";
 
 interface ChatInputProps {
-  onSendMessage: (content: string) => void
-  onFileUpload: (file: File) => void
+  onSendMessage: (content: string) => void;
+  onFileUpload: (file: File) => void;
 }
 
-const ALLOWED_FILE_TYPES = ".png,.jpg,.jpeg,.svg,.txt,.doc,.docx,.xls,.xlsx,.pdf"
-const MAX_FILE_SIZE = 10 * 1024 * 1024 // 10MB
+const ALLOWED_FILE_TYPES =
+  ".png,.jpg,.jpeg,.svg,.txt,.doc,.docx,.xls,.xlsx,.pdf";
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
 export function ChatInput({ onSendMessage, onFileUpload }: ChatInputProps) {
-  const [input, setInput] = useState('')
-  const [isDraggingFile, setIsDraggingFile] = useState(false)
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [toastMessage, setToastMessage] = useState<string | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [input, setInput] = useState("");
+  const [isDraggingFile, setIsDraggingFile] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleSendMessage = () => {
     if (input.trim()) {
-      onSendMessage(input)
-      setInput('')
+      onSendMessage(input);
+      setInput("");
     }
-  }
+  };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault()
-      handleSendMessage()
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
     }
-  }
+  };
 
   const showToast = (message: string) => {
-    setToastMessage(message)
-    setTimeout(() => setToastMessage(null), 3000)
-  }
+    setToastMessage(message);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
 
   const validateFile = (file: File): boolean => {
-    const fileExtension = file.name.split('.').pop()?.toLowerCase()
+    const fileExtension = file.name.split(".").pop()?.toLowerCase();
     if (!fileExtension || !ALLOWED_FILE_TYPES.includes(`.${fileExtension}`)) {
-      showToast("Invalid file type. Please upload a supported file type.")
-      return false
+      showToast("Invalid file type. Please upload a supported file type.");
+      return false;
     }
     if (file.size > MAX_FILE_SIZE) {
-      showToast("File too large. Please upload a file smaller than 10MB.")
-      return false
+      showToast("File too large. Please upload a file smaller than 10MB.");
+      return false;
     }
-    return true
-  }
+    return true;
+  };
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
+  const handleFileSelect = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
     if (files && files.length > 0) {
       if (validateFile(files[0])) {
-        setSelectedFile(files[0])
+        setSelectedFile(files[0]);
       }
     }
-  }
+  };
 
   const handleFileUpload = () => {
     if (selectedFile) {
-      onFileUpload(selectedFile)
-      setIsDialogOpen(false)
-      setSelectedFile(null)
+      onFileUpload(selectedFile);
+      setIsDialogOpen(false);
+      setSelectedFile(null);
     }
-  }
+  };
 
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDraggingFile(true)
-  }
+  const handleDragOver = (e: DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingFile(true);
+  };
 
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDraggingFile(false)
-  }
+  const handleDragLeave = (e: DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingFile(false);
+  };
 
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsDraggingFile(false)
-    const files = e.dataTransfer.files
+  const handleDrop = (e: DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingFile(false);
+    const files = e.dataTransfer.files;
     if (files && files.length > 0) {
       if (validateFile(files[0])) {
-        setSelectedFile(files[0])
+        setSelectedFile(files[0]);
       }
     }
-  }
+  };
 
   return (
     <div className="p-4 relative">
@@ -103,8 +114,8 @@ export function ChatInput({ onSendMessage, onFileUpload }: ChatInputProps) {
           {toastMessage}
         </div>
       )}
-      <div 
-        className={`flex flex-col items-stretch rounded-lg p-2 ${isDraggingFile ? 'border-2 border-dashed' : 'border'}`}
+      <div
+        className={`flex flex-col items-stretch rounded-lg p-2 ${isDraggingFile ? "border-2 border-dashed" : "border"}`}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
@@ -122,12 +133,22 @@ export function ChatInput({ onSendMessage, onFileUpload }: ChatInputProps) {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Button variant="outline" size="icon" onClick={() => setIsDialogOpen(true)}>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setIsDialogOpen(true)}
+                  >
                     <Paperclip className="h-4 w-4" />
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="top" align="start" className="bg-popover p-2 rounded-md shadow-md">
-                  <p className="text-sm font-medium">Attach a file (max 10MB)</p>
+                <TooltipContent
+                  side="top"
+                  align="start"
+                  className="bg-popover p-2 rounded-md shadow-md"
+                >
+                  <p className="text-sm font-medium">
+                    Attach a file (max 10MB)
+                  </p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -144,8 +165,8 @@ export function ChatInput({ onSendMessage, onFileUpload }: ChatInputProps) {
             <DialogTitle>Upload File</DialogTitle>
           </DialogHeader>
           <div className="grid w-full gap-4">
-            <div 
-              className={`border-2 border-dashed rounded-lg p-8 text-center ${selectedFile ? 'bg-secondary' : ''}`}
+            <div
+              className={`border-2 border-dashed rounded-lg p-8 text-center ${selectedFile ? "bg-secondary" : ""}`}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
@@ -153,14 +174,20 @@ export function ChatInput({ onSendMessage, onFileUpload }: ChatInputProps) {
               {selectedFile ? (
                 <div className="flex items-center justify-between">
                   <span>{selectedFile.name}</span>
-                  <Button variant="ghost" size="sm" onClick={() => setSelectedFile(null)}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedFile(null)}
+                  >
                     <X className="h-4 w-4" />
                   </Button>
                 </div>
               ) : (
                 <>
                   <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                  <p className="mt-2">Drag and drop a file here, or click to select a file</p>
+                  <p className="mt-2">
+                    Drag and drop a file here, or click to select a file
+                  </p>
                 </>
               )}
             </div>
@@ -181,5 +208,5 @@ export function ChatInput({ onSendMessage, onFileUpload }: ChatInputProps) {
         </DialogContent>
       </Dialog>
     </div>
-  )
+  );
 }
