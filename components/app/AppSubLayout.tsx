@@ -1,10 +1,9 @@
 "use client";
 import config from "@/config";
-import { DarkModeContext } from "@/store/context/DarkModeContext";
 import cx from "classnames";
 import PlausibleProvider from "next-plausible";
 import { Inter } from "next/font/google";
-import { FC, ReactNode, useContext } from "react";
+import { FC, ReactNode } from "react";
 import GTMProvider from "../GTMProvider/GTMProvider";
 import ClientLayout from "../LayoutClient";
 
@@ -15,12 +14,11 @@ interface AppSubLayoutProps {
 }
 
 const AppSubLayout: FC<AppSubLayoutProps> = ({ children }) => {
-  const { isDarkMode } = useContext(DarkModeContext);
 
   return (
     <html
       lang="en"
-      data-theme={isDarkMode ? "dark" : "light"}
+      data-theme="light"
       className={cx(font.className, "h-[100%]")}
     >
       {config.domainName && (
