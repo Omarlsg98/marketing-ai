@@ -1,9 +1,9 @@
 'use client';
 
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Home() {
   const router = useRouter();
