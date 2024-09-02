@@ -15,6 +15,16 @@ yarn run dev
 yarn run build
 ```
 
+## Adding UI components
+
+- Add components and pages in the components directory. 
+- Don't hardcode any data in the components, use props instead.
+- Don't put the page components in the app directory, put them in the components directory. The app directory is only for the layout, routing, and business logic.
+- Add a .stories.ts file per component in the stories directory.
+
+Use `yarn run storybook` to view the components in isolation, test, debug and document them.
+
+
 ## Managing Supabase
 
 ```bash
