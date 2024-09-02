@@ -2218,7 +2218,7 @@
     "@radix-ui/react-separator" "1.1.0"
     "@radix-ui/react-toggle-group" "1.1.0"
 
-"@radix-ui/react-tooltip@latest":
+"@radix-ui/react-tooltip@^1.1.2", "@radix-ui/react-tooltip@latest":
   version "1.1.2"
   resolved "https://registry.npmjs.org/@radix-ui/react-tooltip/-/react-tooltip-1.1.2.tgz"
   integrity sha512-9XRsLwe6Yb9B/tlnYCPVUd/TFS4J7HuOZW345DCeC6vKIxQGMZdx21RK4VoZauPD5frgkXTYVS5y90L+3YBn4w==
