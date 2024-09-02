@@ -118,7 +118,7 @@ export type Database = {
           description: string | null
           id: string
           last_question_id: number | null
-          persona_id: string | null
+          progress: number
           status: Database["public"]["Enums"]["chat_status"]
           title: string
           updated_at: string
@@ -132,7 +132,7 @@ export type Database = {
           description?: string | null
           id: string
           last_question_id?: number | null
-          persona_id?: string | null
+          progress?: number
           status?: Database["public"]["Enums"]["chat_status"]
           title: string
           updated_at?: string
@@ -146,7 +146,7 @@ export type Database = {
           description?: string | null
           id?: string
           last_question_id?: number | null
-          persona_id?: string | null
+          progress?: number
           status?: Database["public"]["Enums"]["chat_status"]
           title?: string
           updated_at?: string
@@ -158,13 +158,6 @@ export type Database = {
             columns: ["last_question_id"]
             isOneToOne: false
             referencedRelation: "questions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "llm_chats_persona_id_fkey"
-            columns: ["persona_id"]
-            isOneToOne: false
-            referencedRelation: "persona"
             referencedColumns: ["id"]
           },
           {
@@ -226,36 +219,88 @@ export type Database = {
       }
       persona: {
         Row: {
-          about_me: string
+          about_me: string | null
+          chat_id: string
+          coverage: number | null
           created_at: string
           deleted_at: string | null
+          ethnicity: string | null
+          finished: boolean
+          gender: string | null
           id: string
-          image_link: string
+          image_path: string | null
+          information: Json | null
+          information_version:
+            | Database["public"]["Enums"]["persona_info_version"]
+            | null
+          key_challenge: string | null
+          location: string | null
+          main_buying_motivation: string | null
           name: string
+          occupation: string | null
+          primary_goal: string | null
+          short_description: string
           updated_at: string
           user_id: string
         }
         Insert: {
-          about_me: string
+          about_me?: string | null
+          chat_id: string
+          coverage?: number | null
           created_at?: string
           deleted_at?: string | null
+          ethnicity?: string | null
+          finished?: boolean
+          gender?: string | null
           id: string
-          image_link: string
+          image_path?: string | null
+          information?: Json | null
+          information_version?:
+            | Database["public"]["Enums"]["persona_info_version"]
+            | null
+          key_challenge?: string | null
+          location?: string | null
+          main_buying_motivation?: string | null
           name: string
+          occupation?: string | null
+          primary_goal?: string | null
+          short_description?: string
           updated_at?: string
           user_id: string
         }
         Update: {
-          about_me?: string
+          about_me?: string | null
+          chat_id?: string
+          coverage?: number | null
           created_at?: string
           deleted_at?: string | null
+          ethnicity?: string | null
+          finished?: boolean
+          gender?: string | null
           id?: string
-          image_link?: string
+          image_path?: string | null
+          information?: Json | null
+          information_version?:
+            | Database["public"]["Enums"]["persona_info_version"]
+            | null
+          key_challenge?: string | null
+          location?: string | null
+          main_buying_motivation?: string | null
           name?: string
+          occupation?: string | null
+          primary_goal?: string | null
+          short_description?: string
           updated_at?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "persona_chat_id_fkey"
+            columns: ["chat_id"]
+            isOneToOne: false
+            referencedRelation: "llm_chats"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "persona_user_id_fkey"
             columns: ["user_id"]
@@ -581,6 +626,7 @@ export type Database = {
         | "cancelled"
         | "expired"
       message_role: "user" | "assistant" | "system"
+      persona_info_version: "v1"
       question_category: "Persona B2B" | "Persona B2C"
       question_sub_category:
         | "Decision-Making"

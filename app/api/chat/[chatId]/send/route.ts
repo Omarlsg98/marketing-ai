@@ -1,13 +1,13 @@
-import { Database } from '@/types/supabase';
-import { NextRequest, NextResponse } from 'next/server';
-import { getAgentAnswer } from '../../agent';
+import { getAgentAnswer } from '@/lib/server/chat/agent';
 import {
   getAllQuestion,
   getChat,
   getQuestionOptions,
   getUserId,
   insertRecord
-} from '../../database';
+} from '@/lib/server/database';
+import { Database } from '@/types/supabase';
+import { NextRequest, NextResponse } from 'next/server';
 export const maxDuration = 300;
 
 //Register messages from the AI, the user and the system
@@ -91,8 +91,7 @@ export async function POST(
     messageAgent, 
     role, 
     question, 
-    actionTakenMessage, 
-    outstandingQuestions } =
+    actionTakenMessage } =
     await getAgentAnswer(chat, userMessage, prevQuestion);
 
   let q_options = null;
@@ -113,6 +112,6 @@ export async function POST(
     output: newMessage,
     question: question,
     options: q_options,
-    progress: (1 - outstandingQuestions.length / questions.length) * 100
+    progress: chat.progress
   });
 }

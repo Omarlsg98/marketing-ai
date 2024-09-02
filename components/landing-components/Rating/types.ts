@@ -1,1 +1,0 @@
-export interface RatingProps { priority?: boolean }
