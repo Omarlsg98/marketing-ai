@@ -1,11 +1,11 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import { UserAvatar } from "@/components/ui/chat/UserAvatar"
-import { MessageBubble } from "@/components/ui/chat/MessageBubble"
-import { ChatInput } from "@/components/ui/chat/ChatInput"
-import { ResizableDivider } from "@/components/ui/chat/ResizableDivider"
-import { ComponentDisplay } from "@/components/ui/chat/ComponentDisplay"
+import { ChatInput } from "@/components/chat-components/ChatInput"
+import { ComponentDisplay } from "@/components/chat-components/ComponentDisplay"
+import { MessageBubble } from "@/components/chat-components/MessageBubble"
+import { ResizableDivider } from "@/components/chat-components/ResizableDivider"
+import { UserAvatar } from "@/components/chat-components/UserAvatar"
+import { useRef, useState } from 'react'
 
 export default function Chat() {
   const [chatWidth, setChatWidth] = useState(50) // 50% initial width
