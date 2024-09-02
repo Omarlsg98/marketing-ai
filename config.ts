@@ -3,12 +3,12 @@ import { ConfigProps } from "./types/config";
 
 const config = {
   // REQUIRED
-  appName: "NextStarterAI",
+  appName: "Interseed AI",
   // REQUIRED: a short description of your app for SEO tags (can be overwritten)
   appDescription:
-    "NextStarterAI: All in one development kit for your next project. Next.js, Tailwind CSS, Supabase, Stripe, Lemon Squeezy, and more.",
+    "Simplified Marketing",
   // REQUIRED (no https://, not trialing slash at the end, just the naked domain)
-  domainName: "nextstarter.ai",
+  domainName: "interseed.ai",
   crisp: {
     // Crisp website ID. IF YOU DON'T USE CRISP: just remove this => Then add a support email in this config file (mailgun.supportEmail) otherwise customer support won't work.
     id: "",

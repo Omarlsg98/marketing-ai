@@ -76,6 +76,7 @@ export default function SignUpPage() {
         email: email,
         password: password,
         options: {
+          data: { name: name },
           emailRedirectTo: 'http://localhost:3000/dashboard'
         }
       });
@@ -87,6 +88,8 @@ export default function SignUpPage() {
 
       console.log('Form submitted')
       router.push('/my/personas');
+    } else {
+      console.error('Form is not valid')
     }
   }
 

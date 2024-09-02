@@ -43,3 +43,4 @@ certificates
 
 
 yarn.lock
+*storybook.log
