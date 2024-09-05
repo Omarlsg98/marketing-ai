@@ -1,9 +1,10 @@
+// Chat.tsx
 'use client'
 
 import { ChatInput } from "@/components/chat-components/ChatInput"
-import { ComponentDisplay } from "@/components/chat-components/ComponentDisplay"
 import { MessageBubble } from "@/components/chat-components/MessageBubble"
 import { ResizableDivider } from "@/components/chat-components/ResizableDivider"
+import { RightPanel } from "@/components/chat-components/RightPanel"
 import { UserAvatar } from "@/components/chat-components/UserAvatar"
 import { useRef, useState } from 'react'
 
@@ -70,10 +71,10 @@ export default function Chat() {
 
       <ResizableDivider onResize={handleResize} />
 
-      <ComponentDisplay
-        chatWidth={chatWidth}
-        minChatWidth={300}
-      />
+      {/* Right Panel */}
+      <div className="flex-1 overflow-auto p-4">
+        <RightPanel />
+      </div>
     </div>
   )
 }
