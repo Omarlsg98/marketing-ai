@@ -102,3 +102,4 @@ export const uploadFile = async (bucket: string, name: string, file: File) => {
     data,
   };
 };
+

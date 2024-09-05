@@ -1,5 +1,5 @@
 import { createServerSupabaseClient, getSession } from "@/lib/server/supabase";
-import { PersonaInformation } from "@/types/interseed/persona";
+import { Chat, Message, PersonaInformation, Role } from "@/types/database";
 import { Database } from "@/types/supabase";
 import { AuthError, PostgrestError } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
@@ -421,4 +421,18 @@ export const getRecords: (table: tableType, id: string) => any = async (
 
   handleError(error);
   return data;
+};
+
+export const getNewMessage = function (
+  role: Role,
+  content: string,
+  chat: Chat
+): Message {
+  return {
+    chat_id: chat.id,
+    content: content,
+    id: 0,
+    role: role,
+    user_id: chat.user_id,
+  };
 };

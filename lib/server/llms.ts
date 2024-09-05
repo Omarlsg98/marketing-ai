@@ -8,6 +8,27 @@ export type llm_message = {
   content: string;
 };
 
+
+export const sendChatGPTUntilInteger = async (prompt: string, maxRetries: number) => {
+  let retries = maxRetries;
+  while (retries > 0) {
+    try {
+      let response = await sendChatGPT(prompt, 5);
+      // remove everythibg that is not a number
+      response = response.replace(/\D/g, "");
+      const responseInt = parseInt(response);
+      retries--;
+      if (!isNaN(responseInt)) {
+        return responseInt;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  throw new Error("Could not get a valid integer");
+};
+
+
 export const sendChatGPT: (
   prompt: string,
   maxTokens?: number,
