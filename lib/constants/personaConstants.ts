@@ -25,10 +25,6 @@ export interface PersonaInfoPartInterface {
 }
 
 
-export interface PersonaInfoInterface {
-  name: string;
-
-
 export const CustomerJourneyInfo: PersonaInfoInterface[] = [
   {
     title: "Profile",

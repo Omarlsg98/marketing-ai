@@ -1,10 +1,9 @@
 import { cardIcons } from "@/types/components/card";
-import { PersonaInformation } from "@/types/interseed/persona";
+import { PersonaInformation } from "@/types/database";
 
 export interface CustomerJourneyInfoInterface {
   title: string;
   dataFieldName:
-    | "profile"
     | "discovery"
     | "evaluation"
     | "purchase"
@@ -15,7 +14,6 @@ export interface CustomerJourneyInfoInterface {
     description: string;
     icon: cardIcons;
     dataFieldName:
-      | keyof PersonaInformation["v1"]["profile"]
       | keyof PersonaInformation["v1"]["discovery"]
       | keyof PersonaInformation["v1"]["evaluation"]
       | keyof PersonaInformation["v1"]["purchase"]
@@ -25,31 +23,6 @@ export interface CustomerJourneyInfoInterface {
 }
 
 export const CustomerJourneyInfo: CustomerJourneyInfoInterface[] = [
-  {
-    title: "Profile",
-    dataFieldName: "profile",
-    sections: [
-      {
-        title: "Demographics",
-        description:
-          "Describe the persona's demographic information. Like age, location, occupation, etc.",
-        icon: "user",
-        dataFieldName: "demographics",
-      },
-      {
-        title: "Psychographics",
-        description: "Describe the persona's psychological characteristics.",
-        icon: "brain",
-        dataFieldName: "psychographics",
-      },
-      {
-        title: "Goals & Pain Points",
-        description: "Describe the persona's goals and pain points.",
-        icon: "heart",
-        dataFieldName: "goalsPainPoints",
-      },
-    ],
-  },
   //DISCOVERY
   // Information Seeking Behavior: Describe how the customer searches for solutions or information related to their needs and goals.
   // Preferred Content Types: Identify the types of content the customer prefers during the discovery phase
