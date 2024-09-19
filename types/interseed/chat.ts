@@ -1,6 +1,21 @@
 import { ChatEditColumn } from "../components/chatTab";
 import { Chat, Message, Role } from "../database";
 
+import { z } from "zod";
+
+export const IterationAgentOutputSchema = z.object({
+  message: z.string().describe("The message to be sent to the user"),
+  shouldRegenerate: z
+    .boolean()
+    .describe("True if the agent should regenerate the UI components"),
+  imagePrompt: z
+    .string()
+    .optional()
+    .describe("If the agent is generating an image"),
+});
+
+export type IterationAgentOutput = z.infer<typeof IterationAgentOutputSchema>;
+
 export type Question = {
   id: number;
   question: string;
@@ -51,21 +66,20 @@ export type FlowOutput = {
   other?: any;
 };
 
-export type followUpPromptGenerator = (
+// A function that generates a follow-up prompt based on the current information
+export type IterationPromptBuilder = (
   input: FlowInput,
   currentInfo: ChatEditColumn,
-  editInfo?: ChatEditColumn
+  editInfo: ChatEditColumn
 ) => string;
 
-export type generationFunction = (input: FlowInput, prompt: string) => string;
+// A function that generates the actual message to be sent to the user
+export type InvokeIterationAgent = (prompt: string) => Promise<IterationAgentOutput>;
 
-export type formattingPromptGenerator = (
-  input: FlowInput,
-  currentInfo: ChatEditColumn,
-  sectionsToRegenerate: string[]
-) => string;
-
-export type formattingFunction = (
-  message: string,
-  formattingPrompt: string
-) => ChatEditColumn;
+// A function that formats that takes the message
+// and formats the object to be saved in the database
+export type ExtractFunction = (
+    input: FlowInput,
+    agentResponse: IterationAgentOutput,
+    currenInfo: ChatEditColumn
+) => Promise<ChatEditColumn>;

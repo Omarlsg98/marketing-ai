@@ -1,144 +1,201 @@
 // =========== Customer Journey Generation ===========
-const intro = `You are going to generate a customer journey map for a persona.
-This is an overview of everything that you discussed with the user to assist in this task
-Here you have both the context and the question that was asked to the user.
-`;
 
-const generalInstructions = `The information you provide will be used to 
-generate a customer journey map that will be displayed 
-on the persona's profile on a web page. This is not a conversation.
-Answer directly the question asked.
+import basePrompts from "@/lib/constants/prompts";
+import { ChatEditColumn, ChatEditColumnImage } from "@/types/components/chatTab";
+import { FlowInput, IterationAgentOutput, IterationPromptBuilder } from "@/types/interseed/chat";
+
+const personalityPrompt = basePrompts.personalityPrompt;
+
+const generalInstructions = `
+If you haven't addressed this topic in this format yet, Inform the
+user you are transitioning to this new topic and generate a first draft of 
+it now. You can add a brief explanation if needed.
+If you have already introduce this topic and the user asked you 
+clarifications, modifications or a totally different answer, please provide it now.
+Only generate the information of the topic if the user asked for it 
+or if it is necessary. 
+No need to generate all the information every time
+focus on what the user asked for or what is needed to continue the conversation.
+In general, try to address the user message as you would in a normal conversation.
+
+shouldRegenarate should be true if there are changes to the main information, 
+false otherwise (e.g. clarifications, followups, etc).
 Don't make any reference to this instructions.`;
 
-
-const getNamePrompt = (context: string, question: string) => { 
-  return `${intro}
-  ${context}
-
-  Given the previous context what is the name of the persona?
-  Only answer with a first name and a last name.
-  Ex: John Doe
-  ${generalInstructions}`;
-};
-const getAboutMePrompt = (context: string, question: string) => {
-  return `${intro}
-  ${context}
-
-  Given the previous context what is the about me of the persona?
-  Create one paragraph that describe the persona as a whole.
-  ${generalInstructions}`;
-};
-const getShortDescriptionPrompt = (context: string, question: string) => {
-  return `${intro}
-  ${context}
-
-  Given the previous context what is a short description of the persona?
-  Think of this as a tagline or subtitle for the persona.
-
-  Examples: 
-  - The young professional.
-  - The aspiring entrepreneur.
-
-  Keep it short! 1 sentence max!
-  ${generalInstructions}`;
+const infoToString = (currentInfo: Object | null, editInfo: Object | null) => {
+  let info = "";
+  if (currentInfo) {
+    info += `Your previous answer: ${JSON.stringify(currentInfo)}\n`;
+  } else {
+    info += "Your previous answer: You haven't provided any information yet for this topic.\n";
+  }
+  if (editInfo) {
+    info += `The User has made these modifications: ${JSON.stringify(editInfo)}\n`;
+  }
+  return info;
 };
 
-const getShortAnswerPrompt = (context: string, question: string) => {
-  return `${intro}
-  ${context}
+const personaSuggestionsPromptBuilder: IterationPromptBuilder = (
+  input: FlowInput,
+  currenInfo: ChatEditColumn,
+  editInfo: ChatEditColumn
+) => {
+  return `${personalityPrompt}
 
-  Given the previous context answer the following question:
-  ${question}
+${basePrompts.getContextFromInput(input)}
 
-  Be extremely concise and to the point.
-  Keep your answer to a single sentence.
-  Don't structure your answer as a full sentence.
-  ${generalInstructions}`;
-}
-const getOneWordAnswerPrompt = (context: string, question: string) => {
-  return `${intro}
-  ${context}
+You are assisting the user suggesting and brainstorming possible personas for their business.
 
-  Given the previous context answer the following question:
-  ${question}
+You will provide 3 different personas with a brief description of each one using the following template:
+Title: [Title] (i.e. "The Busy Mom", "The Young Professional")
+Who They Are: [Description] (keep it short and concise, less than 2 sentences)
+What They Need: [Description] (keep it short and concise, less than 2 sentences)
+Challenges: [Description] (keep it short and concise, less than 2 sentences)
 
-  Answer with a word max two words.
-  Don't structure your answer as a full sentence.
-  ${generalInstructions}`;
+${infoToString(currenInfo, editInfo)}
 
-};
-const getBulletPointsAnswerPrompt = (context: string, question: string) => {
-  return `${intro}
-  ${context}
-
-  Given the previous context answer the following question:
-  ${question}
-
-  Answer with 5 or less bullet points.
-  ex: 
-  * Bullet point 1
-  * Bullet point 2
-  * Bullet point 3
-
-  Keep the bullet points short and to the point. (less than 2 sentences)
-  If necessary, include bullet points with related questions guiding further research.
-  ${generalInstructions}`;
+${generalInstructions}`;
 };
 
-// ===========        Image Generation     ===========
-const getMainDescriptionPrompt = (context: string) => {
-  return `Context: ${context}
+const personaPromptBuilder: IterationPromptBuilder = (
+  input: FlowInput,
+  currenInfo: ChatEditColumn,
+  editInfo: ChatEditColumn
+) => {
+  return `${personalityPrompt}
 
-Giving the previous context of the subject generate a description like the following:
-Example: The image features an Asian female who appears to be in her late 20s. 
-The subject of the photo has long, straight black hair and presents with a 
-poised and confident demeanor.
+${basePrompts.getContextFromInput(input)}
 
-Keep it succinct and to the point, focusing on the most salient details of the subject's most probable appearance.
-Feel free to came up with details that are not present in the context, but that would make sense given the context.
-Keep it short just 1 or two sentences. Don't mention clothes.
-Answer only the question asked and don't make any reference to this instructions
-`;
+The user just chose a persona to work with. 
+
+You will now provide a detailed description of the persona using the following template:
+Name: [Name] (i.e. "Jane Doe")
+Title: [Title] (i.e. "The Busy Mom", "The Young Professional")
+Short Description: [Description] (keep it short and concise, less than 2 sentences)
+Demographics: [Demographics] (3-5 bullet points about the demographics of the persona)
+Psychographics: [Psychographics] (3-5 bullet points about the psychographics of the persona)
+Behavior: [Behavior] (3-5 bullet points about the behavior of the persona)
+Needs: [Needs] (3-5 bullet points about the needs of the persona)
+
+${infoToString(currenInfo, editInfo)}
+
+${generalInstructions}`;
 };
 
-const getApparelPrompt = (context: string) => {
-  return `${context}
 
-Giving the previous context of the subject generate a description of the apparel like the following:
-Example: She is wearing a deep blue blouse, which 
-offers a sharp contrast to the white backdrop and complements her light olive 
-skin tone. Accessories, such as a simple silver necklace, lend a touch of elegance to the portrait.
+const customerJourneyPromptBuilder: IterationPromptBuilder = (
+  input: FlowInput,
+  currenInfo: ChatEditColumn,
+  editInfo: ChatEditColumn
+) => {
+  return `${personalityPrompt}
 
-Keep it succinct and to the point, focusing on the most salient details of the subject's most probable wardrobe.
-Feel free to came up with details that are not present in the context, but that would make sense given the context.
-Keep it short, just 1 or two sentences. Focus only on clothes from the shoulders up.
-Answer only the question asked and don't make any reference to this instructions
-`;
+${basePrompts.getContextFromInput(input)}
+
+Given the persona you just created, you will now generate a customer journey map for them.
+
+You will now provide a detailed customer journey map for the persona using the following template:
+Awareness:
+  Trigger: [Trigger] (i.e. "Sees an ad on Facebook")
+  Touchpoints: [Touchpoints] (brief description of the touchpoints)
+  Action: [Action] (i.e. "Clicks on the ad")
+Consideration:
+  Research: [Research] (i.e. "Looks for reviews online")
+  Touchpoints: [Touchpoints] (brief description of the touchpoints)
+  Action: [Action] (i.e. "Adds to cart")
+Purchase:
+  Decision: [Decision] (i.e. "Decides to buy")
+  Touchpoints: [Touchpoints] (brief description of the touchpoints)
+  Action: [Action] (i.e. "Completes the purchase")
+Retention:
+  Engagement: [Engagement] (i.e. "Signs up for newsletter")
+  Touchpoints: [Touchpoints] (brief description of the touchpoints)
+  Action: [Action] (i.e. "Opens the email")
+Advocacy:
+  Satisfaction: [Satisfaction] (i.e. "Loves the product")
+  Touchpoints: [Touchpoints] (brief description of the touchpoints)
+  Action: [Action] (i.e. "Refers a friend")
+Summary: [Summary] (a summary of the customer journey as a short story)
+
+${infoToString(currenInfo, editInfo)}
+
+${generalInstructions}`;
 };
 
-const getGenerateImagePrompt = (mainDescription: string, apparel: string) => {
-  return `Create a professional headshot photograph set against a slightly grey background.
-${mainDescription}. The lighting is studio quality, providing a 
-flattering illumination to the subject's delicate facial features without 
-casting any distracting shadows. ${apparel}. The composition is tightly framed, 
-focusing on the subject from the shoulders up, which emphasizes her gentle smile. 
-The overall effect is one of polished professionalism, ideal for use in business 
-networking sites or company directories. Bright and well lit image
-`;
+const generateImagePromptBuilder: IterationPromptBuilder = (
+  input: FlowInput,
+  currenInfo: ChatEditColumn,
+  editInfo: ChatEditColumn
+) => {
+  const currenInfoObj = currenInfo as ChatEditColumnImage;
+  return `${personalityPrompt}
+  
+${basePrompts.getContextFromInput(input)}
+
+You are assisting the user in the generation of an image for their persona. 
+You will provide the prompt to generate the image.
+
+For the prompt use the following template taking into account 
+the conversation so far and the last persona discussed:
+
+Create a professional headshot of a(n) [ethnicity] [gender] in their 
+[age range] with [hair description]. They have a [demeanor] demeanor, wearing
+a [clothing description] in a [background description]. 
+The lighting is studio quality, highlighting their [facial features]. 
+The picture should be light and bright. They may wear [accessories]. 
+The composition is tightly framed from the shoulders up, emphasizing 
+their [expression]. The overall effect should be polished and professional, 
+suitable for [use case].
+
+${infoToString(currenInfoObj.imagePrompt, null)}
+
+${generalInstructions}`;
 };
 
+const aboutMePromptBuilder: IterationPromptBuilder = (
+  input: FlowInput,
+  currenInfo: ChatEditColumn,
+  editInfo: ChatEditColumn
+) => {
+  return `${personalityPrompt}
+
+${basePrompts.getContextFromInput(input)}
+
+Time to summarize the persona you have been working on for both the details
+and the customer journey in a big About Me section.
+
+You will generate a lengthy About Me of the persona using the following template:
+Meet [Name], the [Title]. 
+
+[Main Description summary]
+[Customer Journey Summary]
+
+Don't use bullet points, write it in a narrative form.
+
+${infoToString(currenInfo, editInfo)}
+
+${generalInstructions}`;
+};
+
+const formattingPromptBuilder = (
+  currentInfo: ChatEditColumn,
+  agentResponse: IterationAgentOutput) => {
+  const message = agentResponse.message;
+  return `${infoToString(currentInfo, null)}
+
+Given your current answer to the user:
+${message}
+
+Please convert the main information to JSON format.
+Prefer any information in the current answer over the your previous answer.
+If your current answer is partial complete it with the previous answer. 
+Don't make any reference to this instructions.`;
+};
 export default {
-  image: { 
-    getGenerateImagePrompt,
-    getApparelPrompt,
-    getMainDescriptionPrompt,
-  },
-  customerJourney: {
-    getShortAnswerPrompt,
-    getBulletPointsAnswerPrompt,
-    getOneWordAnswerPrompt,
-    getShortDescriptionPrompt,
-    getAboutMePrompt,
-    getNamePrompt,
-  },
+  personaSuggestionsPromptBuilder,
+  personaPromptBuilder,
+  customerJourneyPromptBuilder,
+  aboutMePromptBuilder,
+  generateImagePromptBuilder,
+  formattingPromptBuilder,
 };
