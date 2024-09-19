@@ -55,7 +55,12 @@ export type FlowInput = {
   chatState: ChatState;
   chat: Chat;
   lastMessages: Message[];
-  extraInfo: any;
+  extraInfo: {
+    saved?: boolean;
+    edited?: boolean;
+    modifications?: ChatEditColumn;
+    idChoice?: string;
+  };
 };
 
 export type FlowOutput = {

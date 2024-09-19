@@ -4,7 +4,7 @@ const ChatEditColumnPersonaSelectorSchema = z.object({
   personas: z
     .array(
       z.object({
-        id: z.number().optional().describe("To be assigned by the backend"),
+        id: z.string().optional().describe("To be assigned by the backend"),
         title: z
           .string()
           .describe(
@@ -29,10 +29,13 @@ const ChatEditColumnPersonaSelectorSchema = z.object({
 });
 
 const ChatEditColumnPersonaSchema = z.object({
+  id: z.string().optional().describe("To be assigned by the backend"),
   name: z.string().describe("The name of the persona. E.g. 'John Doe'"),
   title: z
     .string()
-    .describe("The title of the persona. E.g. 'The Startup Owner' or 'The Marketing Manager'"),
+    .describe(
+      "The title of the persona. E.g. 'The Startup Owner' or 'The Marketing Manager'"
+    ),
   shortDescription: z
     .string()
     .describe("A short description of the persona. Less than 2 or 3 sentences"),
@@ -58,8 +61,8 @@ const ChatEditColumnPersonaSchema = z.object({
     ),
 });
 
-
 const ChatEditColumnCustomerJourneySchema = z.object({
+  id: z.string().optional().describe("To be assigned by the backend"),
   awareness: z.object({
     trigger: z.string(),
     touchpoints: z.string(),
@@ -91,12 +94,14 @@ const ChatEditColumnCustomerJourneySchema = z.object({
 });
 
 const ChatEditColumnImageSchema = z.object({
+  id: z.string().optional().describe("To be assigned by the backend"),
   imagePrompt: z.string(),
   imageUrl: z.string().optional(),
   imageFile: z.instanceof(File).optional(),
 });
 
 const ChatEditColumnAboutMeSchema = z.object({
+  id: z.string().optional().describe("To be assigned by the backend"),
   aboutMe: z
     .string()
     .describe(

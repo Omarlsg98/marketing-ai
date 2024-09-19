@@ -1,9 +1,6 @@
 import prompts from "@/lib/server/generation/prompts";
 import { sendChatGPTJSON } from "@/lib/server/llms";
-import {
-  ChatEditColumn,
-  ChatEditColumnComponent,
-} from "@/types/components/chatTab";
+import { ChatEditColumnComponent } from "@/types/components/chatTab";
 import {
   ExtractFunction,
   FlowInput,
@@ -26,7 +23,7 @@ async function baseIterationFlow(
   extractFunction: ExtractFunction
 ): Promise<FlowOutput> {
   const chat = input.chat;
-  let newDisplayInfo = chat.display_info as ChatEditColumnComponent | null;
+  let newDisplayInfo = JSON.parse(chat.display_info as string) as ChatEditColumnComponent;
   const messages = input.lastMessages;
 
   let messagePrompt = "";
@@ -45,13 +42,24 @@ async function baseIterationFlow(
     chat.substep_id = null;
     chat.display_info = null;
 
-    messages.push(
-      getNewMessage(
-        "system",
-        "The user saved the output and wants to continue",
-        input.chat
-      )
-    );
+    if (newDisplayInfo.type === "multiple_persona") {
+      messages.push(
+        getNewMessage(
+          "system",
+          "The user chose one of the personas you provided and wants to continue",
+          input.chat
+        )
+      );
+      chat.object_context_id = input.extraInfo.idChoice;
+    } else {
+      messages.push(
+        getNewMessage(
+          "system",
+          "The user saved the output and wants to continue",
+          input.chat
+        )
+      );
+    }
 
     return {
       nextState: input.chatState.next,
@@ -61,7 +69,7 @@ async function baseIterationFlow(
     };
     // User edited the output, format the editions
   } else if (input.extraInfo && input.extraInfo.edited) {
-    const editInfo = input.extraInfo.modifications as ChatEditColumn;
+    const editInfo = input.extraInfo.modifications;
     const previousInfo = newDisplayInfo.current;
     newDisplayInfo.old = editInfo;
     messagePrompt = answerPromptBuilder(input, previousInfo, editInfo);
@@ -91,7 +99,7 @@ async function baseIterationFlow(
   }
 
   newDisplayInfo.current = output;
-  chat.display_info = newDisplayInfo;
+  chat.display_info = JSON.stringify(newDisplayInfo);
 
   return {
     nextState: chat.state, // stay in the same state

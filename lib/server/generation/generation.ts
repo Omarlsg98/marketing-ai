@@ -39,11 +39,20 @@ const extractPersonaSuggestions = async function (
   agentResponse: IterationAgentOutput,
   currentInfo: ChatEditColumn
 ): Promise<ChatEditColumnPersonaSelector> {
-  return await sendChatGPTJSON(
+  const personaSuggestions: ChatEditColumnPersonaSelector = await sendChatGPTJSON(
     prompts.formattingPromptBuilder(currentInfo, agentResponse),
     schemas.ChatEditColumnPersonaSelectorSchema,
     1000
   );
+
+  personaSuggestions.personas = personaSuggestions.personas.map((persona) => {
+    return {
+      id: uuidv4(),
+      ...persona,
+    };
+  });
+
+  return personaSuggestions;
 };
 
 const extractPersona = async function (
@@ -51,11 +60,15 @@ const extractPersona = async function (
   agentResponse: IterationAgentOutput,
   currentInfo: ChatEditColumn
 ): Promise<ChatEditColumnPersona> {
-  return await sendChatGPTJSON(
+  const persona: ChatEditColumnPersona = await sendChatGPTJSON(
     prompts.formattingPromptBuilder(currentInfo, agentResponse),
     schemas.ChatEditColumnPersonaSchema,
     1000
   );
+
+  persona.id = input.chat.object_context_id;
+
+  return persona;
 };
 
 const extractCustomerJourney = async function (
@@ -63,11 +76,16 @@ const extractCustomerJourney = async function (
   agentResponse: IterationAgentOutput,
   currentInfo: ChatEditColumn
 ): Promise<ChatEditColumnCustomerJourney> {
-  return await sendChatGPTJSON(
+
+  const customerJourney: ChatEditColumnCustomerJourney = await sendChatGPTJSON(
     prompts.formattingPromptBuilder(currentInfo, agentResponse),
     schemas.ChatEditColumnCustomerJourneySchema,
     1500
   );
+
+  customerJourney.id = input.chat.object_context_id;
+
+  return customerJourney;
 };
 
 const generateImage: ExtractFunction = async (
@@ -96,11 +114,15 @@ const extractAboutMe = async function (
   agentResponse: IterationAgentOutput,
   currentInfo: ChatEditColumn
 ): Promise<ChatEditColumnAboutMe> {
-  return await sendChatGPTJSON(
+  const aboutMe: ChatEditColumnAboutMe = await sendChatGPTJSON(
     prompts.formattingPromptBuilder(currentInfo, agentResponse),
     schemas.ChatEditColumnAboutMeSchema,
     1500
   );
+
+  aboutMe.id = input.chat.object_context_id;
+
+  return aboutMe;
 };
 
 export default {
