@@ -42,10 +42,8 @@ export type Database = {
           id: string
           information: Json | null
           persona_id: string
-          persona_version: number
           updated_at: string
           user_id: string
-          version: number
         }
         Insert: {
           author: Database["public"]["Enums"]["message_role"]
@@ -54,10 +52,8 @@ export type Database = {
           id: string
           information?: Json | null
           persona_id: string
-          persona_version: number
           updated_at?: string
           user_id: string
-          version?: number
         }
         Update: {
           author?: Database["public"]["Enums"]["message_role"]
@@ -66,20 +62,93 @@ export type Database = {
           id?: string
           information?: Json | null
           persona_id?: string
-          persona_version?: number
           updated_at?: string
           user_id?: string
-          version?: number
         }
         Relationships: [
           {
             foreignKeyName: "fk_customer_journey_persona_id"
-            columns: ["persona_id", "persona_version"]
+            columns: ["persona_id"]
             isOneToOne: false
             referencedRelation: "persona"
-            referencedColumns: ["id", "version"]
+            referencedColumns: ["id"]
           },
         ]
+      }
+      leads: {
+        Row: {
+          created_at: string
+          email: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+        }
+        Relationships: []
+      }
+      lemon_squeezy_customers: {
+        Row: {
+          customer_id: number | null
+          id: string
+        }
+        Insert: {
+          customer_id?: number | null
+          id: string
+        }
+        Update: {
+          customer_id?: number | null
+          id?: string
+        }
+        Relationships: []
+      }
+      lemon_squeezy_subscriptions: {
+        Row: {
+          cancelled: boolean | null
+          created_at: string
+          ends_at: string | null
+          id: number
+          metadata: Json | null
+          renews_at: string | null
+          status:
+            | Database["public"]["Enums"]["lemon_squeezy_subscription_status"]
+            | null
+          updated_at: string
+          user_id: string
+          variant_id: number | null
+        }
+        Insert: {
+          cancelled?: boolean | null
+          created_at?: string
+          ends_at?: string | null
+          id: number
+          metadata?: Json | null
+          renews_at?: string | null
+          status?:
+            | Database["public"]["Enums"]["lemon_squeezy_subscription_status"]
+            | null
+          updated_at?: string
+          user_id: string
+          variant_id?: number | null
+        }
+        Update: {
+          cancelled?: boolean | null
+          created_at?: string
+          ends_at?: string | null
+          id?: number
+          metadata?: Json | null
+          renews_at?: string | null
+          status?:
+            | Database["public"]["Enums"]["lemon_squeezy_subscription_status"]
+            | null
+          updated_at?: string
+          user_id?: string
+          variant_id?: number | null
+        }
+        Relationships: []
       }
       llm_chats: {
         Row: {
@@ -205,11 +274,10 @@ export type Database = {
           id: string
           image_path: string | null
           information: Json | null
-          name: string
-          short_description: string
+          is_suggestion: boolean | null
+          short_information: Json | null
           updated_at: string
           user_id: string
-          version: number
         }
         Insert: {
           about_me?: string | null
@@ -221,11 +289,10 @@ export type Database = {
           id: string
           image_path?: string | null
           information?: Json | null
-          name: string
-          short_description?: string
+          is_suggestion?: boolean | null
+          short_information?: Json | null
           updated_at?: string
           user_id: string
-          version?: number
         }
         Update: {
           about_me?: string | null
@@ -237,15 +304,96 @@ export type Database = {
           id?: string
           image_path?: string | null
           information?: Json | null
-          name?: string
-          short_description?: string
+          is_suggestion?: boolean | null
+          short_information?: Json | null
           updated_at?: string
           user_id?: string
-          version?: number
         }
         Relationships: [
           {
             foreignKeyName: "persona_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stripe_customers: {
+        Row: {
+          customer_id: string | null
+          id: string
+        }
+        Insert: {
+          customer_id?: string | null
+          id: string
+        }
+        Update: {
+          customer_id?: string | null
+          id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stripe_customers_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stripe_subscriptions: {
+        Row: {
+          cancel_at: string | null
+          cancel_at_period_end: boolean | null
+          canceled_at: string | null
+          created: string
+          current_period_end: string
+          current_period_start: string
+          ended_at: string | null
+          id: string
+          metadata: Json | null
+          price_id: string | null
+          status:
+            | Database["public"]["Enums"]["stripe_subscription_status"]
+            | null
+          user_id: string
+        }
+        Insert: {
+          cancel_at?: string | null
+          cancel_at_period_end?: boolean | null
+          canceled_at?: string | null
+          created?: string
+          current_period_end?: string
+          current_period_start?: string
+          ended_at?: string | null
+          id: string
+          metadata?: Json | null
+          price_id?: string | null
+          status?:
+            | Database["public"]["Enums"]["stripe_subscription_status"]
+            | null
+          user_id: string
+        }
+        Update: {
+          cancel_at?: string | null
+          cancel_at_period_end?: boolean | null
+          canceled_at?: string | null
+          created?: string
+          current_period_end?: string
+          current_period_start?: string
+          ended_at?: string | null
+          id?: string
+          metadata?: Json | null
+          price_id?: string | null
+          status?:
+            | Database["public"]["Enums"]["stripe_subscription_status"]
+            | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "users"

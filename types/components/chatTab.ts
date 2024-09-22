@@ -1,10 +1,10 @@
 import { z } from "zod";
+import { Role } from "../database";
 
 const ChatEditColumnPersonaSelectorSchema = z.object({
   personas: z
     .array(
       z.object({
-        id: z.string().optional().describe("To be assigned by the backend"),
         title: z
           .string()
           .describe(
@@ -29,7 +29,6 @@ const ChatEditColumnPersonaSelectorSchema = z.object({
 });
 
 const ChatEditColumnPersonaSchema = z.object({
-  id: z.string().optional().describe("To be assigned by the backend"),
   name: z.string().describe("The name of the persona. E.g. 'John Doe'"),
   title: z
     .string()
@@ -62,7 +61,6 @@ const ChatEditColumnPersonaSchema = z.object({
 });
 
 const ChatEditColumnCustomerJourneySchema = z.object({
-  id: z.string().optional().describe("To be assigned by the backend"),
   awareness: z.object({
     trigger: z.string(),
     touchpoints: z.string(),
@@ -94,14 +92,12 @@ const ChatEditColumnCustomerJourneySchema = z.object({
 });
 
 const ChatEditColumnImageSchema = z.object({
-  id: z.string().optional().describe("To be assigned by the backend"),
   imagePrompt: z.string(),
   imageUrl: z.string().optional(),
   imageFile: z.instanceof(File).optional(),
 });
 
 const ChatEditColumnAboutMeSchema = z.object({
-  id: z.string().optional().describe("To be assigned by the backend"),
   aboutMe: z
     .string()
     .describe(
@@ -140,7 +136,8 @@ export type ChatEditColumn =
   | null;
 
 export type ChatEditColumnComponent = {
-  type: string;
+  type: "multiplePersona" | "persona" | "customerJourney" | "image" | "aboutMe";
   old: ChatEditColumn;
   current: ChatEditColumn;
+  author: Role;
 };

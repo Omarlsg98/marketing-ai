@@ -51,16 +51,20 @@ export type ChatState = {
   next?: string;
 };
 
+export const extraInfoSchema = z.object({
+  saved: z.boolean().optional(),
+  edited: z.boolean().optional(),
+  modifications: z.custom<ChatEditColumn>().optional(),
+  idChoice: z.string().optional(),
+});
+
+export type ExtraInfo = z.infer<typeof extraInfoSchema>;
+
 export type FlowInput = {
   chatState: ChatState;
   chat: Chat;
   lastMessages: Message[];
-  extraInfo: {
-    saved?: boolean;
-    edited?: boolean;
-    modifications?: ChatEditColumn;
-    idChoice?: string;
-  };
+  extraInfo: ExtraInfo | null;
 };
 
 export type FlowOutput = {

@@ -1,13 +1,13 @@
 // This file provides a series of functions to validate the state of the conversation
 // It also has the different states of the conversation
 import { Chat, Message } from "@/types/database";
-import { ChatState, FlowInput, FlowOutput } from "@/types/interseed/chat";
+import { ChatState, ExtraInfo, FlowInput, FlowOutput } from "@/types/interseed/chat";
 import {
-    aboutMeFlow,
-    customerJourneyFlow,
-    imageGenerationFlow,
-    personaBrainstormFlow,
-    personaFlow,
+  aboutMeFlow,
+  customerJourneyFlow,
+  imageGenerationFlow,
+  personaBrainstormFlow,
+  personaFlow,
 } from "../generation/iterationFlow";
 
 import prompts from "@/lib/server/chat/prompts";
@@ -318,12 +318,9 @@ export default async function chatFlow(
   chat: Chat,
   //   workspace: Workspace,
   lastMessages: Message[],
-  newMessage: Message,
-  inputExtraInfo: any
-): Promise<{ chat: Chat; newMessages: Message[] }> {
+  inputExtraInfo: ExtraInfo
+): Promise<{ chat: Chat; messages: Message[] }> {
   let currentState: ChatState = CHAT_STATES[chat.state];
-  lastMessages.push(newMessage);
-
   const contextUpdate = await updateContext(chat, lastMessages);
   chat.context = contextUpdate.context;
   chat.last_message_id_in_context = contextUpdate.lastMessageIdInContext;
@@ -343,5 +340,5 @@ export default async function chatFlow(
 
   chat = results.chat;
   chat.state = results.nextState;
-  return { chat, newMessages: results.messages };
+  return { chat, messages: results.messages };
 }

@@ -4,10 +4,11 @@
 
 import { Database } from '@/types/supabase';
 
-export type UserAnswer = Database['public']['Tables']['user_answers']['Row'];
 export type Chat = Database['public']['Tables']['llm_chats']['Row'];
 export type Message = Database['public']['Tables']['llm_messages']['Insert'];
 export type Role = Database['public']['Tables']['llm_messages']['Row']['role'];
+export type Table = keyof Database["public"]["Tables"];
+
 
 export type PersonaInformation = {
 

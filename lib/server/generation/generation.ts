@@ -66,8 +66,6 @@ const extractPersona = async function (
     1000
   );
 
-  persona.id = input.chat.object_context_id;
-
   return persona;
 };
 
@@ -82,8 +80,6 @@ const extractCustomerJourney = async function (
     schemas.ChatEditColumnCustomerJourneySchema,
     1500
   );
-
-  customerJourney.id = input.chat.object_context_id;
 
   return customerJourney;
 };
@@ -119,8 +115,6 @@ const extractAboutMe = async function (
     schemas.ChatEditColumnAboutMeSchema,
     1500
   );
-
-  aboutMe.id = input.chat.object_context_id;
 
   return aboutMe;
 };

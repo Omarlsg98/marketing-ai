@@ -18,7 +18,7 @@ async function invokeAgent(prompt: string): Promise<IterationAgentOutput> {
 
 async function baseIterationFlow(
   input: FlowInput,
-  type: string,
+  type: "multiplePersona" | "persona" | "customerJourney" | "image" | "aboutMe",
   answerPromptBuilder: IterationPromptBuilder,
   extractFunction: ExtractFunction
 ): Promise<FlowOutput> {
@@ -34,6 +34,7 @@ async function baseIterationFlow(
     messagePrompt = answerPromptBuilder(input, null, null);
     newDisplayInfo = {
       type: type,
+      author: "system",
       old: null,
       current: null,
     };
@@ -42,7 +43,7 @@ async function baseIterationFlow(
     chat.substep_id = null;
     chat.display_info = null;
 
-    if (newDisplayInfo.type === "multiple_persona") {
+    if (newDisplayInfo.type === "multiplePersona") {
       messages.push(
         getNewMessage(
           "system",
@@ -92,13 +93,12 @@ async function baseIterationFlow(
   const agentResponse = await invokeAgent(messagePrompt);
   messages.push(getNewMessage("assistant", agentResponse.message, input.chat));
 
-  let output = newDisplayInfo.current;
   if (agentResponse.shouldRegenerate) {
     // Generate the output from the message of the agent
-    output = await extractFunction(input, agentResponse, newDisplayInfo.old);
+    newDisplayInfo.current = await extractFunction(input, agentResponse, newDisplayInfo.old);
+    newDisplayInfo.author = "assistant";
   }
 
-  newDisplayInfo.current = output;
   chat.display_info = JSON.stringify(newDisplayInfo);
 
   return {
@@ -114,7 +114,7 @@ export const personaBrainstormFlow = async function (
 ): Promise<FlowOutput> {
   let output = baseIterationFlow(
     input,
-    "multiple_persona",
+    "multiplePersona",
     prompts.personaSuggestionsPromptBuilder,
     generators.extractPersonaSuggestions
   );
@@ -162,7 +162,7 @@ export const aboutMeFlow = async function (
 ): Promise<FlowOutput> {
   let output = baseIterationFlow(
     input,
-    "about_me",
+    "aboutMe",
     prompts.aboutMePromptBuilder,
     generators.extractAboutMe
   );

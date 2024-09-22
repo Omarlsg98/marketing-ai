@@ -10,11 +10,6 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 
-DROP TABLE public.leads;
-DROP TABLE public.lemon_squeezy_customers;
-DROP TABLE public.lemon_squeezy_subscriptions;
-DROP TABLE public.stripe_customers;
-DROP TABLE public.stripe_subscriptions;
 DROP TABLE public.user_answers_sources;
 DROP TABLE public.user_answers;
 DROP TABLE public.question_options;
@@ -29,15 +24,12 @@ Alter TABLE public.persona DROP COLUMN gender;
 ALTER TABLE public.persona DROP COLUMN ethnicity;
 Alter TABLE public.persona DROP COLUMN location;
 Alter TABLE public.persona DROP COLUMN occupation;
+ALTER TABLE public.persona DROP COLUMN short_description;
+ALTER TABLE public.persona DROP COLUMN name;
 
-
-ALTER TABLE public.persona ADD COLUMN version numeric NOT NULL DEFAULT 1;
+ALTER TABLE public.persona ADD COLUMN is_suggestion boolean DEFAULT true;
 ALTER TABLE public.persona ADD COLUMN author public.message_role NOT NULL;
-
--- change primary key to one composed of id and version
-ALTER TABLE public.persona DROP CONSTRAINT persona_pkey;
-ALTER TABLE ONLY public.persona
-    ADD CONSTRAINT persona_pkey PRIMARY KEY (id, version);
+ALTER TABLE public.persona ADD COLUMN short_information JSONB;
 
 DROP TYPE public.persona_info_version;
 
@@ -59,23 +51,21 @@ ALTER TABLE public.llm_chats ADD COLUMN object_context_id text;
 
 CREATE TABLE IF NOT EXISTS public.customer_journey (
     id uuid NOT NULL,
-    version numeric NOT NULL DEFAULT 1,
     author public.message_role NOT NULL,
     created_at timestamp with time zone DEFAULT (now() AT TIME ZONE 'utc'::text) NOT NULL,
     updated_at timestamp with time zone DEFAULT (now() AT TIME ZONE 'utc'::text) NOT NULL,
     deleted_at timestamp with time zone,
     user_id uuid NOT NULL,
     information JSONB,
-    persona_id uuid NOT NULL,
-    persona_version numeric NOT NULL
+    persona_id uuid NOT NULL
 );
 
 ALTER TABLE ONLY public.customer_journey
-    ADD CONSTRAINT customer_journey_pkey PRIMARY KEY (id, version);
+    ADD CONSTRAINT customer_journey_pkey PRIMARY KEY (id);
 
 -- foreign key to persona
 ALTER TABLE public.customer_journey 
-    ADD CONSTRAINT fk_customer_journey_persona_id FOREIGN KEY (persona_id, persona_version) REFERENCES public.persona(id, version);
+    ADD CONSTRAINT fk_customer_journey_persona_id FOREIGN KEY (persona_id) REFERENCES public.persona(id);
 
 
 --RLS POLICIES
