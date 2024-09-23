@@ -45,16 +45,31 @@ export const getUserId = async () => {
   return session.id;
 };
 
-export const getLastMessages: (chat: Chat) => any = async (chat) => {
+export const getLastMessages: (chat: Chat) => Promise<Message[]> = async (
+  chat
+) => {
   const supabase = createServerSupabaseClient();
-  const userId = await getUserId();
+  let dateThreshold = chat.created_at;
+
+  if (chat.last_message_id_in_context) {
+    //get last message in context date
+    const { data: lastInContext, error: errorLIC } = await supabase
+      .from("llm_messages")
+      .select("created_at")
+      .eq("chat_id", chat.id)
+      .eq("id", chat.last_message_id_in_context)
+      .single();
+
+    handleError(errorLIC);
+    dateThreshold = lastInContext.created_at;
+  }
 
   const { data, error } = await supabase
     .from("llm_messages")
     .select("*")
     .eq("chat_id", chat.id)
-    .eq("user_id", userId)
-    .gt("id", chat.last_message_id_in_context);
+    .gt("created_at", dateThreshold)
+    .order("created_at", { ascending: true });
 
   handleError(error);
 
@@ -105,15 +120,13 @@ export const updateChat: (chat: Chat) => Promise<any> = async (chat) => {
 export const getMessages: (
   chatId: string,
   excludeSystem: boolean
-) => any = async (chatId, excludeSystem) => {
+) => Promise<Message[]> = async (chatId, excludeSystem) => {
   const supabase = createServerSupabaseClient();
   let query = supabase.from("llm_messages").select("*").eq("chat_id", chatId);
   if (excludeSystem) {
     query = query.not("role", "eq", "system");
   }
-  const { data, error } = await query
-    .order("created_at", { ascending: true })
-    .returns<Database["public"]["Tables"]["llm_messages"]["Row"]>();
+  const { data, error } = await query.order("created_at", { ascending: true });
 
   if (!handleError(error)) {
     return null;
@@ -165,10 +178,11 @@ export const saveEditColumn: (chat: Chat) => Promise<any> = async (chat) => {
       const fullPersonas: Database["public"]["Tables"]["persona"]["Insert"][] =
         personas.personas.map((persona) => {
           return {
-            ...persona,
+            short_information: persona,
             author: author,
             id: uuidv4(),
             user_id: chat.user_id,
+            is_suggestion: true,
           };
         });
 
@@ -178,7 +192,7 @@ export const saveEditColumn: (chat: Chat) => Promise<any> = async (chat) => {
     case "persona":
       const persona = current as ChatEditColumnPersona;
       const personaRecord: Database["public"]["Tables"]["persona"]["Insert"] = {
-        short_information: persona,
+        information: persona,
         id: chat.object_context_id,
         author: author,
         user_id: chat.user_id,
@@ -311,15 +325,8 @@ export const getPersonaRecord: (
 
 // Insert functions
 const addUUID = (table: string, record: any) => {
-  //This tables do not require an id (they are serial integers, database generated)
-  if (
-    table === "llm_messages" ||
-    table == "persona" // Persona is a special case, it has same UUID as chat
-  ) {
-    return record;
-  }
+  if (!record.id) record.id = uuidv4();
 
-  record.id = uuidv4();
   return record;
 };
 
@@ -409,15 +416,15 @@ export const getRecords: (table: Table, id: string) => any = async (
   return data;
 };
 
-export const getNewMessage = function (
+export const getNewMessage = async function (
   role: Role,
   content: string,
   chat: Chat
-): Message {
+): Promise<Message> {
   return {
     chat_id: chat.id,
     content: content,
-    id: 0,
+    id: uuidv4(),
     role: role,
     user_id: chat.user_id,
   };

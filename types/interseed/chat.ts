@@ -4,10 +4,10 @@ import { Chat, Message, Role } from "../database";
 import { z } from "zod";
 
 export const IterationAgentOutputSchema = z.object({
-  message: z.string().describe("The message to be sent to the user"),
-  shouldRegenerate: z
+  message: z.string().describe("The message to be sent to the user, it could contain key information."),
+  shouldFormat: z
     .boolean()
-    .describe("True if the agent should regenerate the UI components"),
+    .describe("True if the agent is sending in the message new or modified key information that needs to be formatted"),
   imagePrompt: z
     .string()
     .optional()

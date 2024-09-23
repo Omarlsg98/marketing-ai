@@ -159,7 +159,7 @@ export type Database = {
           display_info: Json | null
           id: string
           is_first_interaction: boolean
-          last_message_id_in_context: number | null
+          last_message_id_in_context: string | null
           object_context_id: string | null
           progress: number
           state: string
@@ -177,7 +177,7 @@ export type Database = {
           display_info?: Json | null
           id: string
           is_first_interaction?: boolean
-          last_message_id_in_context?: number | null
+          last_message_id_in_context?: string | null
           object_context_id?: string | null
           progress?: number
           state?: string
@@ -195,7 +195,7 @@ export type Database = {
           display_info?: Json | null
           id?: string
           is_first_interaction?: boolean
-          last_message_id_in_context?: number | null
+          last_message_id_in_context?: string | null
           object_context_id?: string | null
           progress?: number
           state?: string
@@ -221,7 +221,7 @@ export type Database = {
           content: string
           created_at: string
           deleted_at: string | null
-          id: number
+          id: string
           role: Database["public"]["Enums"]["message_role"]
           updated_at: string
           user_id: string
@@ -231,7 +231,7 @@ export type Database = {
           content: string
           created_at?: string
           deleted_at?: string | null
-          id?: number
+          id: string
           role: Database["public"]["Enums"]["message_role"]
           updated_at?: string
           user_id: string
@@ -241,7 +241,7 @@ export type Database = {
           content?: string
           created_at?: string
           deleted_at?: string | null
-          id?: number
+          id?: string
           role?: Database["public"]["Enums"]["message_role"]
           updated_at?: string
           user_id?: string

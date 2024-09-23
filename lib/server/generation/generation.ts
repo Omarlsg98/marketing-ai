@@ -47,8 +47,8 @@ const extractPersonaSuggestions = async function (
 
   personaSuggestions.personas = personaSuggestions.personas.map((persona) => {
     return {
-      id: uuidv4(),
       ...persona,
+      id: uuidv4(),
     };
   });
 

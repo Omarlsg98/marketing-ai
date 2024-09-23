@@ -30,8 +30,12 @@ const getFormulateNextQuestionPrompt = (
 
 ${basePrompts.getContext(context, lastMessages)}
 
-formulate a follow up comment where you ask the user the following question:
+---
+
+Now, formulate a follow up comment where you ask the user the following question:
 ${question.question}
+
+Your goal is ${question.objective}.
 
 Keep the flow of the conversation. 
 If the question is straightforward be concise, if it is complex, try to break it down into smaller questions.

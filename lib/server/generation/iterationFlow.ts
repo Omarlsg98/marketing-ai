@@ -45,7 +45,7 @@ async function baseIterationFlow(
 
     if (newDisplayInfo.type === "multiplePersona") {
       messages.push(
-        getNewMessage(
+        await getNewMessage(
           "system",
           "The user chose one of the personas you provided and wants to continue",
           input.chat
@@ -54,7 +54,7 @@ async function baseIterationFlow(
       chat.object_context_id = input.extraInfo.idChoice;
     } else {
       messages.push(
-        getNewMessage(
+        await getNewMessage(
           "system",
           "The user saved the output and wants to continue",
           input.chat
@@ -66,7 +66,7 @@ async function baseIterationFlow(
       nextState: input.chatState.next,
       messages: messages,
       chat: chat,
-      stateDone: false,
+      stateDone: true,
     };
     // User edited the output, format the editions
   } else if (input.extraInfo && input.extraInfo.edited) {
@@ -76,7 +76,7 @@ async function baseIterationFlow(
     messagePrompt = answerPromptBuilder(input, previousInfo, editInfo);
 
     messages.push(
-      getNewMessage(
+      await getNewMessage(
         "system",
         "The user edited the ouput you provided.",
         input.chat
@@ -91,9 +91,9 @@ async function baseIterationFlow(
 
   // Generate the message from the agent
   const agentResponse = await invokeAgent(messagePrompt);
-  messages.push(getNewMessage("assistant", agentResponse.message, input.chat));
+  messages.push(await getNewMessage("assistant", agentResponse.message, input.chat));
 
-  if (agentResponse.shouldRegenerate) {
+  if (agentResponse.shouldFormat || newDisplayInfo.current === null) {
     // Generate the output from the message of the agent
     newDisplayInfo.current = await extractFunction(input, agentResponse, newDisplayInfo.old);
     newDisplayInfo.author = "assistant";
@@ -105,7 +105,7 @@ async function baseIterationFlow(
     nextState: chat.state, // stay in the same state
     messages: messages,
     chat: chat,
-    stateDone: true,
+    stateDone: false,
   };
 }
 

@@ -1,7 +1,12 @@
 // This file provides a series of functions to validate the state of the conversation
 // It also has the different states of the conversation
 import { Chat, Message } from "@/types/database";
-import { ChatState, ExtraInfo, FlowInput, FlowOutput } from "@/types/interseed/chat";
+import {
+  ChatState,
+  ExtraInfo,
+  FlowInput,
+  FlowOutput,
+} from "@/types/interseed/chat";
 import {
   aboutMeFlow,
   customerJourneyFlow,
@@ -68,22 +73,24 @@ const CHAT_STATES: {
     type: "message",
     description: null,
     instructions:
-      "Introduce yourself to the user, tell them what you do and how you can help them.",
+      "Introduce yourself to the user, tell them what you do and how you can help them. Keep it short. Don't make questions yet.",
     next: "knowYourUser",
+    executeNextInmediately: true,
   },
   welcomeBack: {
     type: "message",
     description: null,
     instructions:
-      "Welcome back to the chat, remind the user who you are and what you do.",
+      "Welcome back to the chat, remind the user who you are and what you do. Keep it short. Don't make questions yet.",
     next: "askNewPersona",
+    executeNextInmediately: true,
   },
   askNewPersona: {
     type: "question",
     description: null,
     questions: [
       {
-        id: 2,
+        id: 0,
         question: "Do you want to create a new persona?",
         objective:
           "Determine if the user wants to create a new persona or not.",
@@ -91,30 +98,31 @@ const CHAT_STATES: {
       },
     ],
     next: "confirmNewPersona",
+    executeNextInmediately: true,
   },
   confirmNewPersona: {
     type: "decision",
     description: null,
-    executeNextInmediately: true,
     function: userWantsToCreateNewPersona,
     options: {
       true: "knowYourUser",
       false: "goodbye",
     },
+    executeNextInmediately: true,
   },
   knowYourUser: {
     type: "question",
     description: null,
     questions: [
       {
-        id: 1,
+        id: 0,
         question: "What is your business or business idea or product?",
         objective:
-          "Gather all relevant business information from the user to inform customer persona creation and customer journey mapping, recap and confirm if you already know or get new information.",
+          "Gather all relevant business information from the user to inform customer persona creation and customer journey mapping, recap and confirm if you already know or get new information. FOCUS ON THE BUSINESS/IDEA/PRODUCT, NOT THE TARGET CUSTOMERS.",
         q_type: "text",
       },
       {
-        id: 2,
+        id: 1,
         question: "Who are your target customers for these [business/idea]?",
         objective:
           "Identify or suggest target customers, or just recap and confirm if you already know or get new information.",
@@ -123,6 +131,7 @@ const CHAT_STATES: {
     ],
     checkUpdateWorkspace: true,
     next: "brainstormPersonas",
+    executeNextInmediately: true,
   },
   brainstormPersonas: {
     type: "iteration",
@@ -137,7 +146,7 @@ const CHAT_STATES: {
     description: null,
     questions: [
       {
-        id: 1,
+        id: 0,
         question: "Would you clasify the persona you choose as B2B or B2C?",
         objective: "Determine if the persona is B2B or B2C.",
         q_type: "text",
@@ -153,13 +162,6 @@ const CHAT_STATES: {
     function: personaFlow,
     checkUpdateWorkspace: true,
     executeNextInmediately: true,
-    next: "generateImage",
-  },
-  generateImage: {
-    type: "iteration",
-    description: null,
-    function: imageGenerationFlow,
-    executeNextInmediately: true,
     next: "generateCustomerJourney",
   },
   generateCustomerJourney: {
@@ -167,6 +169,13 @@ const CHAT_STATES: {
     description: null,
     function: customerJourneyFlow,
     checkUpdateWorkspace: true,
+    executeNextInmediately: true,
+    next: "generateImage",
+  },
+  generateImage: {
+    type: "iteration",
+    description: null,
+    function: imageGenerationFlow,
     executeNextInmediately: true,
     next: "generateAboutMeFlow",
   },
@@ -206,16 +215,16 @@ async function updateContext(
   lastMessages: Message[]
 ): Promise<{
   context: string;
-  lastMessageIdInContext: number;
+  lastMessageIdInContext: string;
   newLastMessages: Message[];
 }> {
-  let prompt = prompts.getContextMakerPrompt(
-    chat.context,
-    lastMessages.slice(0, MAX_MESSAGES_OUT_OF_CONTEXT)
-  );
-  const context = await sendChatGPT(prompt, 3000);
+  const messagesToContext = lastMessages.slice(0, MAX_MESSAGES_OUT_OF_CONTEXT);
+  const lastMessageIdInContext =
+    messagesToContext[messagesToContext.length - 1].id;
 
-  const lastMessageIdInContext = lastMessages[MAX_MESSAGES_OUT_OF_CONTEXT].id;
+  let prompt = prompts.getContextMakerPrompt(chat.context, messagesToContext);
+
+  const context = await sendChatGPT(prompt, 3000);
   const newLastMessages = lastMessages.slice(-MAX_MESSAGES_OUT_OF_CONTEXT);
 
   return {
@@ -238,7 +247,11 @@ async function executeMessageState(input: FlowInput): Promise<FlowOutput> {
   );
   let newMessage = await sendChatGPT(prompt, 3000);
 
-  let systemMessage: Message = getNewMessage("assistant", newMessage, chat);
+  let systemMessage: Message = await getNewMessage(
+    "assistant",
+    newMessage,
+    chat
+  );
 
   messages.push(systemMessage);
 
@@ -270,12 +283,13 @@ async function executeEndState(input: FlowInput): Promise<FlowOutput> {
     nextState: input.chatState.next,
     messages: input.lastMessages,
     chat: input.chat,
-    stateDone: true,
+    stateDone: false,
   };
 }
 
 async function executeState(input: FlowInput): Promise<FlowOutput> {
   let currentState: ChatState = input.chatState;
+  console.log("===== Executing state: ", currentState);
 
   let results: FlowOutput = {
     chat: input.chat,
@@ -283,10 +297,6 @@ async function executeState(input: FlowInput): Promise<FlowOutput> {
     nextState: "error",
     messages: null,
   };
-
-  if (!currentState) {
-    currentState = CHAT_STATES.initial;
-  }
 
   if (currentState.type === "message") {
     results = await executeMessageState(input);
@@ -302,13 +312,18 @@ async function executeState(input: FlowInput): Promise<FlowOutput> {
     throw new Error(`State ${input.chat.state} not found in chat flow`);
   }
 
+  results.chat.state = results.nextState;
+  
+  console.log("===== State executed: ", results);
+
   if (currentState.executeNextInmediately && results.stateDone) {
     results = await executeState({
       chatState: CHAT_STATES[results.nextState],
       chat: results.chat,
       lastMessages: results.messages,
       extraInfo: null,
-    });
+    }
+  );
   }
 
   return results;
@@ -321,6 +336,11 @@ export default async function chatFlow(
   inputExtraInfo: ExtraInfo
 ): Promise<{ chat: Chat; messages: Message[] }> {
   let currentState: ChatState = CHAT_STATES[chat.state];
+
+  if (!currentState) {
+    currentState = CHAT_STATES.initial;
+  }
+
   const contextUpdate = await updateContext(chat, lastMessages);
   chat.context = contextUpdate.context;
   chat.last_message_id_in_context = contextUpdate.lastMessageIdInContext;
@@ -339,6 +359,5 @@ export default async function chatFlow(
   });
 
   chat = results.chat;
-  chat.state = results.nextState;
   return { chat, messages: results.messages };
 }

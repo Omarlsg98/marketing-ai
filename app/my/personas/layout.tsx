@@ -1,7 +1,6 @@
 "use client";
 
 import "@/app/globals.css";
-import Header from "@/components/general/Header";
 import SideNav from "@/components/general/SideNav";
 import { ReactNode, useState } from "react";
 
@@ -23,14 +22,14 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 flex flex-col overflow-hidden">
-        <Header
+      <main className="flex-1 h-screen flex flex-col overflow-hidden">
+        {/* <Header
           isMobileMenuOpen={isMobileMenuOpen}
           setIsMobileMenuOpen={setIsMobileMenuOpen}
-        />
+        /> */}
 
         {/* Content area */}
-        <div className="flex-1 overflow-y-auto bg-card rounded-lg">
+        <div className="flex-1 h-full bg-card rounded-lg">
           {children}
         </div>
       </main>

@@ -1,80 +1,114 @@
 // Chat.tsx
-'use client'
+"use client";
 
-import { ChatInput } from "@/components/chat-components/ChatInput"
-import { MessageBubble } from "@/components/chat-components/MessageBubble"
-import { ResizableDivider } from "@/components/chat-components/ResizableDivider"
-import { RightPanel } from "@/components/chat-components/RightPanel"
-import { UserAvatar } from "@/components/chat-components/UserAvatar"
-import { useRef, useState } from 'react'
+import { ChatInput } from "@/components/chat-components/ChatInput";
+import { MessageBubble } from "@/components/chat-components/MessageBubble";
+import { ResizableDivider } from "@/components/chat-components/ResizableDivider";
+import { UserAvatar } from "@/components/chat-components/UserAvatar";
+import { ChatEditColumnComponent } from "@/types/components/chatTab";
+import { Chat, Message } from "@/types/database";
+import { ExtraInfo } from "@/types/interseed/chat";
+import { FC, useEffect, useRef, useState } from "react";
+import ChatRightPanel from "./RightPanel";
 
-export default function Chat() {
-  const [chatWidth, setChatWidth] = useState(50) // 50% initial width
-  const [messages, setMessages] = useState([
-    { role: 'assistant', content: 'Hello! How can I assist you today?' },
-    { role: 'user', content: 'Can you help me with a React question?' },
-    { role: 'assistant', content: 'Of course! I\'d be happy to help with your React question. What would you like to know?' },
-  ])
-  const [userGradient] = useState(() => {
-    const colors = ['red', 'orange', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose']
-    const randomColor1 = colors[Math.floor(Math.random() * colors.length)]
-    const randomColor2 = colors[Math.floor(Math.random() * colors.length)]
-    return `bg-gradient-to-br from-${randomColor1}-400 to-${randomColor2}-500`
-  })
-  const containerRef = useRef<HTMLDivElement>(null)
+interface ChatProps {
+  chat: Chat | null;
+  messages: Message[];
+  handleSendMessage: (message: string, extraInfo?: ExtraInfo) => Promise<void>;
+}
+
+const ChatUI: FC<ChatProps> = ({ chat, messages, handleSendMessage }) => {
+  const [chatWidth, setChatWidth] = useState(100); // 50% initial width
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (chat && chat.display_info !== null) {
+      setChatWidth(50);
+    }
+  }, [chat]);
+
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const handleResize = (clientX: number) => {
     if (containerRef.current) {
-      const containerWidth = containerRef.current.offsetWidth
-      const newWidth = (clientX / containerWidth) * 100
-      setChatWidth(Math.min(Math.max(newWidth, 20), 80)) // Limit between 20% and 80%
+      const containerWidth = containerRef.current.offsetWidth;
+      const newWidth = (clientX / containerWidth) * 100;
+      setChatWidth(Math.min(Math.max(newWidth, 20), 80)); // Limit between 20% and 80%
     }
-  }
-
-  const handleSendMessage = (content: string) => {
-    setMessages([...messages, { role: 'user', content }])
-    // Here you would typically send the message to your AI service
-    // and then add the response to the messages
-  }
+  };
 
   const handleFileUpload = (file: File) => {
-    // Handle file upload logic here
-    console.log('File uploaded:', file)
-    // You might want to send this file to your server or process it client-side
-    setMessages([...messages, { role: 'user', content: `Uploaded file: ${file.name}` }])
-  }
+    console.log("File uploaded:", file);
+  };
+
+  const handleSendMessageWrapper: (
+    content: string,
+    extraInfo?: ExtraInfo
+  ) => Promise<void> = async (content, extraInfo) => {
+    setLoading(true);
+    await handleSendMessage(content, extraInfo);
+    setLoading(false);
+  };
 
   return (
-    <div ref={containerRef} className="flex h-screen bg-background text-foreground">
+    <div
+      ref={containerRef}
+      className="flex h-screen bg-background text-foreground"
+    >
       {/* Chat Section */}
-      <div className="flex flex-col" style={{ width: `${chatWidth}%`, minWidth: '300px' }}>
+      <div
+        className="flex flex-col"
+        style={{ width: `${chatWidth}%`, minWidth: "300px" }}
+      >
         <div className="flex-1 overflow-auto p-4">
           {messages.map((message, index) => (
             <MessageBubble
               key={index}
               message={message}
-              isUser={message.role === 'user'}
+              isUser={message.role === "user"}
             >
-              {message.role === 'user' ? (
-                <UserAvatar userImage={null} gradientClass={userGradient} />
+              {message.role === "user" ? (
+                <UserAvatar userImage="/placeholder.svg?height=40&width=40" />
               ) : (
                 <UserAvatar userImage="/placeholder.svg?height=40&width=40" />
               )}
             </MessageBubble>
           ))}
+          {loading && (
+            <div className="flex items-center space-x-2 mt-4  animate-pulse">
+              <UserAvatar userImage="/placeholder.svg?height=40&width=40" />
+              <div className="bg-secondary text-secondary-foreground rounded-lg px-4 py-2">
+                Ethan is typing ...
+              </div>
+            </div>
+          )}
         </div>
         <ChatInput
-          onSendMessage={handleSendMessage}
+          onSendMessage={handleSendMessageWrapper}
           onFileUpload={handleFileUpload}
+          isLoading={loading}
         />
       </div>
 
-      <ResizableDivider onResize={handleResize} />
-
       {/* Right Panel */}
-      <div className="flex-1 overflow-auto p-4">
-        <RightPanel />
-      </div>
+      {chatWidth != 100 && chat && chat.display_info && (
+        <>
+          <ResizableDivider onResize={handleResize} />
+          <div className="flex-1 overflow-auto p-4">
+            <ChatRightPanel
+              onDone={handleSendMessageWrapper} // TODO: Implement this
+              displayInfo={
+                JSON.parse(
+                  chat.display_info as string
+                ) as ChatEditColumnComponent
+              }
+              isLoading={loading}
+            />
+          </div>
+        </>
+      )}
     </div>
-  )
-}
+  );
+};
+
+export default ChatUI;

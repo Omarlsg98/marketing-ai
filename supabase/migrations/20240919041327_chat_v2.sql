@@ -27,6 +27,7 @@ Alter TABLE public.persona DROP COLUMN occupation;
 ALTER TABLE public.persona DROP COLUMN short_description;
 ALTER TABLE public.persona DROP COLUMN name;
 
+TRUNCATE TABLE public.persona;
 ALTER TABLE public.persona ADD COLUMN is_suggestion boolean DEFAULT true;
 ALTER TABLE public.persona ADD COLUMN author public.message_role NOT NULL;
 ALTER TABLE public.persona ADD COLUMN short_information JSONB;
@@ -34,6 +35,13 @@ ALTER TABLE public.persona ADD COLUMN short_information JSONB;
 DROP TYPE public.persona_info_version;
 
 TRUNCATE TABLE public.llm_messages;
+
+ALTER TABLE public.llm_messages DROP CONSTRAINT llm_messages_pkey;
+ALTER TABLE public.llm_messages DROP COLUMN id;
+ALTER TABLE public.llm_messages ADD COLUMN id uuid NOT NULL;
+ALTER TABLE ONLY public.llm_messages
+    ADD CONSTRAINT llm_messages_pkey PRIMARY KEY (id);
+
 DELETE 
 FROM public.llm_chats;
 
@@ -43,7 +51,7 @@ DROP TABLE public.questions;
 
 ALTER TABLE public.llm_chats ADD COLUMN state text NOT NULL DEFAULT 'initial';
 ALTER TABLE public.llm_chats ADD COLUMN is_first_interaction boolean NOT NULL DEFAULT true;
-ALTER TABLE public.llm_chats ADD COLUMN last_message_id_in_context numeric;
+ALTER TABLE public.llm_chats ADD COLUMN last_message_id_in_context uuid;
 ALTER TABLE public.llm_chats ADD COLUMN display_info JSONB;
 ALTER TABLE public.llm_chats ADD COLUMN substep_id numeric;
 ALTER TABLE public.llm_chats ADD COLUMN object_context_id text;

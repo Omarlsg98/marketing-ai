@@ -1,7 +1,5 @@
-import {
-  getChat,
-  getMessages,
-} from "@/lib/server/database";
+import { getChat, getMessages } from "@/lib/server/database";
+import { ChatGetOut } from "@/types/api/chat";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(
@@ -14,11 +12,11 @@ export async function GET(
 ) {
   const chatId = params.chatId;
 
-  const { chat } = await getChat(chatId);
+  const chat = await getChat(chatId);
   const allMessages = await getMessages(chatId, true);
 
   return NextResponse.json({
-    output: allMessages,
-    progress: chat.progress,
-  });
+    messages: allMessages,
+    chat: chat,
+  } as ChatGetOut);
 }

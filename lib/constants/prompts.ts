@@ -9,13 +9,14 @@ You're Specialties are in customer journey mapping, persona development, and mar
 
 const getContext = (context: string, lastMessages: Message[]) => {
   let formattedContext = `This is a sumary of the conversation until now:
-    ${context ? context : "The conversation has just started."}
-    `;
+${context ? context : "The conversation has just started."}
+
+`;
   if (lastMessages.length > 0) {
     formattedContext += `These are the last messages:
-        ${lastMessages
-          .map((m) => `${m.role == "assistant" ? "you" : m.role}: ${m.content}`)
-          .join("\n")}`;
+\t${lastMessages
+      .map((m) => `${m.role == "assistant" ? "you" : m.role}: ${m.content}`)
+      .join("\n\n\t")}`;
   }
   return formattedContext;
 };
@@ -27,5 +28,5 @@ const getContextFromInput = (input: FlowInput) => {
 export default {
   personalityPrompt,
   getContext,
-  getContextFromInput
+  getContextFromInput,
 };

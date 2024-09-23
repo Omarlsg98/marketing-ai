@@ -5,6 +5,7 @@ const ChatEditColumnPersonaSelectorSchema = z.object({
   personas: z
     .array(
       z.object({
+        id: z.string().optional().describe("To be assigned by the backend"),
         title: z
           .string()
           .describe(
@@ -24,8 +25,7 @@ const ChatEditColumnPersonaSelectorSchema = z.object({
             "The challenges of the persona. Less than 2 or 3 sentences"
           ),
       })
-    )
-    .min(3),
+    ),
 });
 
 const ChatEditColumnPersonaSchema = z.object({

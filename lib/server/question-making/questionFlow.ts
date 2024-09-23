@@ -2,11 +2,11 @@ import { sendChatGPT, sendChatGPTUntilInteger } from "@/lib/server/llms";
 import prompts from "@/lib/server/question-making/prompts";
 import { Message } from "@/types/database";
 import {
-    AgentAction,
-    AgentActionFunction,
-    FlowInput,
-    FlowOutput,
-    Question,
+  AgentAction,
+  AgentActionFunction,
+  FlowInput,
+  FlowOutput,
+  Question,
 } from "@/types/interseed/chat";
 import { getNewMessage } from "../database";
 
@@ -186,10 +186,12 @@ const agentActions: AgentAction[] = [
 export async function questionFlow(input: FlowInput): Promise<FlowOutput> {
   let chat = input.chat;
   let currentQuestion: Question | null = null;
+  let remainingQuestions: Question[] = input.chatState.questions.slice();
+  
   if (chat.substep_id !== null) {
     currentQuestion = input.chatState.questions[chat.substep_id];
+    remainingQuestions = input.chatState.questions.slice(chat.substep_id + 1);
   }
-  let remainingQuestions = input.chatState.questions.slice(chat.substep_id + 1);
 
   let agentAction = await getNextAction(
     chat.context,
@@ -197,7 +199,7 @@ export async function questionFlow(input: FlowInput): Promise<FlowOutput> {
     input.lastMessages
   );
 
-  const systemMessage: Message = getNewMessage(
+  const systemMessage: Message = await getNewMessage(
     "system",
     `You decided to ${agentAction.name}`,
     chat
@@ -212,7 +214,7 @@ export async function questionFlow(input: FlowInput): Promise<FlowOutput> {
     input.lastMessages
   );
 
-  let actionMessage: Message = getNewMessage(
+  let actionMessage: Message = await getNewMessage(
     "system",
     "You realized there are no more questions to ask, you continue to the next section",
     chat
@@ -226,12 +228,16 @@ export async function questionFlow(input: FlowInput): Promise<FlowOutput> {
     // If there is a next question, set the next state to the current state
     chat.substep_id = nextQuestion.id;
     nextState = input.chat.state;
-    stateDone = true;
-    actionMessage = getNewMessage(
+    actionMessage = await getNewMessage(
       agentAction["role"],
       newMessage.replace("Ethan:", ""),
       chat
     );
+  } else {
+    // If there are no more questions, set the next state to the next state
+    stateDone = true;
+    nextState = input.chatState.next;
+    chat.substep_id = null;
   }
 
   input.lastMessages.push(actionMessage);
