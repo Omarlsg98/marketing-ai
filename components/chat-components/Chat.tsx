@@ -9,6 +9,7 @@ import { ChatEditColumnComponent } from "@/types/components/chatTab";
 import { Chat, Message } from "@/types/database";
 import { ExtraInfo } from "@/types/interseed/chat";
 import { FC, useEffect, useRef, useState } from "react";
+import { ScrollArea } from "../ui/scroll-area";
 import ChatRightPanel from "./RightPanel";
 
 interface ChatProps {
@@ -24,6 +25,8 @@ const ChatUI: FC<ChatProps> = ({ chat, messages, handleSendMessage }) => {
   useEffect(() => {
     if (chat && chat.display_info !== null) {
       setChatWidth(50);
+    } else {
+      setChatWidth(100);
     }
   }, [chat]);
 
@@ -36,6 +39,17 @@ const ChatUI: FC<ChatProps> = ({ chat, messages, handleSendMessage }) => {
       setChatWidth(Math.min(Math.max(newWidth, 20), 80)); // Limit between 20% and 80%
     }
   };
+
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   const handleFileUpload = (file: File) => {
     console.log("File uploaded:", file);
@@ -61,6 +75,7 @@ const ChatUI: FC<ChatProps> = ({ chat, messages, handleSendMessage }) => {
         style={{ width: `${chatWidth}%`, minWidth: "300px" }}
       >
         <div className="flex-1 overflow-auto p-4">
+        <ScrollArea ref={scrollAreaRef} className="flex-grow p-4">
           {messages.map((message, index) => (
             <MessageBubble
               key={index}
@@ -82,6 +97,8 @@ const ChatUI: FC<ChatProps> = ({ chat, messages, handleSendMessage }) => {
               </div>
             </div>
           )}
+            <div ref={bottomRef} />
+          </ScrollArea>
         </div>
         <ChatInput
           onSendMessage={handleSendMessageWrapper}

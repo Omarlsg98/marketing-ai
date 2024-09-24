@@ -2,8 +2,7 @@
 
 import {
   createServerSupabaseClient,
-  getSession,
-  uploadFile,
+  getSession
 } from "@/lib/server/supabase";
 import {
   ChatEditColumnAboutMe,
@@ -218,15 +217,9 @@ export const saveEditColumn: (chat: Chat) => Promise<any> = async (chat) => {
     case "image":
       const imageinfo = current as ChatEditColumnImage;
 
-      const { signedUrl } = await uploadFile(
-        "persona_images",
-        imageinfo.imageFile.name,
-        imageinfo.imageFile
-      );
-
       const imageRecord: Database["public"]["Tables"]["persona"]["Update"] = {
         id: chat.object_context_id,
-        image_path: signedUrl,
+        image_path: imageinfo.imageUrl,
         user_id: chat.user_id,
         author: author,
       };

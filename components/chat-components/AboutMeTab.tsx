@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import {
   ChatEditColumnAboutMe,
@@ -43,20 +43,27 @@ const AboutMeTab: FC<AboutMeTabProps> = ({
   };
 
   return (
-    <Card className="cursor-pointer transition-all duration-300 hover:bg-secondary">
-      <CardContent className="p-4">
-        <h3 className="font-bold mb-2">About Me</h3>
-        <Textarea
-          className="w-full"
-          placeholder="Enter information about the persona"
-          value={aboutMe.aboutMe}
-          onChange={(e) => {
-            setAboutMe((prev) => ({ ...prev, aboutMe: e.target.value }));
-            setHasChanges(true);
-          }}
-          rows={30}
-        />
-      </CardContent>
+    <div className="space-y-5">
+      <Card>
+        <CardHeader>
+          <CardTitle>About Me</CardTitle>
+          <p className="mb-1 text-sm text-muted-foreground">
+            Edit or save the about me section of your persona
+          </p>
+        </CardHeader>
+
+        <CardContent className="p-4">
+          <Textarea
+            className="w-full h-96"
+            placeholder="Enter information about the persona"
+            value={aboutMe.aboutMe}
+            onChange={(e) => {
+              setAboutMe((prev) => ({ ...prev, aboutMe: e.target.value }));
+              setHasChanges(true);
+            }}
+          />
+        </CardContent>
+      </Card>
       <div className="flex justify-center mt-6">
         <Button
           onClick={submitInfo}
@@ -71,7 +78,7 @@ const AboutMeTab: FC<AboutMeTabProps> = ({
           <CheckCircle className="ml-2 h-5 w-5" />
         </Button>
       </div>
-    </Card>
+    </div>
   );
 };
 

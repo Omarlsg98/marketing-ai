@@ -105,7 +105,7 @@ export const uploadFile = async (bucket: string, name: string, file: File) => {
   // Return the URL of the uploaded file
 
   const signedUrl = await getFileUrl(bucket, name);
-
+  console.log("Imageed saved on: ", signedUrl);
   return {
     signedUrl,
     data,

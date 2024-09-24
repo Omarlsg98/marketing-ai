@@ -38,7 +38,6 @@ export async function POST(
   }
 
   const chat = await getChat(chatId);
-  console.log("1");
 
   // Register the message from the user
   const newMessage = await getNewMessage("user", userMessage, chat);

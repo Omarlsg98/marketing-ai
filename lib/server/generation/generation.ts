@@ -3,18 +3,19 @@ import {
   ChatEditColumn,
   ChatEditColumnAboutMe,
   ChatEditColumnCustomerJourney,
+  ChatEditColumnImage,
   ChatEditColumnPersona,
   ChatEditColumnPersonaSelector,
   schemas,
 } from "@/types/components/chatTab";
 import {
-  ExtractFunction,
   FlowInput,
-  IterationAgentOutput,
+  IterationAgentOutput
 } from "@/types/interseed/chat";
 import { v4 as uuidv4 } from "uuid";
 
-import prompts from "./prompts";
+import prompts from "@/lib/server/generation/prompts";
+import { uploadFile } from "@/lib/server/supabase";
 
 function b64ToFile(b64_json: string, filename: string, mimeType: string): File {
   // Decode the base64 string
@@ -39,11 +40,12 @@ const extractPersonaSuggestions = async function (
   agentResponse: IterationAgentOutput,
   currentInfo: ChatEditColumn
 ): Promise<ChatEditColumnPersonaSelector> {
-  const personaSuggestions: ChatEditColumnPersonaSelector = await sendChatGPTJSON(
-    prompts.formattingPromptBuilder(currentInfo, agentResponse),
-    schemas.ChatEditColumnPersonaSelectorSchema,
-    1000
-  );
+  const personaSuggestions: ChatEditColumnPersonaSelector =
+    await sendChatGPTJSON(
+      prompts.formattingPromptBuilder(currentInfo, agentResponse),
+      schemas.ChatEditColumnPersonaSelectorSchema,
+      1000
+    );
 
   personaSuggestions.personas = personaSuggestions.personas.map((persona) => {
     return {
@@ -74,7 +76,6 @@ const extractCustomerJourney = async function (
   agentResponse: IterationAgentOutput,
   currentInfo: ChatEditColumn
 ): Promise<ChatEditColumnCustomerJourney> {
-
   const customerJourney: ChatEditColumnCustomerJourney = await sendChatGPTJSON(
     prompts.formattingPromptBuilder(currentInfo, agentResponse),
     schemas.ChatEditColumnCustomerJourneySchema,
@@ -84,11 +85,11 @@ const extractCustomerJourney = async function (
   return customerJourney;
 };
 
-const generateImage: ExtractFunction = async (
-  input,
-  agentResponse,
-  currenInfo
-) => {
+const generateImage = async function (
+  input: FlowInput,
+  agentResponse: IterationAgentOutput,
+  currentInfo: ChatEditColumn
+): Promise<ChatEditColumnImage> {
   const chat = input.chat;
   const prompt = agentResponse.imagePrompt;
 
@@ -99,9 +100,15 @@ const generateImage: ExtractFunction = async (
     "image/png"
   );
 
+  const { signedUrl } = await uploadFile(
+    "persona_images",
+    image.name,
+    image
+  );
+
   return {
     imagePrompt: prompt,
-    imageFile: image,
+    imageUrl: signedUrl,
   };
 };
 

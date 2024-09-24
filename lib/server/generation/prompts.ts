@@ -10,16 +10,29 @@ const generalInstructions = `
 If you haven't addressed this topic in this format yet, Inform the
 user you are transitioning to this new topic and generate a first draft of 
 it now. You can add a brief explanation if needed.
+
 If you have already introduce this topic and the user asked you 
 clarifications, modifications or a totally different answer, please provide it now.
+
 Only generate the information of the topic if the user asked for it 
-or if it is necessary. 
-No need to generate all the information every time
+or if you think it is necessary. 
+
+No need to generate all the information every time, 
 focus on what the user asked for or what is needed to continue the conversation.
+
 In general, try to address the user message as you would in a normal conversation.
 
-shouldRegenarate should be true if there are changes to the main information, 
-false otherwise (e.g. clarifications, followups, etc).
+When the user suggest changes, you can ask for more details to understand the changes 
+or briefly acknowledge them. Be critical on the changes suggested by the user.
+If the user suggested a change, and it does not affect other parts of the information,
+don't regenerate the information. 
+
+If you think user is ready to move on, instruct them to click on the "Done" button.
+Don't ask the user what to do next, you have a predefined flow to follow.
+
+shouldFormat should be true if you are making changes to the main information, 
+false otherwise (e.g. clarifications, followups, user's modifications, etc).
+
 Don't make any reference to this instructions.`;
 
 const infoToString = (currentInfo: Object | null, editInfo: Object | null) => {
@@ -30,7 +43,7 @@ const infoToString = (currentInfo: Object | null, editInfo: Object | null) => {
     info += "Your previous answer: You haven't provided any information yet for this topic.\n";
   }
   if (editInfo) {
-    info += `The User has made these modifications: ${JSON.stringify(editInfo)}\n`;
+    info += `\nThe User has made these modifications: ${JSON.stringify(editInfo)}\n`;
   }
   return info;
 };
@@ -115,7 +128,7 @@ Advocacy:
   Satisfaction: [Satisfaction] (i.e. "Loves the product")
   Touchpoints: [Touchpoints] (brief description of the touchpoints)
   Action: [Action] (i.e. "Refers a friend")
-Summary: [Summary] (a summary of the customer journey as a short story)
+Summary: [Summary] (a summary of the customer journey as a short story, use the persona's name)
 
 ${infoToString(currenInfo, editInfo)}
 
@@ -147,7 +160,7 @@ The composition is tightly framed from the shoulders up, emphasizing
 their [expression]. The overall effect should be polished and professional, 
 suitable for [use case].
 
-${infoToString(currenInfoObj.imagePrompt, null)}
+${infoToString(currenInfoObj?.imagePrompt, null)}
 
 ${generalInstructions}`;
 };
@@ -165,6 +178,7 @@ Time to summarize the persona you have been working on for both the details
 and the customer journey in a big About Me section.
 
 You will generate a lengthy About Me of the persona using the following template:
+[Transtion to the topic]
 Meet [Name], the [Title]. 
 
 [Main Description summary]
@@ -189,6 +203,7 @@ ${message}
 Please convert the main information to JSON format.
 Prefer any information in the current answer over the your previous answer.
 If your current answer is partial complete it with the previous answer. 
+If the information is the About me, use line breaks to make it more readable.
 Don't make any reference to this instructions.`;
 };
 export default {

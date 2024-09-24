@@ -23,14 +23,14 @@ const myChat: Chat = {
 
 const myMessages: Message[] = [
   {
-    id: 1,
+    id: "sddsff",
     content: "Hello!",
     role: "user",
     user_id: "1",
     chat_id: "1",
   },
   {
-    id: 2,
+    id: "adfsdf",
     content: "Hi there!",
     role: "assistant",
     user_id: "1",
@@ -171,7 +171,7 @@ export const customerJourney: Story = {
             "The customer discovers the product through online channels, researches thoroughly, makes an informed purchase, engages with the product and support, and ultimately becomes a brand advocate.",
           awareness: {
             trigger: "Realizes need for product",
-            touchpoints: "Social media, search engines",
+            touchpoints: `Social media, search engines, Social media, search engines, Social media, search engines,`,
             action: "Explores options online",
           },
           consideration: {

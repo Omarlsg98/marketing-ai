@@ -23,7 +23,9 @@ async function baseIterationFlow(
   extractFunction: ExtractFunction
 ): Promise<FlowOutput> {
   const chat = input.chat;
-  let newDisplayInfo = JSON.parse(chat.display_info as string) as ChatEditColumnComponent;
+  let newDisplayInfo = JSON.parse(
+    chat.display_info as string
+  ) as ChatEditColumnComponent;
   const messages = input.lastMessages;
 
   let messagePrompt = "";
@@ -70,10 +72,13 @@ async function baseIterationFlow(
     };
     // User edited the output, format the editions
   } else if (input.extraInfo && input.extraInfo.edited) {
-    const editInfo = input.extraInfo.modifications;
-    const previousInfo = newDisplayInfo.current;
-    newDisplayInfo.old = editInfo;
-    messagePrompt = answerPromptBuilder(input, previousInfo, editInfo);
+    newDisplayInfo.old = newDisplayInfo.current;
+    newDisplayInfo.current = input.extraInfo.modifications;
+    messagePrompt = answerPromptBuilder(
+      input,
+      newDisplayInfo.old,
+      newDisplayInfo.current
+    );
 
     messages.push(
       await getNewMessage(
@@ -85,17 +90,23 @@ async function baseIterationFlow(
 
     // User send any message
   } else {
-    newDisplayInfo.old = newDisplayInfo.current;
     messagePrompt = answerPromptBuilder(input, newDisplayInfo.current, null);
   }
 
   // Generate the message from the agent
   const agentResponse = await invokeAgent(messagePrompt);
-  messages.push(await getNewMessage("assistant", agentResponse.message, input.chat));
+  messages.push(
+    await getNewMessage("assistant", agentResponse.message, input.chat)
+  );
 
   if (agentResponse.shouldFormat || newDisplayInfo.current === null) {
+    newDisplayInfo.old = newDisplayInfo.current;
     // Generate the output from the message of the agent
-    newDisplayInfo.current = await extractFunction(input, agentResponse, newDisplayInfo.old);
+    newDisplayInfo.current = await extractFunction(
+      input,
+      agentResponse,
+      newDisplayInfo.old
+    );
     newDisplayInfo.author = "assistant";
   }
 

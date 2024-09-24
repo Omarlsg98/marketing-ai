@@ -1,5 +1,4 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   ChatEditColumnComponent,
@@ -31,7 +30,7 @@ interface JourneyStageProps {
 const JourneyStage: React.FC<JourneyStageProps> = ({ title, data, onEdit }) => {
   return (
     <Card className="w-full">
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 mt-4">
         {Object.entries(data).map(([key, value]) => (
           <div key={key} className="flex items-center space-x-4">
             <Label
@@ -40,11 +39,11 @@ const JourneyStage: React.FC<JourneyStageProps> = ({ title, data, onEdit }) => {
             >
               {key.charAt(0).toUpperCase() + key.slice(1)}
             </Label>
-            <Input
+            <Textarea
               id={`${title}-${key}`}
               value={value}
               onChange={(e) => onEdit(key, e.target.value)}
-              className="flex-grow"
+              className="flex-grow min-h-[40px]"
             />
           </div>
         ))}
@@ -117,30 +116,15 @@ const CustomerJourneyTab: FC<CustomerJourneyTabProps> = ({
   ];
 
   return (
-    <div className="space-y-8">
-      <Card className="mb-6">
+    <div className="space-y-5">
+      <Card >
         <CardHeader>
-          <CardTitle>Customer Journey Overview</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="mb-4 text-sm text-muted-foreground">
+          <CardTitle>Customer Journey</CardTitle>
+          <p className="mb-1 text-sm text-muted-foreground">
             Edit the summary and each stage of the customer journey below. Click
             on each stage to expand and modify its details.
           </p>
-          <Label
-            htmlFor="journey-summary"
-            className="text-sm font-medium mb-2 block"
-          >
-            Journey Summary
-          </Label>
-          <Textarea
-            id="journey-summary"
-            value={journey.summary}
-            onChange={(e) => handleSummaryEdit(e.target.value)}
-            rows={4}
-            className="w-full"
-          />
-        </CardContent>
+        </CardHeader>
       </Card>
 
       <Accordion type="single" collapsible className="w-full">
@@ -166,7 +150,27 @@ const CustomerJourneyTab: FC<CustomerJourneyTabProps> = ({
             </AccordionContent>
           </AccordionItem>
         ))}
+
+        <AccordionItem
+            value="summary"
+            key="summary"
+            className="border rounded-lg mb-4"
+          >
+            <AccordionTrigger className="text-lg font-semibold px-4 py-2 hover:bg-muted/50">
+              Journey Summary
+            </AccordionTrigger>
+            <AccordionContent className="px-4 py-2">
+            <Textarea
+            id="journey-summary"
+            value={journey.summary}
+            onChange={(e) => handleSummaryEdit(e.target.value)}
+            rows={4}
+            className="w-full min-h-[180px]"
+          />
+            </AccordionContent>
+          </AccordionItem>
       </Accordion>
+
       <div className="flex justify-center mt-6">
         <Button
           onClick={submitInfo}

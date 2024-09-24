@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
@@ -45,7 +45,15 @@ const PersonaSelectorTab: FC<PersonaSelectorTabProps> = ({
   };
 
   return (
-    <>
+    <div className="space-y-5">
+      <Card >
+        <CardHeader>
+          <CardTitle>Persona Options</CardTitle>
+          <p className="mb-1 text-sm text-muted-foreground">
+            Choose the persona that you want to create today
+          </p>
+        </CardHeader>
+      </Card>
       <RadioGroup
         value={selectedPersonaId || ""}
         onValueChange={setSelectedPersona}
@@ -97,7 +105,7 @@ const PersonaSelectorTab: FC<PersonaSelectorTabProps> = ({
           <CheckCircle className="ml-2 h-5 w-5" />
         </Button>
       </div>
-    </>
+    </div>
   );
 };
 

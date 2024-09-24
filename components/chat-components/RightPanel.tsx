@@ -48,7 +48,7 @@ const ChatRightPanel: FC<ChatRightPanelProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mb-2">
       <Tabs
         value={displayInfo.type}
         //onValueChange={setActiveTab}
