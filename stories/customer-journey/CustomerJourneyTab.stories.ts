@@ -1,5 +1,4 @@
 import CustomerJourneyTabComponent from "@/components/customer-journey/CustomerJourneyTab";
-import { CustomerJourneyInfo } from "@/lib/constants/personaConstants";
 import type { Meta, StoryObj } from "@storybook/react";
 
 const personaInformationExample = {
@@ -91,23 +90,23 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 //More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
-export const ProfileTab: Story = {
-  args: {
-    currentTabInfo: CustomerJourneyInfo[0],
-    personaInformation: personaInformationExample,
-  },
-};
+// export const ProfileTab: Story = {
+//   args: {
+//     currentTabInfo: CustomerJourneyInfo[0],
+//     personaInformation: personaInformationExample,
+//   },
+// };
 
-export const DiscoveryTab: Story = {
-  args: {
-    currentTabInfo: CustomerJourneyInfo[1],
-    personaInformation: personaInformationExample,
-  },
-};
+// export const DiscoveryTab: Story = {
+//   args: {
+//     currentTabInfo: CustomerJourneyInfo[1],
+//     personaInformation: personaInformationExample,
+//   },
+// };
 
-export const EvaluationTab: Story = {
-  args: {
-    currentTabInfo: CustomerJourneyInfo[2],
-    personaInformation: personaInformationExample,
-  },
-};
+// export const EvaluationTab: Story = {
+//   args: {
+//     currentTabInfo: CustomerJourneyInfo[2],
+//     personaInformation: personaInformationExample,
+//   },
+// };

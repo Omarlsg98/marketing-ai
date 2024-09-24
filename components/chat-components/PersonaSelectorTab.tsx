@@ -23,13 +23,12 @@ const PersonaSelectorTab: FC<PersonaSelectorTabProps> = ({
 }) => {
   const currentInfoMultiplePersonas =
     displayInfo.current as ChatEditColumnPersonaSelector;
-
+  const [selectedPersonaId, setSelectedPersona] = useState<string | null>(null);
+  
   if (!currentInfoMultiplePersonas) {
     return null;
   }
   const personas = currentInfoMultiplePersonas.personas;
-
-  const [selectedPersonaId, setSelectedPersona] = useState<string | null>(null);
 
   const submitInfo = async () => {
     if (selectedPersonaId) {
@@ -46,7 +45,7 @@ const PersonaSelectorTab: FC<PersonaSelectorTabProps> = ({
 
   return (
     <div className="space-y-5">
-      <Card >
+      <Card>
         <CardHeader>
           <CardTitle>Persona Options</CardTitle>
           <p className="mb-1 text-sm text-muted-foreground">

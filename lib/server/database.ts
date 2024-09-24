@@ -1,9 +1,6 @@
 "use server";
 
-import {
-  createServerSupabaseClient,
-  getSession
-} from "@/lib/server/supabase";
+import { createServerSupabaseClient, getSession } from "@/lib/server/supabase";
 import {
   ChatEditColumnAboutMe,
   ChatEditColumnComponent,
@@ -159,7 +156,7 @@ export const saveEditColumn: (chat: Chat) => Promise<any> = async (chat) => {
   let result: any = null;
 
   switch (type) {
-    case "multiplePersona":
+    case "multiplePersona": {
       const personas = current as ChatEditColumnPersonaSelector;
 
       const supabase = createServerSupabaseClient();
@@ -187,8 +184,8 @@ export const saveEditColumn: (chat: Chat) => Promise<any> = async (chat) => {
 
       result = await bulkInsertRecords("persona", fullPersonas);
       return result;
-
-    case "persona":
+    }
+    case "persona": {
       const persona = current as ChatEditColumnPersona;
       const personaRecord: Database["public"]["Tables"]["persona"]["Insert"] = {
         information: persona,
@@ -200,8 +197,8 @@ export const saveEditColumn: (chat: Chat) => Promise<any> = async (chat) => {
 
       result = await updateRecord("persona", personaRecord);
       return result;
-
-    case "customerJourney":
+    }
+    case "customerJourney": {
       const journey = current as ChatEditColumnCustomerJourney;
       const journeyRecord: Database["public"]["Tables"]["customer_journey"]["Insert"] =
         {
@@ -214,7 +211,8 @@ export const saveEditColumn: (chat: Chat) => Promise<any> = async (chat) => {
 
       result = await upsertRecord("customer_journey", journeyRecord);
       return result;
-    case "image":
+    }
+    case "image": {
       const imageinfo = current as ChatEditColumnImage;
 
       const imageRecord: Database["public"]["Tables"]["persona"]["Update"] = {
@@ -226,8 +224,8 @@ export const saveEditColumn: (chat: Chat) => Promise<any> = async (chat) => {
 
       result = await updateRecord("persona", imageRecord);
       return result;
-
-    case "aboutMe":
+    }
+    case "aboutMe": {
       const aboutMe = current as ChatEditColumnAboutMe;
       const aboutMeRecord: Database["public"]["Tables"]["persona"]["Update"] = {
         id: chat.object_context_id,
@@ -238,12 +236,11 @@ export const saveEditColumn: (chat: Chat) => Promise<any> = async (chat) => {
 
       result = await updateRecord("persona", aboutMeRecord);
       return result;
-
-    default:
+    }
+    default: {
       throw new Error("Invalid type");
+    }
   }
-
-  return result;
 };
 
 export const getPersonas: (

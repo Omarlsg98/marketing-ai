@@ -27,7 +27,7 @@ interface JourneyStageProps {
   onEdit: (field: string, value: string) => void;
 }
 
-const JourneyStage: React.FC<JourneyStageProps> = ({ title, data, onEdit }) => {
+const JourneyStage: FC<JourneyStageProps> = ({ title, data, onEdit }) => {
   return (
     <Card className="w-full">
       <CardContent className="space-y-4 mt-4">
@@ -65,12 +65,13 @@ const CustomerJourneyTab: FC<CustomerJourneyTabProps> = ({
 }) => {
   const currentInfoJourney =
     displayInfo.current as ChatEditColumnCustomerJourney;
+
+  const [journey, setJourney] = useState(currentInfoJourney);
+  const [hasChanges, setHasChanges] = useState(false);
   if (!currentInfoJourney) {
     return null;
   }
-  const [journey, setJourney] = useState(currentInfoJourney);
-  const [hasChanges, setHasChanges] = useState(false);
-
+  
   type Stage =
     | "awareness"
     | "consideration"
@@ -117,7 +118,7 @@ const CustomerJourneyTab: FC<CustomerJourneyTabProps> = ({
 
   return (
     <div className="space-y-5">
-      <Card >
+      <Card>
         <CardHeader>
           <CardTitle>Customer Journey</CardTitle>
           <p className="mb-1 text-sm text-muted-foreground">
@@ -152,23 +153,23 @@ const CustomerJourneyTab: FC<CustomerJourneyTabProps> = ({
         ))}
 
         <AccordionItem
-            value="summary"
-            key="summary"
-            className="border rounded-lg mb-4"
-          >
-            <AccordionTrigger className="text-lg font-semibold px-4 py-2 hover:bg-muted/50">
-              Journey Summary
-            </AccordionTrigger>
-            <AccordionContent className="px-4 py-2">
+          value="summary"
+          key="summary"
+          className="border rounded-lg mb-4"
+        >
+          <AccordionTrigger className="text-lg font-semibold px-4 py-2 hover:bg-muted/50">
+            Journey Summary
+          </AccordionTrigger>
+          <AccordionContent className="px-4 py-2">
             <Textarea
-            id="journey-summary"
-            value={journey.summary}
-            onChange={(e) => handleSummaryEdit(e.target.value)}
-            rows={4}
-            className="w-full min-h-[180px]"
-          />
-            </AccordionContent>
-          </AccordionItem>
+              id="journey-summary"
+              value={journey.summary}
+              onChange={(e) => handleSummaryEdit(e.target.value)}
+              rows={4}
+              className="w-full min-h-[180px]"
+            />
+          </AccordionContent>
+        </AccordionItem>
       </Accordion>
 
       <div className="flex justify-center mt-6">

@@ -138,10 +138,11 @@ const PersonaTab: FC<PersonaTabProps> = ({
   submitting,
 }) => {
   const currentInfoPersona = displayInfo.current as ChatEditColumnPersona;
-  if (!currentInfoPersona) return null;
-
   const [persona, setPersona] = useState(currentInfoPersona);
   const [hasChanges, setHasChanges] = useState(false);
+
+
+  if (!currentInfoPersona) return null;
 
   const handleEdit = (field: string, value: string | string[]) => {
     setPersona((prev) => ({ ...prev, [field]: value }));

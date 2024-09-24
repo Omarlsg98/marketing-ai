@@ -1,7 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChatEditColumnComponent } from "@/types/components/chatTab";
 import { ExtraInfo } from "@/types/interseed/chat";
-import { FC, useState } from "react";
+import { FC, ReactNode, useState } from "react";
 import AboutMeTab from "./AboutMeTab";
 import CustomerJourneyTab from "./CustomerJourneyTab";
 import ImageGenerationTab from "./ImageGenerationTab";
@@ -10,7 +10,7 @@ import PersonaTab from "./PersonaTab";
 
 interface LoadingWrapperProps {
   isLoading: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 const LoadingWrapper: FC<LoadingWrapperProps> = ({ children, isLoading }) => {
@@ -40,11 +40,9 @@ const ChatRightPanel: FC<ChatRightPanelProps> = ({
     message: string,
     extraInfo: ExtraInfo
   ) => Promise<void> = async (message, extraInfo) => {
-    if (true) {
-      setSubmitting(true);
-      await onDone(message, extraInfo);
-      setSubmitting(false);
-    }
+    setSubmitting(true);
+    await onDone(message, extraInfo);
+    setSubmitting(false);
   };
 
   return (

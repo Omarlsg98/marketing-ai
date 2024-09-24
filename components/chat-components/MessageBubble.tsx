@@ -24,7 +24,7 @@ export function MessageBubble({
         <div
           className={`prose p-4 rounded-lg max-w-[calc(100%-3.5rem)] ${isUser ? "bg-primary text-primary-foreground" : "bg-secondary text-secondary-foreground"}`}
         >
-          <ReactMarkdown children={message.content} />
+          <ReactMarkdown>{message.content}</ReactMarkdown>
         </div>
       </div>
     </div>
