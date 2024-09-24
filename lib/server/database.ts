@@ -277,10 +277,8 @@ export const getPersonas: (
   return data;
 };
 
-export const getPersonaFormatted: (
+export const getPersona = async (
   personaId: string
-) => Promise<Database["public"]["Tables"]["persona"]["Update"]> = async (
-  personaId
 ) => {
   const supabase = createServerSupabaseClient();
 
@@ -290,7 +288,11 @@ export const getPersonaFormatted: (
       `
     id,
     information,
-    short_information
+    image_path,
+    short_information,
+    finished,
+    about_me,
+    customer_journey(*)
     `
     )
     .eq("id", personaId)
