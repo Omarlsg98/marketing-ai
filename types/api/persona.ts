@@ -1,6 +1,1 @@
-import { PersonaInformation } from "../database";
-
-export type PersonaListOutRecord = PersonaInformation['v1_short'] & {image_url: string};
-export type PersonaListOut = (PersonaListOutRecord)[] ;
-
 export type PersonaUpdateInput = FormData;

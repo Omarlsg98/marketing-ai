@@ -100,7 +100,7 @@ const generateImage = async function (
     "image/png"
   );
 
-  const { signedUrl } = await uploadFile(
+  const { signedUrl, data } = await uploadFile(
     "persona_images",
     image.name,
     image
@@ -109,6 +109,7 @@ const generateImage = async function (
   return {
     imagePrompt: prompt,
     imageUrl: signedUrl,
+    imagePath: data.path,
   };
 };
 

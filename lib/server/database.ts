@@ -219,7 +219,7 @@ export const saveEditColumn: (chat: Chat) => Promise<any> = async (chat) => {
 
       const imageRecord: Database["public"]["Tables"]["persona"]["Update"] = {
         id: chat.object_context_id,
-        image_path: imageinfo.imageUrl,
+        image_path: imageinfo.imagePath,
         user_id: chat.user_id,
         author: author,
       };
@@ -234,6 +234,7 @@ export const saveEditColumn: (chat: Chat) => Promise<any> = async (chat) => {
         about_me: aboutMe.aboutMe,
         user_id: chat.user_id,
         author: author,
+        finished: true,
       };
 
       result = await updateRecord("persona", aboutMeRecord);
@@ -261,6 +262,9 @@ export const getPersonas: (
     .select(
       `
     id,
+    is_suggestion,
+    image_path,
+    information,
     short_information
     `
     )

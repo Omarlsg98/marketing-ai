@@ -94,6 +94,7 @@ const ChatEditColumnCustomerJourneySchema = z.object({
 const ChatEditColumnImageSchema = z.object({
   imagePrompt: z.string(),
   imageUrl: z.string(),
+  imagePath: z.string(),
 });
 
 const ChatEditColumnAboutMeSchema = z.object({
