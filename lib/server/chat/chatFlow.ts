@@ -283,7 +283,7 @@ async function executeEndState(input: FlowInput): Promise<FlowOutput> {
     nextState: input.chatState.next,
     messages: input.lastMessages,
     chat: input.chat,
-    stateDone: false,
+    stateDone: true,
   };
 }
 

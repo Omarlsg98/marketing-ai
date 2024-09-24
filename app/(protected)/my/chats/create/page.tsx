@@ -1,6 +1,7 @@
 "use client";
 
 import ChatUI from "@/components/chat-components/Chat";
+import { ChatGetOut } from "@/types/api/chat";
 import { Chat } from "@/types/database";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -9,8 +10,19 @@ export default function Component() {
   const router = useRouter();
 
   useEffect(() => {
-    const startChat = async () => {
-      const newChat = await fetch("/api/chat/create", {
+    const execute = async () => {
+      const getResponse = await fetch("/api/chat", {
+        method: "GET",
+      });
+
+      let { chat } = (await getResponse.json()) as ChatGetOut;
+      //redirect to chat page
+      if (chat) {
+        router.push(`/my/chats/${chat.id}`);
+        return;
+      }
+
+      const postRepsonse = await fetch("/api/chat", {
         method: "POST",
         body: JSON.stringify({
           title: "New Persona",
@@ -19,23 +31,24 @@ export default function Component() {
         }),
       });
 
-      const { chat } = await newChat.json();
+      const postJson = (await postRepsonse.json()) as ChatGetOut;
+      chat = postJson.chat;
+
       console.log(chat);
 
-      const chatId = chat.id;
-
-      await fetch(`/api/chat/${chatId}/send`, {
+      await fetch(`/api/chat/${chat.id}/send`, {
         method: "POST",
         body: JSON.stringify({ message: "Hi Ethan!" }),
       });
 
       //redirect to chat page
-      router.push(`/my/personas/chat/${chatId}`);
+      router.push(`/my/chats/${chat.id}`);
     };
-    startChat();
+
+    execute();
   }, []);
 
-  const emptyChat:Chat = {
+  const emptyChat: Chat = {
     context: "test",
     created_at: "2021-10-01T00:00:00.000Z",
     description: "test",
@@ -51,7 +64,7 @@ export default function Component() {
     deleted_at: "",
     last_message_id_in_context: "sdfsdf",
     object_context_id: "",
-    substep_id: 0
+    substep_id: 0,
   };
 
   return (

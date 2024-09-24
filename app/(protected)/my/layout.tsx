@@ -4,8 +4,8 @@ import "@/app/globals.css";
 import SideNav from "@/components/general/SideNav";
 import { ReactNode, useState } from "react";
 
-export default function RootLayout({ children }: { children: ReactNode }) {
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+export default function RootLayoutMySection({ children }: { children: ReactNode }) {
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (

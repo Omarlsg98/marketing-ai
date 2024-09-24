@@ -73,20 +73,22 @@ export const getLastMessages: (chat: Chat) => Promise<Message[]> = async (
 };
 
 export const getChat: (
-  chatId: string
+  chatId: string | null
 ) => Promise<Database["public"]["Tables"]["llm_chats"]["Row"]> = async (
   chatId
 ) => {
   const supabase = createServerSupabaseClient();
-  const { data, error } = await supabase
-    .from("llm_chats")
-    .select("*")
-    .eq("id", chatId)
-    .single();
+  const query = supabase.from("llm_chats").select("*");
+
+  if (chatId) {
+    query.eq("id", chatId);
+  }
+
+  const { data, error } = await query.single();
 
   handleError(error);
 
-  if (!data) {
+  if (!data && chatId) {
     throw new Error("Chat not found");
   }
 

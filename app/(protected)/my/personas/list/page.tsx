@@ -50,10 +50,10 @@ export default function Component() {
               {!loading &&  personas.length > 0 &&<PersonaOverview />}
               {!loading && personas.length === 0 && (
                 <div className="items-center">
-                <h4  className="text-l text-gray-800">No personas found. Create a new persona to get started.</h4>
+                <h4  className="text-l text-gray-800">No personas found. Talk to Ethan to create a new persona and get started.</h4>
                 <br />
-                <Link href="/my/personas/create" className="bg-[#75C5D5] text-white px-4 py-2 rounded-md w-full sm:w-auto">
-                  Create Persona 
+                <Link href="/my/chats/create" className="bg-[#75C5D5] text-white px-4 py-2 rounded-md w-full sm:w-auto">
+                  Talk to Ethan! 
                 </Link>
                </div>
               )}

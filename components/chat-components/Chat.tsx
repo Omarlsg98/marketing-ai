@@ -9,7 +9,6 @@ import { ChatEditColumnComponent } from "@/types/components/chatTab";
 import { Chat, Message } from "@/types/database";
 import { ExtraInfo } from "@/types/interseed/chat";
 import { FC, useEffect, useRef, useState } from "react";
-import { ScrollArea } from "../ui/scroll-area";
 import ChatRightPanel from "./RightPanel";
 
 interface ChatProps {
@@ -40,11 +39,13 @@ const ChatUI: FC<ChatProps> = ({ chat, messages, handleSendMessage }) => {
     }
   };
 
-  const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (messagesContainerRef.current) {
+      const { scrollHeight, clientHeight } = messagesContainerRef.current;
+      messagesContainerRef.current.scrollTop = scrollHeight - clientHeight;
+    }
   };
 
   useEffect(() => {
@@ -74,8 +75,7 @@ const ChatUI: FC<ChatProps> = ({ chat, messages, handleSendMessage }) => {
         className="flex flex-col"
         style={{ width: `${chatWidth}%`, minWidth: "300px" }}
       >
-        <div className="flex-1 overflow-auto p-4">
-        <ScrollArea ref={scrollAreaRef} className="flex-grow p-4">
+        <div ref={messagesContainerRef} className="flex-1 overflow-auto p-4">
           {messages.map((message, index) => (
             <MessageBubble
               key={index}
@@ -97,8 +97,6 @@ const ChatUI: FC<ChatProps> = ({ chat, messages, handleSendMessage }) => {
               </div>
             </div>
           )}
-            <div ref={bottomRef} />
-          </ScrollArea>
         </div>
         <ChatInput
           onSendMessage={handleSendMessageWrapper}
