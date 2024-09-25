@@ -72,7 +72,7 @@ export default function LogInPage() {
 
   const handleForgotPassword = (e: React.MouseEvent) => {
     e.preventDefault()
-    router.push('/forgot-password')
+    router.push('/auth/reset-password')
   }
 
   const inputClassName = "w-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#8DBFBD] focus:border-[#8DBFBD] hover:shadow-[0_0_6.9px_rgba(141,191,189,0.7)]"
@@ -153,7 +153,7 @@ export default function LogInPage() {
                 {passwordError && <p className="text-red-500 text-sm">{passwordError}</p>}
                 <div className="text-right">
                   <a
-                    href="#"
+                    href="/auth/reset-password"
                     onClick={handleForgotPassword}
                     className="text-sm text-[#5EA3F4] hover:underline"
                   >
