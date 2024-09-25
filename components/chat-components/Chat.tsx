@@ -22,7 +22,7 @@ const ChatUI: FC<ChatProps> = ({ chat, messages, handleSendMessage }) => {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (chat && chat.display_info !== null) {
+    if (chat && (chat.display_info !== null || chat.state === "end")) {
       setChatWidth(50);
     } else {
       setChatWidth(100);
@@ -106,22 +106,26 @@ const ChatUI: FC<ChatProps> = ({ chat, messages, handleSendMessage }) => {
       </div>
 
       {/* Right Panel */}
-      {chatWidth != 100 && chat && chat.display_info && (
-        <>
-          <ResizableDivider onResize={handleResize} />
-          <div className="flex-1 overflow-auto p-4">
-            <ChatRightPanel
-              onDone={handleSendMessageWrapper} // TODO: Implement this
-              displayInfo={
-                JSON.parse(
-                  chat.display_info as string
-                ) as ChatEditColumnComponent
-              }
-              isLoading={loading}
-            />
-          </div>
-        </>
-      )}
+      {chatWidth != 100 &&
+        chat &&
+        (chat.display_info !== null || chat.state === "end") && (
+          <>
+            <ResizableDivider onResize={handleResize} />
+            <div className="flex-1 overflow-auto p-4">
+              <ChatRightPanel
+                onDone={handleSendMessageWrapper} // TODO: Implement this
+                displayInfo={
+                  JSON.parse(
+                    chat.display_info as string
+                  ) as ChatEditColumnComponent
+                }
+                isLoading={loading}
+                isEnd={chat.state === "end"}
+                personaId={chat.object_context_id}
+              />
+            </div>
+          </>
+        )}
     </div>
   );
 };

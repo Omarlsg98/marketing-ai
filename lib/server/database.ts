@@ -178,7 +178,7 @@ export const saveEditColumn: (chat: Chat) => Promise<any> = async (chat) => {
           return {
             short_information: persona,
             author: author,
-            id: uuidv4(),
+            id: persona.id,
             user_id: chat.user_id,
             is_suggestion: true,
           };

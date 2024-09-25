@@ -141,9 +141,8 @@ const agentActions: AgentAction[] = [
   {
     name: "Ask next MAIN question",
     description:
-      `Ask next MAIN question. Choose this if the user answer is good enough ` +
-      `or if you've been in the same question for too long ` +
-      `or if the user does not seems to know a better answer and wants to continue`,
+      `Ask next MAIN question. Choose this if the user answer is good enough and everything is clear ` +
+      `DON'T choose this if the user's answer is not clear or if he is asking you a question.`,
     func: getNextQuestion,
     role: "assistant",
   },
@@ -187,7 +186,7 @@ export async function questionFlow(input: FlowInput): Promise<FlowOutput> {
   let chat = input.chat;
   let currentQuestion: Question | null = null;
   let remainingQuestions: Question[] = input.chatState.questions.slice();
-  
+
   if (chat.substep_id !== null) {
     currentQuestion = input.chatState.questions[chat.substep_id];
     remainingQuestions = input.chatState.questions.slice(chat.substep_id + 1);
