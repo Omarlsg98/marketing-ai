@@ -31,7 +31,7 @@ const JourneyStage: FC<JourneyStageProps> = ({ title, data, onEdit }) => {
   return (
     <Card className="w-full">
       <CardContent className="space-y-4 mt-4">
-        {Object.entries(data).map(([key, value]) => (
+        {data && Object.entries(data).map(([key, value]) => (
           <div key={key} className="flex items-center space-x-4">
             <Label
               htmlFor={`${title}-${key}`}

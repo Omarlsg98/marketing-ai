@@ -87,7 +87,7 @@ function EditableArrayField({
         <h4 className="font-semibold py-4">{label}</h4>
         {isEditing ? (
           <>
-            {currentValues.map((value, index) => (
+            {currentValues && currentValues.map((value, index) => (
               <div key={index} className="flex items-center space-x-2 mt-2">
                 <Input
                   value={value}
@@ -115,7 +115,7 @@ function EditableArrayField({
         ) : (
           <div className="cursor-pointer" onClick={() => setIsEditing(true)}>
             <ul className="list-disc list-inside">
-              {values.map((value, index) => (
+              {values && values.map((value, index) => (
                 <li key={index}>{value}</li>
               ))}
             </ul>
