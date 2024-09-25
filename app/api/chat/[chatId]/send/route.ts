@@ -7,7 +7,8 @@ import {
   updateChat,
 } from "@/lib/server/database";
 import { NextRequest, NextResponse } from "next/server";
-export const maxDuration = 300;
+
+export const maxDuration = 60;
 
 import chatFlow from "@/lib/server/chat/chatFlow";
 import { schemas } from "@/types/api/chat";

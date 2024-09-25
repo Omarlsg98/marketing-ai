@@ -115,7 +115,7 @@ function EditableArrayField({
         ) : (
           <div className="cursor-pointer" onClick={() => setIsEditing(true)}>
             <ul className="list-disc list-inside">
-              {values && values.map((value, index) => (
+              {values && Array.isArray(values) &&values.map((value, index) => (
                 <li key={index}>{value}</li>
               ))}
             </ul>
