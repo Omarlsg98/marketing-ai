@@ -1,7 +1,10 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ChatEditColumnComponent } from "@/types/components/chatTab";
 import { ExtraInfo } from "@/types/interseed/chat";
+import { UserRoundSearch } from "lucide-react";
+import Link from "next/link";
 import { FC, ReactNode, useState } from "react";
+import { Button } from "../ui/button";
 import AboutMeTab from "./AboutMeTab";
 import CustomerJourneyTab from "./CustomerJourneyTab";
 import ImageGenerationTab from "./ImageGenerationTab";
@@ -27,12 +30,16 @@ interface ChatRightPanelProps {
   displayInfo: ChatEditColumnComponent;
   onDone: (message: string, extraInfo: ExtraInfo) => Promise<void>;
   isLoading: boolean;
+  isEnd: boolean;
+  personaId: string;
 }
 
 const ChatRightPanel: FC<ChatRightPanelProps> = ({
   displayInfo,
   onDone,
   isLoading,
+  isEnd,
+  personaId,
 }) => {
   //const [activeTab, setActiveTab] = useState("multiplePersona");
   const [submitting, setSubmitting] = useState(false);
@@ -44,6 +51,21 @@ const ChatRightPanel: FC<ChatRightPanelProps> = ({
     await onDone(message, extraInfo);
     setSubmitting(false);
   };
+
+  if (isEnd) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[50vh] text-center">
+        <h2 className="text-2xl font-bold mb-4">Persona Created!</h2>
+        <p className="text-muted-foreground mb-6">
+          You can now view your persona here:
+        </p>
+        <Button>
+          <UserRoundSearch className="w-6 h-6 inline-block" />{" "}
+          <Link href={`/my/personas/${personaId}`}>View Persona</Link>
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 mb-2">
