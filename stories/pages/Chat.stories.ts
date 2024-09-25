@@ -60,6 +60,7 @@ const meta = {
     chat: myChat,
     messages: myMessages,
     handleSendMessage,
+    initLoading: false,
   },
 } satisfies Meta<typeof ChatUI>;
 
@@ -74,6 +75,16 @@ export const Base: Story = {
     handleSendMessage,
   },
 };
+
+export const Loading: Story = {
+  args: {
+    chat: myChat,
+    messages: myMessages,
+    handleSendMessage,
+    initLoading: true,
+  },
+};
+
 
 export const multiplePersonas: Story = {
   args: {
