@@ -84,7 +84,7 @@ export const getChat: (
     query.eq("id", chatId);
   }
 
-  const { data, error } = await query.single();
+  const { data, error } = await query.limit(1).maybeSingle();
 
   handleError(error);
 
@@ -277,9 +277,7 @@ export const getPersonas: (
   return data;
 };
 
-export const getPersona = async (
-  personaId: string
-) => {
+export const getPersona = async (personaId: string) => {
   const supabase = createServerSupabaseClient();
 
   const { data, error } = await supabase

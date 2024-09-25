@@ -39,7 +39,7 @@ const makeQuestion = async (
     question,
     lastMessages
   );
-  const formulatedQuestion = await sendChatGPT(prompt, 200);
+  const formulatedQuestion = await sendChatGPT(prompt, 1200);
   return formulatedQuestion;
 };
 
@@ -60,7 +60,7 @@ const getClarification: AgentActionFunction = async (
     currentQuestion,
     lastMessages
   );
-  const newMessage = await sendChatGPT(prompt, 200);
+  const newMessage = await sendChatGPT(prompt, 1200);
   return { nextQuestion: currentQuestion, newMessage };
 };
 
@@ -82,7 +82,7 @@ const getFollowUpQuestion: AgentActionFunction = async (
     lastMessages,
     outstandingQuestions
   );
-  const newMessage = await sendChatGPT(prompt, 200);
+  const newMessage = await sendChatGPT(prompt, 1200);
   return { nextQuestion: currentQuestion, newMessage };
 };
 
@@ -103,7 +103,7 @@ const getConfirmationContinue: AgentActionFunction = async (
     currentQuestion,
     lastMessages
   );
-  const newMessage = await sendChatGPT(prompt, 200);
+  const newMessage = await sendChatGPT(prompt, 1000);
   return { nextQuestion: currentQuestion, newMessage };
 };
 
@@ -133,7 +133,7 @@ const getFreeFormAnswer: AgentActionFunction = async (
     currentQuestion,
     lastMessages
   );
-  const newMessage = await sendChatGPT(prompt, 500);
+  const newMessage = await sendChatGPT(prompt, 2000);
   return { nextQuestion: currentQuestion, newMessage };
 };
 

@@ -80,6 +80,7 @@ export default function Component() {
         },
       ]}
       handleSendMessage={null}
+      initLoading={true}
     />
   );
 }

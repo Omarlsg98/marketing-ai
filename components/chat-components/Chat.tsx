@@ -15,11 +15,12 @@ interface ChatProps {
   chat: Chat | null;
   messages: Message[];
   handleSendMessage: (message: string, extraInfo?: ExtraInfo) => Promise<void>;
+  initLoading?: boolean;
 }
 
-const ChatUI: FC<ChatProps> = ({ chat, messages, handleSendMessage }) => {
+const ChatUI: FC<ChatProps> = ({ chat, messages, handleSendMessage, initLoading}) => {
   const [chatWidth, setChatWidth] = useState(100); // 50% initial width
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(initLoading || false);
 
   useEffect(() => {
     if (chat && (chat.display_info !== null || chat.state === "end")) {
