@@ -34,12 +34,12 @@ const PersonasGrid: FC<PersonasGridUIProps> = ({ personas }) => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
             {personas.map((persona) => (
               <Link
+                key={persona.id}
                 href={
                   !persona.isSuggestion ? `/my/personas/${persona.id}` : "#"
                 }
               >
                 <Card
-                  key={persona.id}
                   className={`transition-all duration-300  ${
                     persona.isSuggestion
                       ? "bg-card border-dashed sketch-bg"
