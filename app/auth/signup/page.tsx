@@ -1,6 +1,7 @@
 'use client'
 
 import React, { FormEvent, useEffect, useState } from 'react'
+import Image from 'next/image'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -100,12 +101,20 @@ export default function CreateAccountPage() {
       <div className="w-full lg:w-2/3 flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-md">
           <div className="space-y-1 flex flex-col items-center mb-8">
-            <div className="w-16 h-16 bg-gray-200 rounded-full mb-4" />
+          <div className="w-16 h-16 relative mb-4">
+              <Image
+                src="/logo.png"
+                alt="Logo"
+                layout="fill"
+                objectFit="contain"
+                priority
+              />
+            </div>
             <h1 className="text-3xl font-bold">Create Account</h1>
             <p className="text-sm text-muted-foreground">
               Already have an account?{' '}
-              <Link href="/signin" className="text-[#5EA3F4] hover:underline">
-                Sign in here
+              <Link href="/auth/login" className="text-[#5EA3F4] hover:underline">
+                Log in here
               </Link>
             </p>
           </div>
@@ -219,27 +228,27 @@ export default function CreateAccountPage() {
           <div className="flex justify-center space-x-4">
             <Button
               onClick={() => {/* Handle LinkedIn sign-up */}}
-              className="w-10 h-10 bg-[#0077B5] text-white rounded-full flex items-center justify-center hover:bg-[#006699] transition-colors"
+              className="w-14 h-14 bg-[#0077B5] text-white rounded-full flex items-center justify-center hover:bg-[#006699] transition-colors"
             >
-              <FaLinkedin className="h-5 w-5" />
+              <FaLinkedin className="h-7 w-7" />
             </Button>
             <Button
               onClick={() => {/* Handle Google sign-up */}}
-              className="w-10 h-10 bg-[#DB4437] text-white rounded-full flex items-center justify-center hover:bg-[#C53929] transition-colors"
+              className="w-14 h-14 bg-[#DB4437] text-white rounded-full flex items-center justify-center hover:bg-[#C53929] transition-colors"
             >
-              <FaGoogle className="h-5 w-5" />
+              <FaGoogle className="h-7 w-7" />
             </Button>
             <Button
               onClick={() => {/* Handle GitHub sign-up */}}
-              className="w-10 h-10 bg-[#333] text-white rounded-full flex items-center justify-center hover:bg-[#24292e] transition-colors"
+              className="w-14 h-14 bg-[#333] text-white rounded-full flex items-center justify-center hover:bg-[#24292e] transition-colors"
             >
-              <FaGithub className="h-5 w-5" />
+              <FaGithub className="h-7 w-7" />
             </Button>
             <Button
               onClick={() => {/* Handle Facebook sign-up */}}
-              className="w-10 h-10 bg-[#1877F2] text-white rounded-full flex items-center justify-center hover:bg-[#166FE5] transition-colors"
+              className="w-14 h-14 bg-[#1877F2] text-white rounded-full flex items-center justify-center hover:bg-[#166FE5] transition-colors"
             >
-              <FaFacebook className="h-5 w-5" />
+              <FaFacebook className="h-7 w-7" />
             </Button>
           </div>
         </div>
