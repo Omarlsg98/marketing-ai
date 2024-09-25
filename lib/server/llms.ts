@@ -8,6 +8,60 @@ export type llm_message = {
   content: string;
 };
 
+import OpenAI from "openai";
+import { zodResponseFormat } from "openai/helpers/zod";
+import { z } from "zod";
+
+export const sendChatGPTJSON = async function (
+  prompt: string,
+  schema: z.AnyZodObject,
+  maxTokens: number = 100,
+  temperature: number = 1
+): Promise<any> {
+  if (DEBUG_LLM) {
+    console.log("------ DEBUG_LLM PROMPT:\n" + prompt);
+  }
+
+  const openai = new OpenAI();
+
+  const completion = await openai.beta.chat.completions.parse({
+    model: process.env.LLM_MODEL,
+    max_tokens: maxTokens,
+    temperature: temperature,
+    messages: [{ role: "system", content: prompt }],
+    response_format: zodResponseFormat(schema, "object"),
+  });
+
+  if (DEBUG_LLM) {
+    console.log("------ DEBUG_LLM RESPONSE:\n" +  completion.choices[0].message.content);
+  }
+
+  const event = completion.choices[0].message.parsed;
+  return event;
+};
+
+export const sendChatGPTUntilInteger = async (
+  prompt: string,
+  maxRetries: number
+) => {
+  let retries = maxRetries;
+  while (retries > 0) {
+    try {
+      let response = await sendChatGPT(prompt, 5);
+      // remove everythibg that is not a number
+      response = response.replace(/\D/g, "");
+      const responseInt = parseInt(response);
+      retries--;
+      if (!isNaN(responseInt)) {
+        return responseInt;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  throw new Error("Could not get a valid integer");
+};
+
 export const sendChatGPT: (
   prompt: string,
   maxTokens?: number,

@@ -1,19 +1,38 @@
-import { Database } from "../supabase";
+import z from "zod";
+import { Chat, Message } from "../database";
+import { extraInfoSchema } from "../interseed/chat";
 
-export type ChatGetInput = {
-    chatId: string;
+const ChatGetInputSchema = z.object({
+    chatId: z.string(),
+});
+
+export type ChatGetInput = z.infer<typeof ChatGetInputSchema>;
+
+const ChatGetOutSchema = z.object({
+    chat: z.custom<Chat>(),
+    messages: z.array(z.custom<Message>()),
+});
+
+
+export type ChatGetOut = z.infer<typeof ChatGetOutSchema>;
+
+const ChatSendInSchema = z.object({
+    message: z.string(),
+    extraInfo: extraInfoSchema.optional(),
+});
+
+export type ChatSendIn = z.infer<typeof ChatSendInSchema>;
+
+const ChatSendOutSchema = z.object({
+    chat: z.custom<Chat>(),
+    messages: z.array(z.custom<Message>()),
+});
+
+export type ChatSendOut = z.infer<typeof ChatSendOutSchema>;
+
+export const schemas = {
+    ChatGetInputSchema,
+    ChatGetOutSchema,
+    ChatSendInSchema,
+    ChatSendOutSchema,
 };
-
-export type ChatGetOut = {
-    output: Database['public']['Tables']['llm_messages']['Row'][];
-    progress: number;
-    lastQuestion: Database['public']['Tables']['questions']['Row'];
-    options: string[] | null;
-};
-
-export type ChatSendOut = {
-    output: Database['public']['Tables']['llm_messages']['Row'];
-    question: Database['public']['Tables']['questions']['Row'];
-    options: string[] | null;
-    progress: number;
-  };

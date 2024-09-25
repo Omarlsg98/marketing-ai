@@ -1,117 +1,73 @@
-import { getAgentAnswer } from '@/lib/server/chat/agent';
 import {
-  getAllQuestion,
   getChat,
-  getQuestionOptions,
-  getUserId,
-  insertRecord
-} from '@/lib/server/database';
-import { Database } from '@/types/supabase';
-import { NextRequest, NextResponse } from 'next/server';
+  getLastMessages,
+  getNewMessage,
+  registerMessages,
+  saveEditColumn,
+  updateChat,
+} from "@/lib/server/database";
+import { NextRequest, NextResponse } from "next/server";
 export const maxDuration = 300;
 
-//Register messages from the AI, the user and the system
-const registerMessage = async (
-  chatId: string,
-  message: string,
-  role: Database['public']['Tables']['llm_messages']['Insert']['role']
-) => {
-  const NewMessage: Database['public']['Tables']['llm_messages']['Insert'] = {
-    chat_id: chatId,
-    user_id: await getUserId(),
-    content: message,
-    role: role
-  };
+import chatFlow from "@/lib/server/chat/chatFlow";
+import { schemas } from "@/types/api/chat";
 
-  const messageRecord = await insertRecord('llm_messages', NewMessage);
-  return messageRecord;
-};
+const ChatSendInSchema = schemas.ChatSendInSchema;
 
 export async function POST(
   req: NextRequest,
   {
-    params
+    params,
   }: {
     params: { chatId: string };
   }
 ) {
   const requestBody = await req.json();
 
-  const userMessage = requestBody.message;
+  // validate the request body with zod
+  const ChatSendIn = ChatSendInSchema.parse(requestBody);
+
+  const userMessage = ChatSendIn.message;
+  const inputExtraInfo = ChatSendIn.extraInfo;
   const chatId = params.chatId;
+
+  console.log("inputExtraInfo", inputExtraInfo);
+
+  if (userMessage === "") {
+    throw new Error("Please enter a valid message");
+  }
+
+  const chat = await getChat(chatId);
+
   // Register the message from the user
-  await registerMessage(chatId, userMessage, 'user');
-
-  const { chat, prevQuestion } = await getChat(chatId);
-
-  if (chat.status === 'closed') {
-    return NextResponse.json({
-      output: 'This chat is closed'
-    });
-  }
-
-  if (userMessage === '') {
-    return NextResponse.json({
-      output: 'Please enter a message'
-    });
-  }
-
-  // Validate the user message
-  if (
-    prevQuestion?.q_type === 'select' ||
-    prevQuestion?.q_type === 'multi-select'
-  ) {
-    const validOptions = await getQuestionOptions(prevQuestion.id);
-    if (!validOptions) {
-      throw new Error('No options found for the question');
-    }
-
-    const userMessages = userMessage.split('&&');
-    for (const message of userMessages) {
-      if (!validOptions.includes(message)) {
-       throw new Error(`Invalid option: ${message}. Choose from ${validOptions}`);
-      }
-    }
-  } else if (prevQuestion?.q_type === 'number') {
-    if (isNaN(userMessage)) {
-      return NextResponse.json({
-        output: 'Please enter a valid number'
-      });
-    }
-  } else if (prevQuestion?.q_type === 'date') {
-    if (!Date.parse(userMessage)) {
-      return NextResponse.json({
-        output: 'Please enter a valid date'
-      });
-    }
-  }
+  const newMessage = await getNewMessage("user", userMessage, chat);
+  const lastMessages = await getLastMessages(chat);
+  lastMessages.push(newMessage);
 
   // Use the AI to get the next question
-  const { 
-    messageAgent, 
-    role, 
-    question, 
-    actionTakenMessage } =
-    await getAgentAnswer(chat, userMessage, prevQuestion);
+  const { chat: newChat, messages } = await chatFlow(
+    chat,
+    lastMessages,
+    inputExtraInfo
+  );
 
-  let q_options = null;
-  if (
-    question &&
-    (question.q_type === 'select' || question.q_type === 'multi-select')
-  ) {
-    q_options = await getQuestionOptions(question.id);
-  }
+  let newMessages = messages.filter(
+    (message) => message.created_at === null || message.created_at === undefined
+  );
 
-  await registerMessage(chatId, actionTakenMessage, 'system');
-  // Register the message from the AI
-  const newMessage = await registerMessage(chatId, messageAgent, role);
+  // Persist To dabatase newChat, newMessages and NewObjects
+  const promises = [
+    registerMessages(newMessages),
+    updateChat(newChat),
+    saveEditColumn(newChat),
+  ];
+ 
+  await Promise.all(promises);
 
-  const questions = await getAllQuestion(chat.category);
-
+  //remove system messages from the chat
+  newMessages = newMessages.filter((message) => message.role !== "system");
   return NextResponse.json({
-    output: newMessage,
-    question: question,
-    options: q_options,
-    progress: chat.progress
+    chat: newChat,
+    messages: newMessages,
   });
 }
