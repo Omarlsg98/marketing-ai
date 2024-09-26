@@ -6,15 +6,20 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { AlertCircle, Upload, X } from "lucide-react"
 import Image from "next/image"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 
 export default function AccountPage() {
-  const [profilePicture, setProfilePicture] = useState("/logo-white-circle.svg")
+  const [profilePicture, setProfilePicture] = useState<string>("/que-placeholder.png")
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
+  const [firstName, setFirstName] = useState("")
+  const [lastName, setLastName] = useState("")
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    // Handle form submission logic here
-    console.log("Form submitted")
+    // Here you would typically send the data to your backend
+    console.log("Saving changes:", { firstName, lastName, profilePicture })
+    alert("Changes saved successfully!")
   }
 
   const handleProfilePictureUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,7 +28,7 @@ export default function AccountPage() {
       const validTypes = ['image/jpeg', 'image/png', 'image/svg+xml']
       if (validTypes.includes(file.type)) {
         const reader = new FileReader()
-        reader.onload = (e) => {
+        reader.onload = (e: ProgressEvent<FileReader>) => {
           const result = e.target?.result
           if (typeof result === 'string') {
             setProfilePicture(result)
@@ -37,10 +42,11 @@ export default function AccountPage() {
   }
 
   const handleRemoveProfilePicture = () => {
-    setProfilePicture("/logo-white-circle.svg")
+    setProfilePicture("/que-placeholder.png")
     if (fileInputRef.current) {
       fileInputRef.current.value = ""
     }
+    setIsDeleteDialogOpen(false)
   }
 
   return (
@@ -65,7 +71,7 @@ export default function AccountPage() {
                 alt="Profile picture"
                 width={128}
                 height={128}
-                className="rounded-full"
+                className="rounded-full object-cover"
               />
             </div>
             <div className="text-center">
@@ -80,15 +86,32 @@ export default function AccountPage() {
                   onClick={() => fileInputRef.current?.click()}
                 >
                   <Upload className="h-4 w-4" />
+                  <span className="sr-only">Upload profile picture</span>
                 </Button>
-                <Button
-                  size="icon"
-                  variant="outline"
-                  className="rounded-full"
-                  onClick={handleRemoveProfilePicture}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+                <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button
+                      size="icon"
+                      variant="outline"
+                      className="rounded-full"
+                    >
+                      <X className="h-4 w-4" />
+                      <span className="sr-only">Remove profile picture</span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Delete Profile Picture</DialogTitle>
+                      <DialogDescription>
+                        Are you sure you want to delete your profile picture? This action cannot be undone.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                      <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>Cancel</Button>
+                      <Button onClick={handleRemoveProfilePicture}>Delete</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
             <input
@@ -97,6 +120,7 @@ export default function AccountPage() {
               onChange={handleProfilePictureUpload}
               accept="image/png,image/jpeg,image/svg+xml"
               className="hidden"
+              aria-label="Upload profile picture"
             />
           </div>
 
@@ -109,6 +133,8 @@ export default function AccountPage() {
                   name="firstName" 
                   type="text" 
                   required 
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
                   className="mt-1 focus:ring-2 focus:ring-[#8DBFBD] focus:border-[#8DBFBD] hover:shadow-[0_0_6.9px_rgba(141,191,189,0.7)]" 
                 />
               </div>
@@ -119,6 +145,8 @@ export default function AccountPage() {
                   name="lastName" 
                   type="text" 
                   required 
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
                   className="mt-1 focus:ring-2 focus:ring-[#8DBFBD] focus:border-[#8DBFBD] hover:shadow-[0_0_6.9px_rgba(141,191,189,0.7)]" 
                 />
               </div>
