@@ -1,9 +1,9 @@
 import React from 'react'
 import { Button } from "@/components/ui/button"
-import PersonaStats from '@/components/customer/persona/PersonaStats'
-import PersonaTabs from '@/components/customer/persona/PersonaTabs'
+import PersonaStats from './PersonaStats'
+import PersonaTabs from './PersonaTabs'
 
-export default function PersonasPage() {
+export default function Persona() {
   return (
     <div className="bg-background text-foreground w-full h-full overflow-auto">
       <div className="p-6 space-y-8">
@@ -25,6 +25,7 @@ export default function PersonasPage() {
         </div>
 
         <PersonaStats />
+
         <PersonaTabs />
       </div>
     </div>

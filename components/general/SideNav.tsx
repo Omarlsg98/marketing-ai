@@ -8,6 +8,7 @@ import { User, MessageSquare, Users, ClipboardList, Settings, ChevronRight, Bell
 import { useTheme } from "next-themes"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { Button } from "@/components/ui/button"
+import Image from 'next/image'
 
 const navItems = [
   { icon: User, label: 'Account', href: '/my/account' },
@@ -127,7 +128,7 @@ export default function SideNav({ onStateChange, isMobile = false, onClose, isCo
     <div className="flex h-full">
       <nav className="w-16 bg-background border-r border-border flex flex-col items-center">
         <div className="h-16 flex items-center justify-center">
-          <img src="/placeholder.svg?height=40&width=40" alt="Logo" className="w-10 h-10" />
+        <Image src="/logo.png" alt="Logo" width={40} height={40} />
         </div>
         <div className="w-full h-px bg-border" />
         <TooltipProvider>
