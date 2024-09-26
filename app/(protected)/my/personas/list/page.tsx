@@ -1,6 +1,6 @@
 "use server";
 
-import PersonasGrid from "@/components/customer-journey/PersonasList";
+import PersonasGrid from "@/components/customer/persona/PersonasList";
 
 import { getPersonas } from "@/lib/server/database";
 import { getFileUrl } from "@/lib/server/supabase";

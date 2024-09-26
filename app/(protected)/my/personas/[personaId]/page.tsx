@@ -1,6 +1,6 @@
 "use server";
 
-import PersonaProfileUI from "@/components/customer-journey/Persona";
+import PersonaProfileUI from "@/components/customer/persona/Persona";
 import { getPersona } from "@/lib/server/database";
 
 import { getFileUrl } from "@/lib/server/supabase";

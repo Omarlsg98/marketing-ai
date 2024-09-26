@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import PersonasGrid from "@/components/customer-journey/PersonasList";
+import PersonasGrid from "@/components/customer/PersonasList";
 import { PersonaList } from "@/types/components/persona";
 
 const mockPersonas: PersonaList = [

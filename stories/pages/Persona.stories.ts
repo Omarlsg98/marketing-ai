@@ -1,4 +1,4 @@
-import PersonaProfileUI from "@/components/customer-journey/Persona";
+import PersonaProfileUI from "@/components/customer/persona/Persona";
 import { FullPersona } from "@/types/components/persona";
 import type { Meta, StoryObj } from "@storybook/react";
 
