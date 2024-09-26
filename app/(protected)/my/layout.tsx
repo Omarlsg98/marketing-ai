@@ -1,38 +1,43 @@
-"use client";
+"use client"
 
-import "@/app/globals.css";
-import SideNav from "@/components/general/SideNav";
-import { ReactNode, useState } from "react";
+import { ReactNode, useState } from "react"
+import SideNav from "@/components/general/SideNav"
+import { cn } from "@/lib/utils"
 
-export default function RootLayoutMySection({ children }: { children: ReactNode }) {
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(true);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+interface LayoutPrivateProps {
+  children: ReactNode
+}
+
+export default function LayoutPrivate({ children }: LayoutPrivateProps) {
+  const [menuState, setMenuState] = useState<'closed' | 'level1' | 'level2'>('closed')
+
+  const handleMenuStateChange = (newState: 'closed' | 'level1' | 'level2') => {
+    setMenuState(newState)
+  }
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden p-4">
-      {/* Sidebar - hidden on mobile */}
+    <div className="flex h-screen overflow-hidden">
       <aside
-        className={`bg-card text-card-foreground transition-all duration-300 ease-in-out hidden md:block h-full rounded-lg mr-4 ${
-          isSidebarCollapsed ? "w-16" : "w-64"
-        }`}
-        onMouseEnter={() => setIsSidebarCollapsed(false)}
-        onMouseLeave={() => setIsSidebarCollapsed(true)}
+        className={cn(
+          "bg-background border-r transition-all duration-300 ease-in-out",
+          menuState === 'closed' && "w-16",
+          menuState === 'level1' && "w-64",
+          menuState === 'level2' && "w-[320px]"
+        )}
       >
-        <SideNav isCollapsed={isSidebarCollapsed} />
+        <SideNav onStateChange={handleMenuStateChange} />
       </aside>
 
-      {/* Main content */}
-      <main className="flex-1 h-screen flex flex-col overflow-hidden">
-        {/* <Header
-          isMobileMenuOpen={isMobileMenuOpen}
-          setIsMobileMenuOpen={setIsMobileMenuOpen}
-        /> */}
-
-        {/* Content area */}
-        <div className="flex-1 h-full bg-card rounded-lg">
-          {children}
-        </div>
+      <main 
+        className={cn(
+          "flex-1 overflow-auto transition-all duration-300 ease-in-out",
+          menuState === 'closed' && "ml-16",
+          menuState === 'level1' && "ml-64",
+          menuState === 'level2' && "ml-[320px]"
+        )}
+      >
+        {children}
       </main>
     </div>
-  );
+  )
 }

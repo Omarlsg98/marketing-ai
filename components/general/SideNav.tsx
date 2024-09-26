@@ -1,305 +1,196 @@
-"use client";
+"use client"
 
-import { Button } from "@/components/ui/button";
-import {
-  BarChart2,
-  Bot,
-  ChevronDown,
-  ChevronRight,
-  ClipboardList,
-  Eye,
-  HelpCircle,
-  Key,
-  Laptop,
-  LogIn,
-  MessageSquare,
-  Moon,
-  PieChart,
-  PlusCircle,
-  Settings,
-  Sun,
-  User,
-  UserPlus,
-  UserRoundSearch,
-  Users,
-} from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { useState, useCallback, useEffect } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { Users, HelpCircle, Settings, User, CreditCard, Bell, Shield, Zap, Sun, Moon, Laptop } from 'lucide-react'
+import { useTheme } from "next-themes"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { Button } from "@/components/ui/button"
+
+const navItems = [
+  { icon: Users, label: 'Users', href: '/users' },
+  { icon: HelpCircle, label: 'Help', href: '/help' },
+]
+
+const settingsItems = [
+  { id: "account", label: "Account", icon: User },
+  { id: "billing", label: "Billing", icon: CreditCard },
+  { id: "notifications", label: "Notifications", icon: Bell },
+  { id: "security", label: "Security", icon: Shield },
+  { id: "team", label: "Team", icon: Users },
+  { id: "integrations", label: "Integrations", icon: Zap },
+]
 
 interface SideNavProps {
-  isCollapsed: boolean;
-  isMobile?: boolean;
-  onClose?: () => void;
+  onStateChange: (newState: 'closed' | 'level1' | 'level2') => void
 }
 
-interface MenuItem {
-  id: string;
-  icon: React.ReactNode;
-  text: string;
-  href?: string;
-  submenu?: {
-    icon: React.ReactNode;
-    text: string;
-    href: string;
-  }[];
-}
-
-export default function Component({
-  isCollapsed,
-  isMobile = false,
-}: SideNavProps) {
-  const [expandedItems, setExpandedItems] = useState<string[]>([
-    "agents",
-  ]);
-  const [theme, setTheme] = useState<"light" | "dark" | "system">("system");
-  const pathname = usePathname();
+export default function SideNav({ onStateChange }: SideNavProps) {
+  const [activeItem, setActiveItem] = useState<string | null>(null)
+  const [activeSettingsItem, setActiveSettingsItem] = useState<string | null>(null)
+  const { setTheme, theme, systemTheme } = useTheme()
+  const [currentTheme, setCurrentTheme] = useState<string | undefined>(undefined)
+  const pathname = usePathname()
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") as
-      | "light"
-      | "dark"
-      | "system"
-      | null;
-    if (savedTheme) {
-      setTheme(savedTheme);
-      document.documentElement.classList.toggle("dark", savedTheme === "dark");
+    setCurrentTheme(theme === 'system' ? systemTheme : theme)
+  }, [theme, systemTheme])
+
+  const toggleSubMenu = useCallback((label: string) => {
+    setActiveItem(prevActiveItem => {
+      const newActiveItem = prevActiveItem === label ? null : label
+      onStateChange(newActiveItem ? 'level1' : 'closed')
+      return newActiveItem
+    })
+    setActiveSettingsItem(null)
+  }, [onStateChange])
+
+  const toggleSettingsSubMenu = useCallback((id: string) => {
+    setActiveSettingsItem(prevActiveSettingsItem => {
+      const newActiveSettingsItem = prevActiveSettingsItem === id ? null : id
+      onStateChange(newActiveSettingsItem ? 'level2' : 'level1')
+      return newActiveSettingsItem
+    })
+  }, [onStateChange])
+
+  const handleThemeChange = useCallback((value: string) => {
+    if (value) {
+      setTheme(value)
     }
-  }, []);
-
-  const toggleExpanded = (itemId: string) => {
-    setExpandedItems((current) =>
-      current.includes(itemId)
-        ? current.filter((id) => id !== itemId)
-        : [...current, itemId]
-    );
-  };
-
-  const toggleTheme = () => {
-    const newTheme =
-      theme === "light" ? "dark" : theme === "dark" ? "system" : "light";
-    setTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
-    if (newTheme === "dark") {
-      document.documentElement.classList.add("dark");
-    } else if (newTheme === "light") {
-      document.documentElement.classList.remove("dark");
-    } else {
-      const prefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)"
-      ).matches;
-      document.documentElement.classList.toggle("dark", prefersDark);
-    }
-  };
-
-  const menuItems: MenuItem[] = [
-    {
-      id: "agents",
-      icon: <Bot className="w-5 h-5" />,
-      text: "Agents",
-      submenu: [
-        {
-          icon: <UserRoundSearch className="w-4 h-4" />,
-          text: "Ethan",
-          href: "/my/chats/create",
-        },
-      ],
-    },
-    {
-      id: "customerInsights",
-      icon: <Users className="w-5 h-5" />,
-      text: "Customer Insights",
-      submenu: [
-        {
-          icon: <ClipboardList className="w-4 h-4" />,
-          text: "Insights",
-          href: "/my/personas",
-        },
-        {
-          icon: <Eye className="w-4 h-4" />,
-          text: "View All",
-          href: "/my/personas/list",
-        },
-      ],
-    },
-    {
-      id: "auth",
-      icon: <Key className="w-5 h-5" />,
-      text: "Authentication",
-      submenu: [
-        {
-          icon: <LogIn className="w-4 h-4" />,
-          text: "Login",
-          href: "/auth/login",
-        },
-        {
-          icon: <UserPlus className="w-4 h-4" />,
-          text: "Sign Up",
-          href: "/auth/signup",
-        },
-        {
-          icon: <Key className="w-4 h-4" />,
-          text: "Forgot Password",
-          href: "/auth/reset-password",
-        },
-      ],
-    },
-    {
-      id: "competitorAnalysis",
-      icon: <BarChart2 className="w-5 h-5" />,
-      text: "Competitor Analysis",
-      submenu: [
-        {
-          icon: <PieChart className="w-4 h-4" />,
-          text: "Dashboard",
-          href: "/my/competitors/dashboard",
-        },
-        {
-          icon: <Eye className="w-4 h-4" />,
-          text: "All Competitors",
-          href: "/my/competitors",
-        },
-        {
-          icon: <PlusCircle className="w-4 h-4" />,
-          text: "Add Competitor",
-          href: "/my/competitors/create",
-        },
-      ],
-    },
-    {
-      id: "settings",
-      icon: <Settings className="w-5 h-5" />,
-      text: "Settings",
-      href: "/settings",
-    },
-    {
-      id: "help",
-      icon: <HelpCircle className="w-5 h-5" />,
-      text: "Help & Support",
-      submenu: [
-        {
-          icon: <MessageSquare className="w-4 h-4" />,
-          text: "FAQ",
-          href: "/help/faq",
-        },
-        {
-          icon: <MessageSquare className="w-4 h-4" />,
-          text: "Contact Us",
-          href: "/help/contact",
-        },
-      ],
-    },
-  ];
-
-  const renderMenuItem = (item: MenuItem) => (
-    <div key={item.id} className="mb-1">
-      {item.submenu ? (
-        <div>
-          <button
-            onClick={() => toggleExpanded(item.id)}
-            className={`w-full text-left py-2 px-4 flex items-center justify-between transition-colors duration-200 hover:bg-secondary hover:text-secondary-foreground ${
-              expandedItems.includes(item.id)
-                ? "bg-secondary text-secondary-foreground"
-                : ""
-            }`}
-            aria-expanded={expandedItems.includes(item.id)}
-            aria-controls={`submenu-${item.id}`}
-          >
-            <div className="flex items-center">
-              {item.icon}
-              {(!isCollapsed || isMobile) && (
-                <span className="ml-3 text-base">{item.text}</span>
-              )}
-            </div>
-            {(!isCollapsed || isMobile) &&
-              (expandedItems.includes(item.id) ? (
-                <ChevronDown className="w-4 h-4" />
-              ) : (
-                <ChevronRight className="w-4 h-4" />
-              ))}
-          </button>
-          {(!isCollapsed || isMobile) && expandedItems.includes(item.id) && (
-            <div className="mt-1 ml-4" id={`submenu-${item.id}`} role="menu">
-              {item.submenu.map((subItem) => (
-                <Link
-                  key={subItem.href}
-                  href={subItem.href}
-                  className={`w-full text-left py-2 px-4 flex items-center text-muted-foreground hover:text-secondary-foreground hover:bg-secondary/50 relative group ${
-                    pathname === subItem.href
-                      ? "bg-secondary text-secondary-foreground"
-                      : ""
-                  }`}
-                  role="menuitem"
-                >
-                  {subItem.icon}
-                  <span className="ml-3 text-sm">{subItem.text}</span>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      ) : (
-        <Link
-          href={item.href!}
-          className={`w-full text-left py-2 px-4 flex items-center transition-colors duration-200 hover:bg-secondary hover:text-secondary-foreground ${
-            pathname === item.href
-              ? "bg-secondary text-secondary-foreground"
-              : ""
-          }`}
-        >
-          {item.icon}
-          {(!isCollapsed || isMobile) && (
-            <span className="ml-3 text-base">{item.text}</span>
-          )}
-        </Link>
-      )}
-    </div>
-  );
+  }, [setTheme])
 
   return (
-    <div className="flex flex-col h-full bg-background text-foreground">
-      <Link
-        href="/my/personas"
-        className="flex items-center justify-center h-[72px] border-b border-border"
-      >
-        {isCollapsed || isMobile ? (
-          <Image src="/logo-icon.svg" alt="Logo" width={40} height={40} />
-        ) : (
-          <Image src="/logo-full.svg" alt="Logo" width={160} height={40} />
-        )}
-      </Link>
-      <nav className="flex-1 mt-4 px-2 overflow-y-auto" role="navigation">
-        {menuItems.map(renderMenuItem)}
-      </nav>
-      <div className="border-t border-border mt-auto py-4 px-2">
-        <div
-          className={`px-4 py-2 flex items-center ${isCollapsed && !isMobile ? "justify-center" : "justify-between"}`}
-        >
-          {(!isCollapsed || isMobile) && <span>Theme</span>}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleTheme}
-            className="rounded-md"
-            aria-label={`Switch to ${theme === "light" ? "dark" : theme === "dark" ? "system" : "light"} theme`}
-          >
-            {theme === "light" && <Sun className="h-4 w-4" />}
-            {theme === "dark" && <Moon className="h-4 w-4" />}
-            {theme === "system" && <Laptop className="h-4 w-4" />}
-          </Button>
+    <div className="flex h-full">
+      <nav className="w-16 bg-background border-r border-border flex flex-col items-center flex-shrink-0">
+        <div className="h-16 flex items-center justify-center">
+          <img src="/placeholder.svg?height=40&width=40" alt="Logo" className="w-10 h-10" />
         </div>
-        <Link
-          href="/my/account"
-          className={`w-full text-left py-2 px-4 flex items-center text-muted-foreground hover:text-secondary-foreground hover:bg-secondary mt-2 rounded-md ${
-            isCollapsed && !isMobile ? "justify-center" : ""
-          } ${pathname === "/my/account" ? "bg-secondary text-secondary-foreground" : ""}`}
-          aria-label="Account"
-        >
-          <User className="w-5 h-5" />
-          {(!isCollapsed || isMobile) && <span className="ml-3">Account</span>}
-        </Link>
-      </div>
+        <div className="w-full h-px bg-border" />
+        <TooltipProvider>
+          <div className="flex-grow flex flex-col space-y-4 pt-4">
+            {navItems.map((item) => (
+              <Tooltip key={item.label}>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => toggleSubMenu(item.label)}
+                    className={activeItem === item.label ? 'bg-accent' : ''}
+                    aria-label={item.label}
+                  >
+                    <item.icon className="w-5 h-5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <p>{item.label}</p>
+                </TooltipContent>
+              </Tooltip>
+            ))}
+          </div>
+          <div className="mt-auto pb-4">
+            <div className="w-full h-px bg-border mb-4" />
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => toggleSubMenu('Settings')}
+                  className={activeItem === 'Settings' ? 'bg-accent' : ''}
+                  aria-label="Settings"
+                >
+                  <Settings className="w-5 h-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="right">
+                <p>Settings</p>
+              </TooltipContent>
+            </Tooltip>
+          </div>
+        </TooltipProvider>
+      </nav>
+      {activeItem && (
+        <div className="w-64 bg-background border-r border-border flex flex-col flex-shrink-0">
+          <div className="h-16 flex items-center px-4">
+            <h2 className="text-xl font-semibold">{activeItem}</h2>
+          </div>
+          <div className="w-full h-px bg-border" />
+          <div className="flex-grow overflow-y-auto">
+            {activeItem === 'Settings' ? (
+              <div className="flex flex-col h-full">
+                <div className="p-4 space-y-1 flex-grow">
+                  {settingsItems.map((item) => (
+                    <Button
+                      key={item.id}
+                      variant="ghost"
+                      className={`w-full justify-start ${activeSettingsItem === item.id ? 'bg-accent' : ''}`}
+                      onClick={() => toggleSettingsSubMenu(item.id)}
+                    >
+                      <item.icon className="w-5 h-5 mr-2" />
+                      <span>{item.label}</span>
+                    </Button>
+                  ))}
+                </div>
+                <div className="mt-auto">
+                  <div className="w-full h-px bg-border" />
+                  <div className="p-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium">Theme</span>
+                      <ToggleGroup type="single" value={currentTheme} onValueChange={handleThemeChange}>
+                        <ToggleGroupItem value="light" aria-label="Light mode">
+                          <Sun className="h-4 w-4" />
+                        </ToggleGroupItem>
+                        <ToggleGroupItem value="dark" aria-label="Dark mode">
+                          <Moon className="h-4 w-4" />
+                        </ToggleGroupItem>
+                        <ToggleGroupItem value="system" aria-label="System theme">
+                          <Laptop className="h-4 w-4" />
+                        </ToggleGroupItem>
+                      </ToggleGroup>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <ul className="p-4 space-y-2">
+                <li>
+                  <Link href="#" className="block py-2 px-3 rounded-lg hover:bg-accent transition-colors">Submenu Item 1</Link>
+                </li>
+                <li>
+                  <Link href="#" className="block py-2 px-3 rounded-lg hover:bg-accent transition-colors">Submenu Item 2</Link>
+                </li>
+                <li>
+                  <Link href="#" className="block py-2 px-3 rounded-lg hover:bg-accent transition-colors">Submenu Item 3</Link>
+                </li>
+              </ul>
+            )}
+          </div>
+        </div>
+      )}
+      {activeSettingsItem && (
+        <div className="w-64 bg-background border-r border-border flex flex-col flex-shrink-0">
+          <div className="h-16 flex items-center px-4">
+            <h2 className="text-xl font-semibold">
+              {settingsItems.find(item => item.id === activeSettingsItem)?.label}
+            </h2>
+          </div>
+          <div className="w-full h-px bg-border" />
+          <div className="p-4 flex-grow overflow-y-auto">
+            <ul className="space-y-2">
+              <li>
+                <Link href="#" className="block py-2 px-3 rounded-lg hover:bg-accent transition-colors">Submenu Item 1</Link>
+              </li>
+              <li>
+                <Link href="#" className="block py-2 px-3 rounded-lg hover:bg-accent transition-colors">Submenu Item 2</Link>
+              </li>
+              <li>
+                <Link href="#" className="block py-2 px-3 rounded-lg hover:bg-accent transition-colors">Submenu Item 3</Link>
+              </li>
+            </ul>
+          </div>
+        </div>
+      )}
     </div>
-  );
+  )
 }

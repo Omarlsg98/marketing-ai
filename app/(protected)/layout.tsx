@@ -1,23 +1,19 @@
-import config from "@/config";
-import { getSession } from "@/lib/server/supabase";
-import { redirect } from "next/navigation";
 import { ReactNode } from "react";
+import { Viewport } from "next";
+import { getSEOTags } from "@/libs/seo";
+import config from "@/config";
+import "../globals.css";
+import "react-tooltip/dist/react-tooltip.css";
+import AppLayout from "@/components/app/AppLayout";
 
-// This is a server-side component to ensure the user is logged in.
-// If not, it will redirect to the login page.
-// It's applied to all subpages of /dashboard in /app/dashboard/*** pages
-// You can also add custom static UI elements like a Navbar, Sidebar, Footer, etc..
-// See https://nextstarter.ai/docs/tutorials/private-page
-export default async function LayoutPrivate({
-  children,
-}: {
-  children: ReactNode;
-}) {
-  const session = await getSession();
-  
-  if (!session) {
-    redirect(config.auth.loginUrl);
-  }
+export const viewport: Viewport = {
+  themeColor: config.colors.main,
+  width: "device-width",
+  initialScale: 1,
+};
 
-  return <>{children}</>;
+export const metadata = getSEOTags();
+
+export default function ProtectedLayout({ children }: { children: ReactNode }) {
+  return <AppLayout>{children}</AppLayout>;
 }
