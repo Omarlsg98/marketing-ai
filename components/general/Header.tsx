@@ -1,22 +1,13 @@
-"use client"
-
-import { useState, useCallback } from 'react'
+import React from 'react'
 import Link from 'next/link'
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu"
-import { Bell, ChevronDown, Menu, Search } from 'lucide-react'
-import SideNav from '@/components/general/SideNav'
-
-interface HeaderProps {
-  isMobileMenuOpen: boolean
-  setIsMobileMenuOpen: (isOpen: boolean) => void
-}
+import { Bell, ChevronDown, Search } from 'lucide-react'
 
 interface NavItem {
   label: string
@@ -29,33 +20,13 @@ const navItems: NavItem[] = [
   { label: 'Current Page', items: ['Overview', 'Details', 'Settings'] },
 ]
 
-export default function Header({ isMobileMenuOpen, setIsMobileMenuOpen }: HeaderProps) {
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
-
-  const handleCloseMobileMenu = useCallback(() => {
-    setIsMobileMenuOpen(false)
-  }, [setIsMobileMenuOpen])
+export default function Header() {
+  const [activeDropdown, setActiveDropdown] = React.useState<string | null>(null)
 
   return (
-    <header className="bg-background border-b border-border p-4 flex items-center justify-between">
-      <div className="flex items-center space-x-4">
-        <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <Menu className="h-5 w-5" />
-              <span className="sr-only">Open menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-64">
-            <SideNav 
-              isMobile={true} 
-              onClose={handleCloseMobileMenu} 
-              isCollapsed={false}
-            />
-          </SheetContent>
-        </Sheet>
-        
-        <nav className="hidden md:flex space-x-2">
+    <header className="bg-background w-full h-16 flex items-center relative after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-[-1px] after:h-[1px] after:bg-border">
+      <div className="flex-1 flex items-center justify-between px-4 md:px-6">
+        <nav className="flex space-x-2">
           {navItems.map((item) => (
             <DropdownMenu key={item.label}>
               <DropdownMenuTrigger asChild>
@@ -80,15 +51,15 @@ export default function Header({ isMobileMenuOpen, setIsMobileMenuOpen }: Header
             </DropdownMenu>
           ))}
         </nav>
-      </div>
-      
-      <div className="flex items-center space-x-2">
-        <Button variant="ghost" size="icon" aria-label="Search">
-          <Search className="h-5 w-5" />
-        </Button>
-        <Button variant="ghost" size="icon" aria-label="Notifications">
-          <Bell className="h-5 w-5" />
-        </Button>
+        
+        <div className="flex items-center space-x-2">
+          <Button variant="ghost" size="icon" aria-label="Search">
+            <Search className="h-5 w-5" />
+          </Button>
+          <Button variant="ghost" size="icon" aria-label="Notifications">
+            <Bell className="h-5 w-5" />
+          </Button>
+        </div>
       </div>
     </header>
   )

@@ -1,19 +1,20 @@
-import { ReactNode } from "react";
-import { Viewport } from "next";
-import { getSEOTags } from "@/libs/seo";
-import config from "@/config";
-import "../globals.css";
-import "react-tooltip/dist/react-tooltip.css";
-import AppLayout from "@/components/app/AppLayout";
+import React from 'react';
+import { ReactNode } from "react"
 
-export const viewport: Viewport = {
-  themeColor: config.colors.main,
-  width: "device-width",
-  initialScale: 1,
-};
+interface LayoutPrivateProps {
+  children: ReactNode
+}
 
-export const metadata = getSEOTags();
+function LayoutPrivate({ children }: LayoutPrivateProps) {
+  return (
+    <div className="flex h-screen overflow-hidden bg-background">
+      <main className="flex-1 overflow-auto p-6">
+        {children}
+      </main>
+    </div>
+  )
+}
 
-export default function ProtectedLayout({ children }: { children: ReactNode }) {
-  return <AppLayout>{children}</AppLayout>;
+export default function MyLayout({ children }: { children: React.ReactNode }) {
+  return <LayoutPrivate>{children}</LayoutPrivate>
 }

@@ -2,37 +2,41 @@
 
 import { useState, useCallback, useEffect } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { Users, HelpCircle, Settings, User, CreditCard, Bell, Shield, Zap, Sun, Moon, Laptop } from 'lucide-react'
+import { User, MessageSquare, Users, ClipboardList, Settings, ChevronRight, Bell, Shield, Palette, Sun, Moon, Laptop } from 'lucide-react'
 import { useTheme } from "next-themes"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { Button } from "@/components/ui/button"
 
 const navItems = [
-  { icon: Users, label: 'Users', href: '/users' },
-  { icon: HelpCircle, label: 'Help', href: '/help' },
+  { icon: User, label: 'Account', href: '/my/account' },
+  { icon: MessageSquare, label: 'Chats', href: '/my/chats' },
+  { icon: Users, label: 'Personas', href: '/my/personas' },
+  { icon: ClipboardList, label: 'Survey Builder', href: '/my/survey-builder' },
 ]
 
 const settingsItems = [
   { id: "account", label: "Account", icon: User },
-  { id: "billing", label: "Billing", icon: CreditCard },
   { id: "notifications", label: "Notifications", icon: Bell },
   { id: "security", label: "Security", icon: Shield },
-  { id: "team", label: "Team", icon: Users },
-  { id: "integrations", label: "Integrations", icon: Zap },
+  { id: "appearance", label: "Appearance", icon: Palette },
 ]
 
 interface SideNavProps {
   onStateChange: (newState: 'closed' | 'level1' | 'level2') => void
+  isMobile?: boolean
+  onClose?: () => void
+  isCollapsed?: boolean
 }
 
-export default function SideNav({ onStateChange }: SideNavProps) {
+export default function SideNav({ onStateChange, isMobile = false, onClose, isCollapsed = false }: SideNavProps) {
   const [activeItem, setActiveItem] = useState<string | null>(null)
   const [activeSettingsItem, setActiveSettingsItem] = useState<string | null>(null)
   const { setTheme, theme, systemTheme } = useTheme()
   const [currentTheme, setCurrentTheme] = useState<string | undefined>(undefined)
   const pathname = usePathname()
+  const router = useRouter()
 
   useEffect(() => {
     setCurrentTheme(theme === 'system' ? systemTheme : theme)
@@ -61,15 +65,25 @@ export default function SideNav({ onStateChange }: SideNavProps) {
     }
   }, [setTheme])
 
+  const handleLinkClick = useCallback((href: string) => {
+    router.push(href)
+    setActiveItem(null)
+    setActiveSettingsItem(null)
+    onStateChange('closed')
+    if (isMobile && onClose) {
+      onClose()
+    }
+  }, [router, onStateChange, isMobile, onClose])
+
   return (
     <div className="flex h-full">
-      <nav className="w-16 bg-background border-r border-border flex flex-col items-center flex-shrink-0">
+      <nav className="w-16 bg-background border-r border-border flex flex-col items-center">
         <div className="h-16 flex items-center justify-center">
           <img src="/placeholder.svg?height=40&width=40" alt="Logo" className="w-10 h-10" />
         </div>
         <div className="w-full h-px bg-border" />
         <TooltipProvider>
-          <div className="flex-grow flex flex-col space-y-4 pt-4">
+          <div className="flex-grow flex flex-col space-y-4 pt-4 overflow-y-auto">
             {navItems.map((item) => (
               <Tooltip key={item.label}>
                 <TooltipTrigger asChild>
@@ -111,7 +125,7 @@ export default function SideNav({ onStateChange }: SideNavProps) {
         </TooltipProvider>
       </nav>
       {activeItem && (
-        <div className="w-64 bg-background border-r border-border flex flex-col flex-shrink-0">
+        <div className="w-64 bg-background border-r border-border flex flex-col overflow-hidden">
           <div className="h-16 flex items-center px-4">
             <h2 className="text-xl font-semibold">{activeItem}</h2>
           </div>
@@ -119,7 +133,7 @@ export default function SideNav({ onStateChange }: SideNavProps) {
           <div className="flex-grow overflow-y-auto">
             {activeItem === 'Settings' ? (
               <div className="flex flex-col h-full">
-                <div className="p-4 space-y-1 flex-grow">
+                <div className="p-4 space-y-1 flex-grow overflow-y-auto">
                   {settingsItems.map((item) => (
                     <Button
                       key={item.id}
@@ -154,22 +168,68 @@ export default function SideNav({ onStateChange }: SideNavProps) {
               </div>
             ) : (
               <ul className="p-4 space-y-2">
-                <li>
-                  <Link href="#" className="block py-2 px-3 rounded-lg hover:bg-accent transition-colors">Submenu Item 1</Link>
-                </li>
-                <li>
-                  <Link href="#" className="block py-2 px-3 rounded-lg hover:bg-accent transition-colors">Submenu Item 2</Link>
-                </li>
-                <li>
-                  <Link href="#" className="block py-2 px-3 rounded-lg hover:bg-accent transition-colors">Submenu Item 3</Link>
-                </li>
+                {activeItem === 'Chats' && (
+                  <>
+                    <li>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start"
+                        onClick={() => handleLinkClick('/my/chats')}
+                      >
+                        All Chats
+                      </Button>
+                    </li>
+                    <li>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start"
+                        onClick={() => handleLinkClick('/my/chats/create')}
+                      >
+                        Create New Chat
+                      </Button>
+                    </li>
+                  </>
+                )}
+                {activeItem === 'Personas' && (
+                  <>
+                    <li>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start"
+                        onClick={() => handleLinkClick('/my/personas')}
+                      >
+                        All Personas
+                      </Button>
+                    </li>
+                    <li>
+                      <Button
+                        variant="ghost"
+                        className="w-full justify-start"
+                        onClick={() => handleLinkClick('/my/personas/list')}
+                      >
+                        Persona List
+                      </Button>
+                    </li>
+                  </>
+                )}
+                {(activeItem === 'Account' || activeItem === 'Survey Builder') && (
+                  <li>
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-start"
+                      onClick={() => handleLinkClick(`/my/${activeItem.toLowerCase().replace(' ', '-')}`)}
+                    >
+                      Overview
+                    </Button>
+                  </li>
+                )}
               </ul>
             )}
           </div>
         </div>
       )}
       {activeSettingsItem && (
-        <div className="w-64 bg-background border-r border-border flex flex-col flex-shrink-0">
+        <div className="w-64 bg-background border-r border-border flex flex-col overflow-hidden">
           <div className="h-16 flex items-center px-4">
             <h2 className="text-xl font-semibold">
               {settingsItems.find(item => item.id === activeSettingsItem)?.label}
@@ -179,13 +239,31 @@ export default function SideNav({ onStateChange }: SideNavProps) {
           <div className="p-4 flex-grow overflow-y-auto">
             <ul className="space-y-2">
               <li>
-                <Link href="#" className="block py-2 px-3 rounded-lg hover:bg-accent transition-colors">Submenu Item 1</Link>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => handleLinkClick('#')}
+                >
+                  Setting Option 1
+                </Button>
               </li>
               <li>
-                <Link href="#" className="block py-2 px-3 rounded-lg hover:bg-accent transition-colors">Submenu Item 2</Link>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => handleLinkClick('#')}
+                >
+                  Setting Option 2
+                </Button>
               </li>
               <li>
-                <Link href="#" className="block py-2 px-3 rounded-lg hover:bg-accent transition-colors">Submenu Item 3</Link>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => handleLinkClick('#')}
+                >
+                  Setting Option 3
+                </Button>
               </li>
             </ul>
           </div>
