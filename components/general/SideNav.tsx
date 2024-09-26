@@ -4,7 +4,7 @@ import { useState, useCallback, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { User, MessageSquare, Users, ClipboardList, Settings, ChevronRight, Bell, Shield, Palette, Sun, Moon, Laptop } from 'lucide-react'
+import { User, MessageSquare, Users, ClipboardList, Settings, ChevronRight, Bell, Shield, Palette, Sun, Moon, Laptop, CreditCard, Plug, Sliders, Users2, UserPlus } from 'lucide-react'
 import { useTheme } from "next-themes"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { Button } from "@/components/ui/button"
@@ -17,10 +17,48 @@ const navItems = [
 ]
 
 const settingsItems = [
-  { id: "account", label: "Account", icon: User },
-  { id: "notifications", label: "Notifications", icon: Bell },
-  { id: "security", label: "Security", icon: Shield },
-  { id: "appearance", label: "Appearance", icon: Palette },
+  { 
+    id: "account", 
+    label: "Account", 
+    icon: User,
+    subItems: ["email", "password", "profile"]
+  },
+  { 
+    id: "billing", 
+    label: "Billing", 
+    icon: CreditCard,
+    subItems: ["invoices", "payment", "subscription", "usage"]
+  },
+  { 
+    id: "integrations", 
+    label: "Integrations", 
+    icon: Plug,
+    subItems: ["available", "connected"]
+  },
+  { 
+    id: "notifications", 
+    label: "Notifications", 
+    icon: Bell,
+    subItems: ["email", "inapp", "push", "sms"]
+  },
+  { 
+    id: "preferences", 
+    label: "Preferences", 
+    icon: Sliders,
+    subItems: ["accessibility", "language", "theme", "time-zone"]
+  },
+  { 
+    id: "security", 
+    label: "Security", 
+    icon: Shield,
+    subItems: ["activity", "api", "devices", "two-factor-auth"]
+  },
+  { 
+    id: "team", 
+    label: "Team", 
+    icon: Users2,
+    subItems: ["invitations", "members", "roles"]
+  },
 ]
 
 interface SideNavProps {
@@ -33,6 +71,7 @@ interface SideNavProps {
 export default function SideNav({ onStateChange, isMobile = false, onClose, isCollapsed = false }: SideNavProps) {
   const [activeItem, setActiveItem] = useState<string | null>(null)
   const [activeSettingsItem, setActiveSettingsItem] = useState<string | null>(null)
+  const [activeSubItem, setActiveSubItem] = useState<string | null>(null)
   const { setTheme, theme, systemTheme } = useTheme()
   const [currentTheme, setCurrentTheme] = useState<string | undefined>(undefined)
   const pathname = usePathname()
@@ -49,6 +88,7 @@ export default function SideNav({ onStateChange, isMobile = false, onClose, isCo
       return newActiveItem
     })
     setActiveSettingsItem(null)
+    setActiveSubItem(null)
   }, [onStateChange])
 
   const toggleSettingsSubMenu = useCallback((id: string) => {
@@ -57,7 +97,15 @@ export default function SideNav({ onStateChange, isMobile = false, onClose, isCo
       onStateChange(newActiveSettingsItem ? 'level2' : 'level1')
       return newActiveSettingsItem
     })
+    setActiveSubItem(null)
   }, [onStateChange])
+
+  const toggleSettingsSubItem = useCallback((subItem: string) => {
+    setActiveSubItem(prevActiveSubItem => {
+      const newActiveSubItem = prevActiveSubItem === subItem ? null : subItem
+      return newActiveSubItem
+    })
+  }, [])
 
   const handleThemeChange = useCallback((value: string) => {
     if (value) {
@@ -65,15 +113,15 @@ export default function SideNav({ onStateChange, isMobile = false, onClose, isCo
     }
   }, [setTheme])
 
-  const handleLinkClick = useCallback((href: string) => {
-    router.push(href)
+  const handleLinkClick = useCallback(() => {
     setActiveItem(null)
     setActiveSettingsItem(null)
+    setActiveSubItem(null)
     onStateChange('closed')
     if (isMobile && onClose) {
       onClose()
     }
-  }, [router, onStateChange, isMobile, onClose])
+  }, [onStateChange, isMobile, onClose])
 
   return (
     <div className="flex h-full">
@@ -87,15 +135,14 @@ export default function SideNav({ onStateChange, isMobile = false, onClose, isCo
             {navItems.map((item) => (
               <Tooltip key={item.label}>
                 <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="icon"
+                  <Link
+                    href={item.href}
+                    className={`w-12 h-12 flex items-center justify-center rounded-md ${activeItem === item.label ? 'bg-accent' : 'hover:bg-accent/50'}`}
                     onClick={() => toggleSubMenu(item.label)}
-                    className={activeItem === item.label ? 'bg-accent' : ''}
                     aria-label={item.label}
                   >
                     <item.icon className="w-5 h-5" />
-                  </Button>
+                  </Link>
                 </TooltipTrigger>
                 <TooltipContent side="right">
                   <p>{item.label}</p>
@@ -138,11 +185,14 @@ export default function SideNav({ onStateChange, isMobile = false, onClose, isCo
                     <Button
                       key={item.id}
                       variant="ghost"
-                      className={`w-full justify-start ${activeSettingsItem === item.id ? 'bg-accent' : ''}`}
+                      className={`w-full justify-between ${activeSettingsItem === item.id ? 'bg-accent' : ''}`}
                       onClick={() => toggleSettingsSubMenu(item.id)}
                     >
-                      <item.icon className="w-5 h-5 mr-2" />
-                      <span>{item.label}</span>
+                      <div className="flex items-center">
+                        <item.icon className="w-5 h-5 mr-2" />
+                        <span>{item.label}</span>
+                      </div>
+                      {item.subItems.length > 0 && <ChevronRight className="w-4 h-4" />}
                     </Button>
                   ))}
                 </div>
@@ -171,56 +221,56 @@ export default function SideNav({ onStateChange, isMobile = false, onClose, isCo
                 {activeItem === 'Chats' && (
                   <>
                     <li>
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start"
-                        onClick={() => handleLinkClick('/my/chats')}
+                      <Link
+                        href="/my/chats"
+                        className="block w-full text-left px-3 py-2 rounded-md hover:bg-accent"
+                        onClick={handleLinkClick}
                       >
                         All Chats
-                      </Button>
+                      </Link>
                     </li>
                     <li>
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start"
-                        onClick={() => handleLinkClick('/my/chats/create')}
+                      <Link
+                        href="/my/chats/create"
+                        className="block w-full text-left px-3 py-2 rounded-md hover:bg-accent"
+                        onClick={handleLinkClick}
                       >
                         Create New Chat
-                      </Button>
+                      </Link>
                     </li>
                   </>
                 )}
                 {activeItem === 'Personas' && (
                   <>
                     <li>
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start"
-                        onClick={() => handleLinkClick('/my/personas')}
+                      <Link
+                        href="/my/personas"
+                        className="block w-full text-left px-3 py-2 rounded-md hover:bg-accent"
+                        onClick={handleLinkClick}
                       >
                         All Personas
-                      </Button>
+                      </Link>
                     </li>
                     <li>
-                      <Button
-                        variant="ghost"
-                        className="w-full justify-start"
-                        onClick={() => handleLinkClick('/my/personas/list')}
+                      <Link
+                        href="/my/personas/list"
+                        className="block w-full text-left px-3 py-2 rounded-md hover:bg-accent"
+                        onClick={handleLinkClick}
                       >
                         Persona List
-                      </Button>
+                      </Link>
                     </li>
                   </>
                 )}
                 {(activeItem === 'Account' || activeItem === 'Survey Builder') && (
                   <li>
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-start"
-                      onClick={() => handleLinkClick(`/my/${activeItem.toLowerCase().replace(' ', '-')}`)}
+                    <Link
+                      href={`/my/${activeItem.toLowerCase().replace(' ', '-')}`}
+                      className="block w-full text-left px-3 py-2 rounded-md hover:bg-accent"
+                      onClick={handleLinkClick}
                     >
                       Overview
-                    </Button>
+                    </Link>
                   </li>
                 )}
               </ul>
@@ -238,33 +288,20 @@ export default function SideNav({ onStateChange, isMobile = false, onClose, isCo
           <div className="w-full h-px bg-border" />
           <div className="p-4 flex-grow overflow-y-auto">
             <ul className="space-y-2">
-              <li>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start"
-                  onClick={() => handleLinkClick('#')}
-                >
-                  Setting Option 1
-                </Button>
-              </li>
-              <li>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start"
-                  onClick={() => handleLinkClick('#')}
-                >
-                  Setting Option 2
-                </Button>
-              </li>
-              <li>
-                <Button
-                  variant="ghost"
-                  className="w-full justify-start"
-                  onClick={() => handleLinkClick('#')}
-                >
-                  Setting Option 3
-                </Button>
-              </li>
+              {settingsItems.find(item => item.id === activeSettingsItem)?.subItems.map((subItem) => (
+                <li key={subItem}>
+                  <Link
+                    href={`/my/settings/${activeSettingsItem}/${subItem}`}
+                    className={`block w-full text-left px-3 py-2 rounded-md hover:bg-accent ${activeSubItem === subItem ? 'bg-accent' : ''}`}
+                    onClick={() => {
+                      toggleSettingsSubItem(subItem)
+                      handleLinkClick()
+                    }}
+                  >
+                    {subItem.charAt(0).toUpperCase() + subItem.slice(1).replace('-', ' ')}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
