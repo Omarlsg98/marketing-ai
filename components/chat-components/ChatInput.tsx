@@ -2,31 +2,32 @@
 
 import { Button } from "@/components/ui/button";
 import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { Paperclip, Send, Upload, X } from "lucide-react";
 import { ChangeEvent, DragEvent, KeyboardEvent, useRef, useState } from "react";
 
 interface ChatInputProps {
-  onSendMessage: (content: string) => void;
+  onSendMessage: (content: string) => Promise<void>;
   onFileUpload: (file: File) => void;
+  isLoading: boolean;
 }
 
 const ALLOWED_FILE_TYPES =
   ".png,.jpg,.jpeg,.svg,.txt,.doc,.docx,.xls,.xlsx,.pdf";
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 
-export function ChatInput({ onSendMessage, onFileUpload }: ChatInputProps) {
+export function ChatInput({ onSendMessage, onFileUpload, isLoading }: ChatInputProps) {
   const [input, setInput] = useState("");
   const [isDraggingFile, setIsDraggingFile] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -34,14 +35,14 @@ export function ChatInput({ onSendMessage, onFileUpload }: ChatInputProps) {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (input.trim()) {
-      onSendMessage(input);
+      await onSendMessage(input);
       setInput("");
     }
   };
 
-  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = async (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
@@ -122,6 +123,7 @@ export function ChatInput({ onSendMessage, onFileUpload }: ChatInputProps) {
       >
         <Textarea
           value={input}
+          disabled={isLoading}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Ask a question or drop files here..."
@@ -137,6 +139,7 @@ export function ChatInput({ onSendMessage, onFileUpload }: ChatInputProps) {
                     variant="outline"
                     size="icon"
                     onClick={() => setIsDialogOpen(true)}
+                    disabled={true}
                   >
                     <Paperclip className="h-4 w-4" />
                   </Button>
@@ -153,7 +156,7 @@ export function ChatInput({ onSendMessage, onFileUpload }: ChatInputProps) {
               </Tooltip>
             </TooltipProvider>
           </div>
-          <Button onClick={handleSendMessage}>
+          <Button onClick={handleSendMessage} disabled={isLoading}>
             <Send className="h-4 w-4 mr-2" />
             Send
           </Button>
@@ -198,7 +201,9 @@ export function ChatInput({ onSendMessage, onFileUpload }: ChatInputProps) {
               onChange={handleFileSelect}
               accept={ALLOWED_FILE_TYPES}
             />
-            <Button onClick={() => fileInputRef.current?.click()}>
+            <Button 
+              onClick={() => fileInputRef.current?.click()} 
+              >
               Select File
             </Button>
             <Button onClick={handleFileUpload} disabled={!selectedFile}>

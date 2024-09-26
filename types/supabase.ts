@@ -34,6 +34,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      customer_journey: {
+        Row: {
+          author: Database["public"]["Enums"]["message_role"]
+          created_at: string
+          deleted_at: string | null
+          id: string
+          information: Json | null
+          persona_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          author: Database["public"]["Enums"]["message_role"]
+          created_at?: string
+          deleted_at?: string | null
+          id: string
+          information?: Json | null
+          persona_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          author?: Database["public"]["Enums"]["message_role"]
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          information?: Json | null
+          persona_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_customer_journey_persona_id"
+            columns: ["persona_id"]
+            isOneToOne: false
+            referencedRelation: "persona"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       leads: {
         Row: {
           created_at: string
@@ -111,55 +152,60 @@ export type Database = {
       }
       llm_chats: {
         Row: {
-          category: Database["public"]["Enums"]["question_category"]
           context: string | null
           created_at: string
           deleted_at: string | null
           description: string | null
+          display_info: Json | null
           id: string
-          last_question_id: number | null
+          is_first_interaction: boolean
+          last_message_id_in_context: string | null
+          object_context_id: string | null
           progress: number
+          state: string
           status: Database["public"]["Enums"]["chat_status"]
+          substep_id: number | null
           title: string
           updated_at: string
           user_id: string
         }
         Insert: {
-          category: Database["public"]["Enums"]["question_category"]
           context?: string | null
           created_at?: string
           deleted_at?: string | null
           description?: string | null
+          display_info?: Json | null
           id: string
-          last_question_id?: number | null
+          is_first_interaction?: boolean
+          last_message_id_in_context?: string | null
+          object_context_id?: string | null
           progress?: number
+          state?: string
           status?: Database["public"]["Enums"]["chat_status"]
+          substep_id?: number | null
           title: string
           updated_at?: string
           user_id: string
         }
         Update: {
-          category?: Database["public"]["Enums"]["question_category"]
           context?: string | null
           created_at?: string
           deleted_at?: string | null
           description?: string | null
+          display_info?: Json | null
           id?: string
-          last_question_id?: number | null
+          is_first_interaction?: boolean
+          last_message_id_in_context?: string | null
+          object_context_id?: string | null
           progress?: number
+          state?: string
           status?: Database["public"]["Enums"]["chat_status"]
+          substep_id?: number | null
           title?: string
           updated_at?: string
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "llm_chats_last_question_id_fkey"
-            columns: ["last_question_id"]
-            isOneToOne: false
-            referencedRelation: "questions"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "llm_chats_user_id_fkey"
             columns: ["user_id"]
@@ -175,7 +221,7 @@ export type Database = {
           content: string
           created_at: string
           deleted_at: string | null
-          id: number
+          id: string
           role: Database["public"]["Enums"]["message_role"]
           updated_at: string
           user_id: string
@@ -185,7 +231,7 @@ export type Database = {
           content: string
           created_at?: string
           deleted_at?: string | null
-          id?: number
+          id: string
           role: Database["public"]["Enums"]["message_role"]
           updated_at?: string
           user_id: string
@@ -195,7 +241,7 @@ export type Database = {
           content?: string
           created_at?: string
           deleted_at?: string | null
-          id?: number
+          id?: string
           role?: Database["public"]["Enums"]["message_role"]
           updated_at?: string
           user_id?: string
@@ -220,87 +266,50 @@ export type Database = {
       persona: {
         Row: {
           about_me: string | null
-          chat_id: string
+          author: Database["public"]["Enums"]["message_role"]
           coverage: number | null
           created_at: string
           deleted_at: string | null
-          ethnicity: string | null
           finished: boolean
-          gender: string | null
           id: string
           image_path: string | null
           information: Json | null
-          information_version:
-            | Database["public"]["Enums"]["persona_info_version"]
-            | null
-          key_challenge: string | null
-          location: string | null
-          main_buying_motivation: string | null
-          name: string
-          occupation: string | null
-          primary_goal: string | null
-          short_description: string
+          is_suggestion: boolean | null
+          short_information: Json | null
           updated_at: string
           user_id: string
         }
         Insert: {
           about_me?: string | null
-          chat_id: string
+          author: Database["public"]["Enums"]["message_role"]
           coverage?: number | null
           created_at?: string
           deleted_at?: string | null
-          ethnicity?: string | null
           finished?: boolean
-          gender?: string | null
           id: string
           image_path?: string | null
           information?: Json | null
-          information_version?:
-            | Database["public"]["Enums"]["persona_info_version"]
-            | null
-          key_challenge?: string | null
-          location?: string | null
-          main_buying_motivation?: string | null
-          name: string
-          occupation?: string | null
-          primary_goal?: string | null
-          short_description?: string
+          is_suggestion?: boolean | null
+          short_information?: Json | null
           updated_at?: string
           user_id: string
         }
         Update: {
           about_me?: string | null
-          chat_id?: string
+          author?: Database["public"]["Enums"]["message_role"]
           coverage?: number | null
           created_at?: string
           deleted_at?: string | null
-          ethnicity?: string | null
           finished?: boolean
-          gender?: string | null
           id?: string
           image_path?: string | null
           information?: Json | null
-          information_version?:
-            | Database["public"]["Enums"]["persona_info_version"]
-            | null
-          key_challenge?: string | null
-          location?: string | null
-          main_buying_motivation?: string | null
-          name?: string
-          occupation?: string | null
-          primary_goal?: string | null
-          short_description?: string
+          is_suggestion?: boolean | null
+          short_information?: Json | null
           updated_at?: string
           user_id?: string
         }
         Relationships: [
-          {
-            foreignKeyName: "persona_chat_id_fkey"
-            columns: ["chat_id"]
-            isOneToOne: false
-            referencedRelation: "llm_chats"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "persona_user_id_fkey"
             columns: ["user_id"]
@@ -309,77 +318,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      question_options: {
-        Row: {
-          created_at: string
-          deleted_at: string | null
-          id: number
-          q_option: string
-          question_id: number
-          updated_at: string
-        }
-        Insert: {
-          created_at?: string
-          deleted_at?: string | null
-          id?: number
-          q_option: string
-          question_id: number
-          updated_at?: string
-        }
-        Update: {
-          created_at?: string
-          deleted_at?: string | null
-          id?: number
-          q_option?: string
-          question_id?: number
-          updated_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "question_options_question_id_fkey"
-            columns: ["question_id"]
-            isOneToOne: false
-            referencedRelation: "questions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      questions: {
-        Row: {
-          category: Database["public"]["Enums"]["question_category"]
-          created_at: string
-          deleted_at: string | null
-          id: number
-          q_order: number
-          q_type: Database["public"]["Enums"]["question_type"]
-          question: string
-          sub_category: Database["public"]["Enums"]["question_sub_category"]
-          updated_at: string
-        }
-        Insert: {
-          category: Database["public"]["Enums"]["question_category"]
-          created_at?: string
-          deleted_at?: string | null
-          id?: number
-          q_order: number
-          q_type: Database["public"]["Enums"]["question_type"]
-          question: string
-          sub_category: Database["public"]["Enums"]["question_sub_category"]
-          updated_at?: string
-        }
-        Update: {
-          category?: Database["public"]["Enums"]["question_category"]
-          created_at?: string
-          deleted_at?: string | null
-          id?: number
-          q_order?: number
-          q_type?: Database["public"]["Enums"]["question_type"]
-          question?: string
-          sub_category?: Database["public"]["Enums"]["question_sub_category"]
-          updated_at?: string
-        }
-        Relationships: []
       }
       stripe_customers: {
         Row: {
@@ -463,111 +401,6 @@ export type Database = {
           },
         ]
       }
-      user_answers: {
-        Row: {
-          answer: string
-          chat_id: string
-          created_at: string
-          deleted_at: string | null
-          id: number
-          persona_id: string | null
-          question_id: number
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          answer: string
-          chat_id: string
-          created_at?: string
-          deleted_at?: string | null
-          id?: number
-          persona_id?: string | null
-          question_id: number
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          answer?: string
-          chat_id?: string
-          created_at?: string
-          deleted_at?: string | null
-          id?: number
-          persona_id?: string | null
-          question_id?: number
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_answers_chat_id_fkey"
-            columns: ["chat_id"]
-            isOneToOne: false
-            referencedRelation: "llm_chats"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_answers_persona_id_fkey"
-            columns: ["persona_id"]
-            isOneToOne: false
-            referencedRelation: "persona"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_answers_question_id_fkey"
-            columns: ["question_id"]
-            isOneToOne: false
-            referencedRelation: "questions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_answers_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      user_answers_sources: {
-        Row: {
-          message_id: number
-          user_answer_id: number
-          user_id: string
-        }
-        Insert: {
-          message_id: number
-          user_answer_id: number
-          user_id: string
-        }
-        Update: {
-          message_id?: number
-          user_answer_id?: number
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_answers_sources_message_id_fkey"
-            columns: ["message_id"]
-            isOneToOne: false
-            referencedRelation: "llm_messages"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_answers_sources_user_answer_id_fkey"
-            columns: ["user_answer_id"]
-            isOneToOne: false
-            referencedRelation: "user_answers"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_answers_sources_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       users: {
         Row: {
           avatar_url: string | null
@@ -626,7 +459,6 @@ export type Database = {
         | "cancelled"
         | "expired"
       message_role: "user" | "assistant" | "system"
-      persona_info_version: "v1"
       question_category: "Persona B2B" | "Persona B2C"
       question_sub_category:
         | "Decision-Making"

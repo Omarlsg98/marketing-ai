@@ -1,16 +1,19 @@
+"use server";
+
 import { createServerSupabaseClient, getSession } from "@/lib/server/supabase";
-import { PersonaInformation } from "@/types/persona";
+import {
+  ChatEditColumnAboutMe,
+  ChatEditColumnComponent,
+  ChatEditColumnCustomerJourney,
+  ChatEditColumnImage,
+  ChatEditColumnPersona,
+  ChatEditColumnPersonaSelector,
+} from "@/types/components/chatTab";
+import { Chat, Message, Role, Table } from "@/types/database";
 import { Database } from "@/types/supabase";
 import { AuthError, PostgrestError } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { v4 as uuidv4 } from "uuid";
-
-type QuestionType = Database["public"]["Tables"]["questions"]["Row"];
-type UserAnswerType = Database["public"]["Tables"]["user_answers"]["Row"];
-type chatType = Database["public"]["Tables"]["llm_chats"]["Row"];
-type messageType = Database["public"]["Tables"]["llm_messages"]["Row"];
-type roles = Database["public"]["Tables"]["llm_messages"]["Row"]["role"];
-type tableType = keyof Database["public"]["Tables"];
 
 const handleError: (error: PostgrestError | AuthError | null) => boolean = (
   error
@@ -38,181 +41,58 @@ export const getUserId = async () => {
   return session.id;
 };
 
-export const getLastMessages: (chatId: string) => any = async (chatId) => {
+export const getLastMessages: (chat: Chat) => Promise<Message[]> = async (
+  chat
+) => {
   const supabase = createServerSupabaseClient();
-  const userId = await getUserId();
+  let dateThreshold = chat.created_at;
+
+  if (chat.last_message_id_in_context) {
+    //get last message in context date
+    const { data: lastInContext, error: errorLIC } = await supabase
+      .from("llm_messages")
+      .select("created_at")
+      .eq("chat_id", chat.id)
+      .eq("id", chat.last_message_id_in_context)
+      .single();
+
+    handleError(errorLIC);
+    dateThreshold = lastInContext.created_at;
+  }
 
   const { data, error } = await supabase
     .from("llm_messages")
-    .select("*, user_answers_sources!left(user_answer_id)")
-    .eq("chat_id", chatId)
-    .eq("user_id", userId)
-    .is("user_answers_sources", null);
-
-  handleError(error);
-
-  return data;
-};
-
-// LLM Specific
-export const getAllQuestionsInfo: (
-  chat: chatType,
-  returnLastMessages: boolean
-) => any = async (chat, returnLastMessages = true) => {
-  const supabase = createServerSupabaseClient();
-  const userId = await getUserId();
-
-  // Get user_answers for the user
-  const { data: userAnswers, error: userAnswersError } = await supabase
-    .from("user_answers")
-    .select("*, questions(category)")
+    .select("*")
     .eq("chat_id", chat.id)
-    .eq("user_id", userId)
-    .eq("questions.category", chat.category);
-
-  handleError(userAnswersError);
-
-  let query = supabase
-    .from("questions")
-    .select("*")
-    .eq("category", chat.category);
-
-  if (userAnswers && userAnswers.length > 0) {
-    const answeredQuestions = userAnswers.map((ua) => ua.question_id);
-    let answeredQuestionsStr = String(answeredQuestions);
-    answeredQuestionsStr =
-      "(" + answeredQuestionsStr.replace("[", "").replace("]", "") + ")"; // Convert to string for the query
-    query = query.not("id", "in", answeredQuestionsStr);
-  }
-
-  const { data: outstandingQuestions, error } = await query.order("q_order", {
-    ascending: true,
-  });
-
-  handleError(error);
-
-  return {
-    outstandingQuestions: outstandingQuestions,
-    userAnswers: userAnswers,
-    lastMessages: returnLastMessages ? await getLastMessages(chat.id) : null,
-  };
-};
-
-export const getAllQuestion: (
-  category: string
-) => Promise<Database["public"]["Tables"]["questions"]["Row"][]> = async (
-  category
-) => {
-  const supabase = createServerSupabaseClient();
-  const { data, error } = await supabase
-    .from("questions")
-    .select("*")
-    .eq("category", category);
+    .gt("created_at", dateThreshold)
+    .order("created_at", { ascending: true });
 
   handleError(error);
 
   return data;
 };
 
-export const saveUserAnswer: (
-  chat_id: string,
-  question_id: number,
-  answer: string,
-  unusedMessages: any[]
-) => any = async (chat_id, question_id, answer, unusedMessages) => {
-  const userId = await getUserId();
-
-  const NewUserAnswer: Database["public"]["Tables"]["user_answers"]["Insert"] =
-    {
-      user_id: userId,
-      question_id: question_id,
-      chat_id: chat_id,
-      answer: answer,
-    };
-
-  const userAnswer = await insertRecord("user_answers", NewUserAnswer);
-
-  let userAnswerSources = [];
-  // Create records in user_answer_sources for each unused message linking to the userAnswer
-  for (const message of unusedMessages) {
-    const NewUserAnswerSource: Database["public"]["Tables"]["user_answers_sources"]["Insert"] =
-      {
-        user_answer_id: userAnswer.id,
-        message_id: message.id,
-        user_id: userId,
-      };
-
-    const ansSource = await insertRecord(
-      "user_answers_sources",
-      NewUserAnswerSource
-    );
-    userAnswerSources.push(ansSource);
-  }
-
-  return {
-    userAnswer,
-    userAnswerSources,
-  };
-};
-
-// General get functions
-export const getUserAnswers: (
-  chatId: string
-) => Promise<(UserAnswerType & { questions: QuestionType })[]> = async (
+export const getChat: (
+  chatId: string | null
+) => Promise<Database["public"]["Tables"]["llm_chats"]["Row"]> = async (
   chatId
 ) => {
   const supabase = createServerSupabaseClient();
-  const userId = await getUserId();
+  const query = supabase.from("llm_chats").select("*");
 
-  const { data, error } = await supabase
-    .from("user_answers")
-    .select("*, questions(*)")
-    .eq("chat_id", chatId)
-    .eq("user_id", userId);
+  if (chatId) {
+    query.eq("id", chatId);
+  }
 
-  handleError(error);
-
-  return data;
-};
-
-export const getChat: (chatId: string) => Promise<{
-  chat: Database["public"]["Tables"]["llm_chats"]["Row"];
-  prevQuestion: Database["public"]["Tables"]["questions"]["Row"] | null;
-}> = async (chatId) => {
-  const supabase = createServerSupabaseClient();
-  const { data, error } = await supabase
-    .from("llm_chats")
-    .select("*, questions(*)")
-    .eq("id", chatId)
-    .single();
+  const { data, error } = await query.limit(1).maybeSingle();
 
   handleError(error);
 
-  if (!data) {
+  if (!data && chatId) {
     throw new Error("Chat not found");
   }
 
-  const prevQuestion = data.questions;
-  //remove questions from chat object
-  let chat = (({ questions, ...rest }) => rest)(data);
-
-  return {
-    chat: chat,
-    prevQuestion: prevQuestion,
-  };
-};
-
-export const getQuestionOptions: (
-  questionId: number
-) => Promise<string[] | null> = async (questionId) => {
-  const supabase = createServerSupabaseClient();
-  const { data, error } = await supabase
-    .from("question_options")
-    .select("q_option")
-    .eq("question_id", questionId);
-
-  handleError(error);
-  return data.map((option) => option.q_option);
+  return data;
 };
 
 export const getChats: () => any = async () => {
@@ -230,18 +110,21 @@ export const getChats: () => any = async () => {
   return data;
 };
 
+export const updateChat: (chat: Chat) => Promise<any> = async (chat) => {
+  const result = await updateRecord("llm_chats", chat);
+  return result;
+};
+
 export const getMessages: (
   chatId: string,
   excludeSystem: boolean
-) => any = async (chatId, excludeSystem) => {
+) => Promise<Message[]> = async (chatId, excludeSystem) => {
   const supabase = createServerSupabaseClient();
   let query = supabase.from("llm_messages").select("*").eq("chat_id", chatId);
   if (excludeSystem) {
     query = query.not("role", "eq", "system");
   }
-  const { data, error } = await query
-    .order("created_at", { ascending: true })
-    .returns<Database["public"]["Tables"]["llm_messages"]["Row"]>();
+  const { data, error } = await query.order("created_at", { ascending: true });
 
   if (!handleError(error)) {
     return null;
@@ -250,9 +133,124 @@ export const getMessages: (
   return data;
 };
 
+export const registerMessages: (messages: Message[]) => any = async (
+  messages
+) => {
+  const result = await bulkInsertRecords("llm_messages", messages);
+  return result;
+};
+
+export const saveEditColumn: (chat: Chat) => Promise<any> = async (chat) => {
+  if (chat.display_info == null) {
+    return null;
+  }
+
+  const info = JSON.parse(
+    chat.display_info as string
+  ) as ChatEditColumnComponent;
+  const type = info.type;
+  const current = info.current;
+  const author = info.author;
+
+  if (current == null) {
+    return null;
+  }
+  let result: any = null;
+
+  switch (type) {
+    case "multiplePersona": {
+      const personas = current as ChatEditColumnPersonaSelector;
+
+      const supabase = createServerSupabaseClient();
+      // delete previous personas for this user made by the assistant in version 1
+      // if they exist
+      const { data, error } = await supabase
+        .from("persona")
+        .delete()
+        .eq("user_id", chat.user_id)
+        .eq("is_suggestion", true)
+        .eq("author", "assistant");
+
+      handleError(error);
+
+      const fullPersonas: Database["public"]["Tables"]["persona"]["Insert"][] =
+        personas.personas.map((persona) => {
+          return {
+            short_information: persona,
+            author: author,
+            id: persona.id,
+            user_id: chat.user_id,
+            is_suggestion: true,
+          };
+        });
+
+      result = await bulkInsertRecords("persona", fullPersonas);
+      return result;
+    }
+    case "persona": {
+      const persona = current as ChatEditColumnPersona;
+      const personaRecord: Database["public"]["Tables"]["persona"]["Insert"] = {
+        information: persona,
+        id: chat.object_context_id,
+        author: author,
+        user_id: chat.user_id,
+        is_suggestion: false,
+      };
+
+      result = await updateRecord("persona", personaRecord);
+      return result;
+    }
+    case "customerJourney": {
+      const journey = current as ChatEditColumnCustomerJourney;
+      const journeyRecord: Database["public"]["Tables"]["customer_journey"]["Insert"] =
+        {
+          information: journey,
+          author: author,
+          id: chat.object_context_id,
+          user_id: chat.user_id,
+          persona_id: chat.object_context_id,
+        };
+
+      result = await upsertRecord("customer_journey", journeyRecord);
+      return result;
+    }
+    case "image": {
+      const imageinfo = current as ChatEditColumnImage;
+
+      const imageRecord: Database["public"]["Tables"]["persona"]["Update"] = {
+        id: chat.object_context_id,
+        image_path: imageinfo.imagePath,
+        user_id: chat.user_id,
+        author: author,
+      };
+
+      result = await updateRecord("persona", imageRecord);
+      return result;
+    }
+    case "aboutMe": {
+      const aboutMe = current as ChatEditColumnAboutMe;
+      const aboutMeRecord: Database["public"]["Tables"]["persona"]["Update"] = {
+        id: chat.object_context_id,
+        about_me: aboutMe.aboutMe,
+        user_id: chat.user_id,
+        author: author,
+        finished: true,
+      };
+
+      result = await updateRecord("persona", aboutMeRecord);
+      return result;
+    }
+    default: {
+      throw new Error("Invalid type");
+    }
+  }
+};
+
 export const getPersonas: (
   numRecords: number | null
-) => Promise<PersonaInformation["v1_short"][]> = async (numRecords) => {
+) => Promise<Database["public"]["Tables"]["persona"]["Update"][]> = async (
+  numRecords
+) => {
   const supabase = createServerSupabaseClient();
 
   if (!numRecords) {
@@ -264,14 +262,10 @@ export const getPersonas: (
     .select(
       `
     id,
-    name,
-    short_description,
-    finished,
-    llm_chats(progress),
-    primary_goal,
-    key_challenge,
-    main_buying_motivation,
-    image_path
+    is_suggestion,
+    image_path,
+    information,
+    short_information
     `
     )
     .order("finished", { ascending: false })
@@ -280,19 +274,10 @@ export const getPersonas: (
 
   handleError(error);
 
-  const output: PersonaInformation["v1_short"][] = data.map((persona) => {
-    return {
-      ...persona,
-      chat_progress: persona.llm_chats.progress,
-    };
-  });
-
-  return output;
+  return data;
 };
 
-export const getPersonaFormatted: (
-  personaId: string
-) => Promise<PersonaInformation["v1"]> = async (personaId) => {
+export const getPersona = async (personaId: string) => {
   const supabase = createServerSupabaseClient();
 
   const { data, error } = await supabase
@@ -300,25 +285,12 @@ export const getPersonaFormatted: (
     .select(
       `
     id,
-    name,
-    short_description,
-    finished,
-    llm_chats(progress),
-    primary_goal,
-    key_challenge,
-    main_buying_motivation,
+    information,
     image_path,
+    short_information,
+    finished,
     about_me,
-    gender,
-    ethnicity,
-    location,
-    occupation,
-    profile: information->profile,
-    discovery: information->discovery,
-    evaluation: information->evaluation,
-    purchase: information->purchase,
-    implementation: information->implementation,
-    renewal: information->renewal
+    customer_journey(*)
     `
     )
     .eq("id", personaId)
@@ -326,16 +298,7 @@ export const getPersonaFormatted: (
 
   handleError(error);
 
-  return {
-    ...data,
-    chat_progress: data.llm_chats.progress,
-    profile: data.profile as any,
-    discovery: data.discovery as any,
-    evaluation: data.evaluation as any,
-    purchase: data.purchase as any,
-    implementation: data.implementation as any,
-    renewal: data.renewal as any,
-  };
+  return data;
 };
 
 export const getPersonaRecord: (
@@ -358,21 +321,12 @@ export const getPersonaRecord: (
 
 // Insert functions
 const addUUID = (table: string, record: any) => {
-  //This tables do not require an id (they are serial integers, database generated)
-  if (
-    table === "llm_messages" ||
-    table === "user_answers" ||
-    table === "user_answers_sources" ||
-    table == "persona" // Persona is a special case, it has same UUID as chat
-  ) {
-    return record;
-  }
+  if (!record.id) record.id = uuidv4();
 
-  record.id = uuidv4();
   return record;
 };
 
-export const insertRecord: (table: tableType, record: any) => any = async (
+export const insertRecord: (table: Table, record: any) => any = async (
   table,
   record
 ) => {
@@ -392,7 +346,24 @@ export const insertRecord: (table: tableType, record: any) => any = async (
   return data;
 };
 
-export const updateRecord: (table: tableType, record: any) => any = async (
+export const bulkInsertRecords: (table: Table, records: any[]) => any = async (
+  table,
+  records
+) => {
+  const supabase = createServerSupabaseClient();
+
+  console.log("Inserting records into " + table + ":", records);
+
+  // add UUIDs to records
+  records = records.map((record) => addUUID(table, record));
+
+  const { data, error } = await supabase.from(table).insert(records);
+
+  handleError(error);
+  return data;
+};
+
+export const updateRecord: (table: Table, record: any) => any = async (
   table,
   record
 ) => {
@@ -411,7 +382,25 @@ export const updateRecord: (table: tableType, record: any) => any = async (
   return data;
 };
 
-export const getRecords: (table: tableType, id: string) => any = async (
+export const upsertRecord: (table: Table, record: any) => any = async (
+  table,
+  record
+) => {
+  const supabase = createServerSupabaseClient();
+
+  console.log("Upserting record in " + table + ":", record);
+
+  const { data, error } = await supabase
+    .from(table)
+    .upsert(record)
+    .select()
+    .single();
+
+  handleError(error);
+  return data;
+};
+
+export const getRecords: (table: Table, id: string) => any = async (
   table,
   id
 ) => {
@@ -421,4 +410,18 @@ export const getRecords: (table: tableType, id: string) => any = async (
 
   handleError(error);
   return data;
+};
+
+export const getNewMessage = async function (
+  role: Role,
+  content: string,
+  chat: Chat
+): Promise<Message> {
+  return {
+    chat_id: chat.id,
+    content: content,
+    id: uuidv4(),
+    role: role,
+    user_id: chat.user_id,
+  };
 };

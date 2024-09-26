@@ -2,7 +2,7 @@
 const nextConfig = {
   reactStrictMode: true,
   experimental: {
-    appDir: true,
+    // Remove appDir as it's now the default in Next.js 14
     esmExternals: "loose"
   },
   images: {
@@ -12,6 +12,7 @@ const nextConfig = {
       "pbs.twimg.com",
       "images.unsplash.com",
       "logos-world.net",
+      "ptxpbcxejidpakzfnqkv.supabase.co"
     ],
   },
   webpack: (config) => {
@@ -30,7 +31,7 @@ const nextConfig = {
         ],
       },
       {
-        source: "/:path",
+        source: "/:path*",
         headers: [
           {
             key: 'X-Robots-Tag',

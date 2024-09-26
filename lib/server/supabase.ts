@@ -20,7 +20,18 @@ export const createServerSupabaseClient = () => {
       cookies: {
         getAll() {
           return cookieStore.getAll();
-        }
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          } catch {
+            // The `setAll` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing
+            // user sessions.
+          }
+        },
       },
     }
   );
@@ -79,8 +90,6 @@ export const getFileUrl = async (bucket: string, name: string) => {
   return data.signedUrl;
 };
 
-
-
 export const uploadFile = async (bucket: string, name: string, file: File) => {
   const supabase = createServerSupabaseClient();
   const { data, error } = await supabase.storage
@@ -95,8 +104,8 @@ export const uploadFile = async (bucket: string, name: string, file: File) => {
   }
   // Return the URL of the uploaded file
 
-  const signedUrl  = await getFileUrl(bucket, name);
-
+  const signedUrl = await getFileUrl(bucket, name);
+  console.log("Imageed saved on: ", signedUrl);
   return {
     signedUrl,
     data,
