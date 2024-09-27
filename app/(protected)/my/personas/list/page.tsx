@@ -1,7 +1,4 @@
-"use server";
-
 import PersonasGrid from "@/components/customer/persona/PersonasList";
-
 import { getPersonas } from "@/lib/server/database";
 import { getFileUrl } from "@/lib/server/supabase";
 import {
@@ -10,42 +7,39 @@ import {
 } from "@/types/components/chatTab";
 import { PersonaList } from "@/types/components/persona";
 
-export default async function Component() {
-  const fetchData = async () => {
-    const data = await getPersonas(30);
+async function fetchPersonas(): Promise<PersonaList> {
+  const data = await getPersonas(30);
 
-    // format data to PersonaList
-    let output: PersonaList = [];
+  const personasPromises = data.map(async (persona) => {
+    const shortInformation = persona.short_information as ChatEditColumnPersonaSelector["personas"][0];
+    const information = persona.information as ChatEditColumnPersona;
 
-    for (const persona of data) {
-      const shortInformation =
-        persona.short_information as ChatEditColumnPersonaSelector["personas"][0];
+    const image_url = persona.image_path
+      ? await getFileUrl("persona_images", persona.image_path)
+      : null;
 
-      const information = persona.information as ChatEditColumnPersona;
+    return {
+      id: persona.id,
+      name: information?.name ?? "",
+      image_url: image_url,
+      shortDescription: information?.shortDescription ?? "",
+      title: shortInformation?.title ?? "",
+      whoTheyAre: shortInformation.whoTheyAre ?? "",
+      needs: shortInformation.needs ?? "",
+      challenges: shortInformation.challenges ?? "",
+      isSuggestion: persona.is_suggestion ?? false,
+    };
+  });
 
-      const image_url = persona.image_path
-        ? await getFileUrl("persona_images", persona.image_path)
-        : null;
+  return Promise.all(personasPromises);
+}
 
-      output.push({
-        id: persona.id,
-        name: information?.name,
-        image_url: image_url,
-        shortDescription: information?.shortDescription,
-        title: shortInformation?.title,
-        whoTheyAre: shortInformation.whoTheyAre,
-        needs: shortInformation.needs,
-        challenges: shortInformation.challenges,
-        isSuggestion: persona.is_suggestion,
-      });
-    }
-    return output;
-  };
-
-  const personas = await fetchData();
+export default async function PersonasListPage() {
+  const personas = await fetchPersonas();
 
   return (
-    <div className="container mx-auto py-2">
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-6">All Personas</h1>
       <PersonasGrid personas={personas} />
     </div>
   );
