@@ -29,7 +29,6 @@ const navItems = [
   { icon: MessageSquare, label: "Chats", href: "javascript:void(0);" },
   { icon: Users, label: "Personas", href: "javascript:void(0);" },
   { icon: ClipboardList, label: "Survey Builder", href: "javascript:void(0);" },
-  { icon: User, label: "Account", href: "javascript:void(0);" },
 ];
 
 const settingsItems = [
@@ -37,7 +36,7 @@ const settingsItems = [
     id: "account",
     label: "Account",
     icon: User,
-    subItems: ["password", "logout"],
+    subItems: ["email", "profile", "password", "logout"],
   },
   // Disabled for now, will enable when it is actually implmented
   // {
