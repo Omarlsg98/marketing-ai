@@ -1,60 +1,50 @@
-import React from 'react'
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { PersonaList } from "@/types/components/persona"
+import PersonaCard from "@/components/customer/persona/PersonaCard";
+import { Button } from "@/components/ui/button";
+import { PersonaList } from "@/types/components/persona";
+import { Bot } from "lucide-react";
+import Link from "next/link";
 
-interface PersonasGridProps {
+interface PersonasListProps {
   personas: PersonaList;
 }
 
-export default function PersonasGrid({ personas }: PersonasGridProps) {
+export default function PersonasList({ personas }: PersonasListProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-      {personas.map((persona) => (
-        <PersonaCard
-          key={persona.id}
-          name={persona.name}
-          type={persona.title}
-          coverage={30} // You might want to replace this with actual data
-          avatarSrc={persona.image_url}
-        />
-      ))}
-    </div>
-  )
-}
-
-interface PersonaCardProps {
-  name: string;
-  type: string;
-  coverage: number;
-  avatarSrc: string | null;
-}
-
-function PersonaCard({ name, type, coverage, avatarSrc }: PersonaCardProps) {
-  return (
-    <div className="bg-card text-card-foreground rounded-lg shadow-md p-6 space-y-4">
-      <div className="flex items-center space-x-4">
-        <Avatar className="h-12 w-12">
-          {avatarSrc ? (
-            <AvatarImage src={avatarSrc} alt={name} />
-          ) : (
-            <AvatarFallback>{name.slice(0, 2).toUpperCase()}</AvatarFallback>
-          )}
-        </Avatar>
-        <div>
-          <h2 className="text-lg font-semibold">{name}</h2>
-          <p className="text-sm text-muted-foreground">{type}</p>
-        </div>
-      </div>
-      <div className="space-y-2">
-        <p className="text-sm font-medium">Coverage</p>
-        <div className="w-full bg-secondary rounded-full h-2.5">
-          <div 
-            className="bg-primary h-2.5 rounded-full" 
-            style={{ width: `${coverage}%` }}
-          ></div>
-        </div>
-        <p className="text-sm text-right">{coverage}%</p>
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold">All Personas</h1>
+      <div className="h-[calc(100vh-200px)] overflow-y-auto pr-4">
+        {personas.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-[50vh] text-center">
+            <h2 className="text-2xl font-bold mb-4">No personas yet</h2>
+            <p className="text-muted-foreground mb-6">
+              Talk with Ethan the agent to create personas
+            </p>
+            <Button>
+              <Bot size={24} className="pr-1" />
+              <Link href="/my/chats/create">Chat with Ethan</Link>
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {personas.map((persona) => (
+              <Link
+                key={persona.id}
+                href={
+                  !persona.isSuggestion ? `/my/personas/${persona.id}` : "#"
+                }
+              >
+                <PersonaCard
+                  key={persona.id}
+                  name={persona.name}
+                  type={persona.title}
+                  coverage={null} // You might want to replace this with actual data
+                  avatarSrc={persona.image_url}
+                />
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </div>
-  )
+  );
 }

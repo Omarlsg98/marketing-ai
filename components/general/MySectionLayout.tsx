@@ -1,15 +1,15 @@
 "use client"
 
-import { ReactNode, useState } from "react"
-import { cn } from "@/lib/utils"
-import SideNav from "@/components/general/SideNav"
 import Header from "@/components/general/Header"
+import SideNav from "@/components/general/SideNav"
+import { cn } from "@/lib/utils"
+import { ReactNode, useState } from "react"
 
-interface LayoutPrivateProps {
+interface MySectionLayoutProps {
   children: ReactNode
 }
 
-export default function LayoutPrivate({ children }: LayoutPrivateProps) {
+export default function MySectionLayout({ children }: MySectionLayoutProps) {
   const [menuState, setMenuState] = useState<'closed' | 'level1' | 'level2'>('closed')
 
   const handleMenuStateChange = (newState: 'closed' | 'level1' | 'level2') => {
