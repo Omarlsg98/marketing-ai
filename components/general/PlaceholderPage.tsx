@@ -8,8 +8,8 @@ interface PlaceholderUIProps {
 }
 
 export default function PlaceholderUI({ pageName }: PlaceholderUIProps) {
+  const pathname = usePathname();
   if (pageName === undefined || pageName === "" || pageName === null) {
-    const pathname = usePathname();
     pageName = pathname.split("/").pop() || "Home";
   }
 
