@@ -32,17 +32,10 @@ export default function Component() {
       });
 
       const postJson = (await postRepsonse.json()) as ChatGetOut;
-      chat = postJson.chat;
-
-      console.log(chat);
-
-      await fetch(`/api/chat/${chat.id}/send`, {
-        method: "POST",
-        body: JSON.stringify({ message: "Hi Ethan!" }),
-      });
+      const newChat = postJson.chat;
 
       //redirect to chat page
-      router.push(`/my/chats/${chat.id}`);
+      router.push(`/my/chats/${newChat.id}`);
     };
 
     execute();
@@ -71,13 +64,6 @@ export default function Component() {
     <ChatUI
       chat={emptyChat}
       messages={[
-        {
-          id: "sdfsdf",
-          content: "Hi Ethan!",
-          role: "user",
-          user_id: "1",
-          chat_id: "1",
-        },
       ]}
       handleSendMessage={null}
       initLoading={true}

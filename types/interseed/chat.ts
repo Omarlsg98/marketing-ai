@@ -19,7 +19,6 @@ export type IterationAgentOutput = z.infer<typeof IterationAgentOutputSchema>;
 export type Question = {
   id: number;
   question: string;
-  q_type: string;
   objective: string;
 };
 
