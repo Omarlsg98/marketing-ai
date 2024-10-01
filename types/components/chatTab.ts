@@ -2,30 +2,27 @@ import { z } from "zod";
 import { Role } from "../database";
 
 const ChatEditColumnPersonaSelectorSchema = z.object({
-  personas: z
-    .array(
-      z.object({
-        id: z.string().optional().describe("To be assigned by the backend"),
-        title: z
-          .string()
-          .describe(
-            "The title of the persona. E.g. 'The Startup Owner' or 'The Marketing Manager'"
-          ),
-        whoTheyAre: z
-          .string()
-          .describe(
-            "A brief description of the persona. Less than 2 or 3 sentences"
-          ),
-        needs: z
-          .string()
-          .describe("The needs of the persona. Less than 2 or 3 sentences"),
-        challenges: z
-          .string()
-          .describe(
-            "The challenges of the persona. Less than 2 or 3 sentences"
-          ),
-      })
-    ),
+  personas: z.array(
+    z.object({
+      id: z.string().optional().describe("To be assigned by the backend"),
+      title: z
+        .string()
+        .describe(
+          "The title of the persona. E.g. 'The Startup Owner' or 'The Marketing Manager'"
+        ),
+      whoTheyAre: z
+        .string()
+        .describe(
+          "A brief description of the persona. Less than 2 or 3 sentences"
+        ),
+      needs: z
+        .string()
+        .describe("The needs of the persona. Less than 2 or 3 sentences"),
+      challenges: z
+        .string()
+        .describe("The challenges of the persona. Less than 2 or 3 sentences"),
+    })
+  ),
 });
 
 const ChatEditColumnPersonaSchema = z.object({
@@ -35,6 +32,9 @@ const ChatEditColumnPersonaSchema = z.object({
     .describe(
       "The title of the persona. E.g. 'The Startup Owner' or 'The Marketing Manager'"
     ),
+  b2bOrb2c: z
+    .enum(["b2b", "b2c"])
+    .describe("Whether the persona is B2B or B2C"),
   shortDescription: z
     .string()
     .describe("A short description of the persona. Less than 2 or 3 sentences"),

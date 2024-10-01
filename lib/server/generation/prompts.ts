@@ -84,6 +84,7 @@ The user just chose a persona to work with.
 You will now provide a detailed description of the persona using the following template:
 Name: [Name] (i.e. "Jane Doe")
 Title: [Title] (i.e. "The Busy Mom", "The Young Professional")
+B2B or B2C: [B2B or B2C] (i.e. "B2C")
 Short Description: [Description] (keep it short and concise, less than 2 sentences)
 Demographics: [Demographics] (3-5 bullet points about the demographics of the persona)
 Psychographics: [Psychographics] (3-5 bullet points about the psychographics of the persona)

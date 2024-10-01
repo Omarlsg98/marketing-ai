@@ -26,6 +26,7 @@ async function isFirstInteraction(input: FlowInput): Promise<FlowOutput> {
   let nextState = input.chatState.options.false;
   if (input.chat.is_first_interaction && input.lastMessages.length <= 1) {
     nextState = input.chatState.options.true;
+    input.chat.is_first_interaction = false;
   }
   return {
     nextState: nextState,
@@ -137,21 +138,6 @@ const CHAT_STATES: {
     type: "iteration",
     description: null,
     function: personaBrainstormFlow,
-    checkUpdateWorkspace: true,
-    executeNextInmediately: true,
-    next: "isB2CorB2B",
-  },
-  isB2CorB2B: {
-    type: "question",
-    description: null,
-    questions: [
-      {
-        id: 0,
-        question: "Would you clasify the persona you choose as B2B or B2C?",
-        objective: "Determine if the persona is B2B or B2C.",
-        q_type: "text",
-      },
-    ],
     checkUpdateWorkspace: true,
     executeNextInmediately: true,
     next: "generateDetailedPersona",
