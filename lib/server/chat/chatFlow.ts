@@ -20,7 +20,7 @@ import { sendChatGPT, sendChatGPTUntilInteger } from "@/lib/server/llms";
 import { getNewMessage } from "../database";
 import { questionFlow } from "../question-making/questionFlow";
 
-const MAX_MESSAGES_OUT_OF_CONTEXT = 5;
+const MAX_MESSAGES_OUT_OF_CONTEXT = 10;
 
 async function isFirstInteraction(input: FlowInput): Promise<FlowOutput> {
   let nextState = input.chatState.options.false;
@@ -204,7 +204,17 @@ async function updateContext(
   lastMessageIdInContext: string;
   newLastMessages: Message[];
 }> {
-  const messagesToContext = lastMessages.slice(0, MAX_MESSAGES_OUT_OF_CONTEXT);
+  if (lastMessages.length <= MAX_MESSAGES_OUT_OF_CONTEXT) {
+    console.log("Not enough messages to update context");
+
+    return {
+      context: chat.context,
+      lastMessageIdInContext: chat.last_message_id_in_context,
+      newLastMessages: lastMessages,
+    };
+  }
+
+  const messagesToContext = lastMessages.slice(0, -MAX_MESSAGES_OUT_OF_CONTEXT);
   const lastMessageIdInContext =
     messagesToContext[messagesToContext.length - 1].id;
 
@@ -299,7 +309,7 @@ async function executeState(input: FlowInput): Promise<FlowOutput> {
   }
 
   results.chat.state = results.nextState;
-  
+
   console.log("===== State executed: ", results);
 
   if (currentState.executeNextInmediately && results.stateDone) {
@@ -308,8 +318,7 @@ async function executeState(input: FlowInput): Promise<FlowOutput> {
       chat: results.chat,
       lastMessages: results.messages,
       extraInfo: null,
-    }
-  );
+    });
   }
 
   return results;
