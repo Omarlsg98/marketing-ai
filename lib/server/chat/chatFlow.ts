@@ -95,18 +95,17 @@ const CHAT_STATES: {
         question: "Do you want to create a new persona?",
         objective:
           "Determine if the user wants to create a new persona or not.",
-        q_type: "boolean",
       },
     ],
-    next: "confirmNewPersona",
+    next: "whatToDo",
     executeNextInmediately: true,
   },
-  confirmNewPersona: {
+  whatToDo: {
     type: "decision",
     description: null,
     function: userWantsToCreateNewPersona,
     options: {
-      true: "knowYourUser",
+      true: "brainstormPersonas",
       false: "goodbye",
     },
     executeNextInmediately: true,
@@ -120,14 +119,12 @@ const CHAT_STATES: {
         question: "What is your business or business idea or product?",
         objective:
           "Gather all relevant business information from the user to inform customer persona creation and customer journey mapping, recap and confirm if you already know or get new information. FOCUS ON THE BUSINESS/IDEA/PRODUCT, NOT THE TARGET CUSTOMERS.",
-        q_type: "text",
       },
       {
         id: 1,
         question: "Who are your target customers for these [business/idea]?",
         objective:
           "Identify or suggest target customers, or just recap and confirm if you already know or get new information.",
-        q_type: "text",
       },
     ],
     checkUpdateWorkspace: true,
