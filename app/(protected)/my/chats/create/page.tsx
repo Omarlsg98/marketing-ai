@@ -32,10 +32,10 @@ export default function Component() {
       });
 
       const postJson = (await postRepsonse.json()) as ChatGetOut;
-      chat = postJson.chat;
+      const newChat = postJson.chat;
 
       //redirect to chat page
-      router.push(`/my/chats/${chat.id}`);
+      router.push(`/my/chats/${newChat.id}`);
     };
 
     execute();

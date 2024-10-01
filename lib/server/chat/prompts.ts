@@ -34,6 +34,7 @@ ${basePrompt.getContext(prev_context, new_messages)}
 
 Based on the context and the new messages, update the context.
 Be concise and clear in the new context but don't leave any important details out.
+Don't include any specific information about the AI assistant (Ethan), only about the conversation.
 Only answer with the updated context.`;
 };
 

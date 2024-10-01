@@ -29,22 +29,22 @@ export async function sendMessage(
   lastMessages.push(newMessage);
 
   // Use the AI to get the next question
-  const { chat: newChat, messages } = await chatFlow(
-    chat,
-    lastMessages,
-    inputExtraInfo
-  );
+  const {
+    chat: newChat,
+    messages,
+    regenerated,
+  } = await chatFlow(chat, lastMessages, inputExtraInfo);
 
   let newMessages = messages.filter(
     (message) => message.created_at === null || message.created_at === undefined
   );
 
   // Persist To dabatase newChat, newMessages and NewObjects
-  const promises = [
-    registerMessages(newMessages),
-    updateChat(newChat),
-    saveEditColumn(newChat),
-  ];
+  const promises = [registerMessages(newMessages), updateChat(newChat)];
+
+  if (regenerated) {
+    promises.push(saveEditColumn(newChat));
+  }
 
   await Promise.all(promises);
 

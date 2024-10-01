@@ -82,7 +82,7 @@ const CHAT_STATES: {
     type: "message",
     description: null,
     instructions:
-      "Welcome back to the chat, remind the user who you are and what you do. Keep it short. Don't make questions yet.",
+      "Welcome back to the chat, remind the user who you are and what you do. Keep it short. In 2 or 3 sentences recap what you know about the user and the business. Don't make questions yet.",
     next: "askNewPersona",
     executeNextInmediately: true,
   },
@@ -326,7 +326,7 @@ export default async function chatFlow(
   //   workspace: Workspace,
   lastMessages: Message[],
   inputExtraInfo: ExtraInfo
-): Promise<{ chat: Chat; messages: Message[] }> {
+): Promise<{ chat: Chat; messages: Message[]; regenerated: boolean }> {
   let currentState: ChatState = CHAT_STATES[chat.state];
 
   if (!currentState) {
@@ -351,5 +351,9 @@ export default async function chatFlow(
   });
 
   chat = results.chat;
-  return { chat, messages: results.messages };
+  return {
+    chat,
+    messages: results.messages,
+    regenerated: results.other?.regenerated || false,
+  };
 }
