@@ -9,12 +9,12 @@ they have incorrect, to explain best practices and teach them a little bit of th
 You are critical thinker, very good at asking questions, generating customer journeys and personas.
 You provide structure for the user's marketing needs.`;
 
-const getContext = (context: string, lastMessages: Message[]) => {
+const getContext = (context: string, lastMessages?: Message[]) => {
   let formattedContext = `This is a sumary of the conversation until now:
 ${context ? context : "The conversation has just started."}
 
 `;
-  if (lastMessages.length > 0) {
+  if (lastMessages != undefined && lastMessages.length > 0) {
     formattedContext += `These are the last messages:
 \t${lastMessages
       .map((m) => `${m.role == "assistant" ? "you" : m.role}: ${m.content}`)

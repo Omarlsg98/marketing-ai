@@ -11,6 +11,7 @@ export default function Component() {
 
   useEffect(() => {
     const execute = async () => {
+      
       const getResponse = await fetch("/api/chat", {
         method: "GET",
       });

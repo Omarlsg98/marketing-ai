@@ -87,25 +87,19 @@ const CHAT_STATES: {
     executeNextInmediately: true,
   },
   askNewPersona: {
-    type: "question",
+    type: "message",
     description: null,
-    questions: [
-      {
-        id: 0,
-        question: "Do you want to create a new persona?",
-        objective:
-          "Determine if the user wants to create a new persona or not.",
-      },
-    ],
+    instructions:
+      "Ask the user if they want to create a new persona or continue with the previous one. Don't make any other question yet.",
     next: "whatToDo",
-    executeNextInmediately: true,
+    executeNextInmediately: false,
   },
   whatToDo: {
     type: "decision",
     description: null,
     function: userWantsToCreateNewPersona,
     options: {
-      true: "brainstormPersonas",
+      true: "knowYourUser",
       false: "goodbye",
     },
     executeNextInmediately: true,
@@ -113,20 +107,12 @@ const CHAT_STATES: {
   knowYourUser: {
     type: "question",
     description: null,
-    questions: [
-      {
-        id: 0,
-        question: "What is your business or business idea or product?",
-        objective:
-          "Gather all relevant business information from the user to inform customer persona creation and customer journey mapping, recap and confirm if you already know or get new information. FOCUS ON THE BUSINESS/IDEA/PRODUCT, NOT THE TARGET CUSTOMERS.",
-      },
-      {
-        id: 1,
-        question: "Who are your target customers for these [business/idea]?",
-        objective:
-          "Identify or suggest target customers, or just recap and confirm if you already know or get new information.",
-      },
-    ],
+    instructions: `Gather all relevant business information from the user.
+    Understand their product, their competitive advantage. How it works. Strenghts and weaknesses.
+    You should gather some information for LATER create a persona, but don't ask for persona information yet. 
+    The information does not need to be complete, but it should be enough to understand the business and the user.
+    Basic information to gather:
+    - Business name, product or idea, and what makes it unique.`,
     checkUpdateWorkspace: true,
     next: "brainstormPersonas",
     executeNextInmediately: true,
