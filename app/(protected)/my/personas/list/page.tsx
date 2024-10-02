@@ -1,52 +1,63 @@
-"use server";
-
-import PersonasList from "@/components/customer/persona/PersonasList";
-
-import { getPersonas } from "@/lib/server/database";
-import { getFileUrl } from "@/lib/server/supabase";
-import {
-  ChatEditColumnPersona,
-  ChatEditColumnPersonaSelector,
-} from "@/types/components/chatTab";
+import PersonaCard from "@/components/customer/persona/PersonaCard";
+import { Button } from "@/components/ui/button";
 import { PersonaList } from "@/types/components/persona";
+import { Bot } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
 
-export default async function Component() {
-  const fetchData = async () => {
-    const data = await getPersonas(30);
+interface PersonasListProps {
+  personas?: PersonaList;
+}
 
-    // format data to PersonaList
-    let output: PersonaList = [];
-
-    for (const persona of data) {
-      const shortInformation =
-        persona.short_information as ChatEditColumnPersonaSelector["personas"][0];
-
-      const information = persona.information as ChatEditColumnPersona;
-
-      const image_url = persona.image_path
-        ? await getFileUrl("persona_images", persona.image_path)
-        : null;
-
-      output.push({
-        id: persona.id,
-        name: information?.name,
-        image_url: image_url,
-        shortDescription: information?.shortDescription,
-        title: shortInformation?.title,
-        whoTheyAre: shortInformation.whoTheyAre,
-        needs: shortInformation.needs,
-        challenges: shortInformation.challenges,
-        isSuggestion: persona.is_suggestion,
-      });
-    }
-    return output;
-  };
-
-  const personas = await fetchData();
-
+export default function PersonasList({ personas = [] }: PersonasListProps) {
   return (
-    <div className="container mx-auto py-2">
-      <PersonasList personas={personas} />
+    <div className="space-y-6">
+      <h1 className="text-3xl font-bold">All Personas</h1>
+      <div className="h-[calc(100vh-200px)] overflow-y-auto pr-4">
+        {(!personas || personas.length === 0) ? (
+          <div className="flex flex-col items-center justify-center min-h-[50vh] text-center py-8">
+            <h2 className="text-2xl font-bold mb-4">No personas yet</h2>
+            <div className="relative w-full max-w-[500px] aspect-square mb-6">
+              <Image
+                src="/assets/empty-state/default.svg"
+                alt="Empty state illustration"
+                fill
+                className="object-contain"
+              />
+            </div>
+            <p className="text-muted-foreground mb-6">
+              Talk with Ethan the agent to create personas
+            </p>
+            <Link href="/my/chats/create" passHref>
+              <Button asChild>
+                <span>
+                  <Bot size={24} className="mr-2" />
+                  Chat with Ethan
+                </span>
+              </Button>
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            {personas.map((persona) => (
+              <Link
+                key={persona.id}
+                href={
+                  !persona.isSuggestion ? `/my/personas/${persona.id}` : "#"
+                }
+              >
+                <PersonaCard
+                  key={persona.id}
+                  name={persona.name}
+                  type={persona.title}
+                  coverage={null}
+                  avatarSrc={persona.image_url}
+                />
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

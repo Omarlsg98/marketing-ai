@@ -11,7 +11,7 @@ export default function Home() {
   useEffect(() => {
     const timer = setTimeout(() => {
       router.push('/my/personas');
-    }, 2000); // Show temp landing page for 2 seconds before redirecting
+    }, 1000); // Show temp landing page for 1 seconds before redirecting
 
     return () => clearTimeout(timer);
   }, [router]);
