@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useCallback, useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import {
@@ -23,7 +24,6 @@ import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
 
 const navItems = [
   { icon: MessageSquare, label: "Chats", href: "javascript:void(0);" },
@@ -38,43 +38,6 @@ const settingsItems = [
     icon: User,
     subItems: ["email", "profile", "password", "logout"],
   },
-  // Disabled for now, will enable when it is actually implmented
-  // {
-  //   id: "billing",
-  //   label: "Billing",
-  //   icon: CreditCard,
-  //   subItems: ["invoices", "payment", "subscription", "usage"],
-  // },
-  // {
-  //   id: "integrations",
-  //   label: "Integrations",
-  //   icon: Plug,
-  //   subItems: ["available", "connected"],
-  // },
-  // {
-  //   id: "notifications",
-  //   label: "Notifications",
-  //   icon: Bell,
-  //   subItems: ["email", "inapp", "push", "sms"],
-  // },
-  // {
-  //   id: "preferences",
-  //   label: "Preferences",
-  //   icon: Sliders,
-  //   subItems: ["accessibility", "language", "theme", "time-zone"],
-  // },
-  // {
-  //   id: "security",
-  //   label: "Security",
-  //   icon: Shield,
-  //   subItems: ["activity", "api", "devices", "two-factor-auth"],
-  // },
-  // {
-  //   id: "team",
-  //   label: "Team",
-  //   icon: Users2,
-  //   subItems: ["invitations", "members", "roles"],
-  // },
 ];
 
 interface SideNavProps {
@@ -91,14 +54,10 @@ export default function SideNav({
   isCollapsed = false,
 }: SideNavProps) {
   const [activeItem, setActiveItem] = useState<string | null>(null);
-  const [activeSettingsItem, setActiveSettingsItem] = useState<string | null>(
-    null
-  );
+  const [activeSettingsItem, setActiveSettingsItem] = useState<string | null>(null);
   const [activeSubItem, setActiveSubItem] = useState<string | null>(null);
   const { setTheme, theme, systemTheme } = useTheme();
-  const [currentTheme, setCurrentTheme] = useState<string | undefined>(
-    undefined
-  );
+  const [currentTheme, setCurrentTheme] = useState<string | undefined>(undefined);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -241,9 +200,7 @@ export default function SideNav({
                       <span className="text-sm font-medium">Theme</span>
                       <ToggleGroup
                         type="single"
-                        // disabled while we fix the dark theme
-                        value={"light" || currentTheme}
-                        disabled={true}
+                        value={currentTheme}
                         onValueChange={handleThemeChange}
                       >
                         <ToggleGroupItem value="light" aria-label="Light mode">
@@ -252,10 +209,7 @@ export default function SideNav({
                         <ToggleGroupItem value="dark" aria-label="Dark mode">
                           <Moon className="h-4 w-4" />
                         </ToggleGroupItem>
-                        <ToggleGroupItem
-                          value="system"
-                          aria-label="System theme"
-                        >
+                        <ToggleGroupItem value="system" aria-label="System theme">
                           <Laptop className="h-4 w-4" />
                         </ToggleGroupItem>
                       </ToggleGroup>
@@ -300,8 +254,7 @@ export default function SideNav({
                     </li>
                   </>
                 )}
-                {(activeItem === "Account" ||
-                  activeItem === "Survey Builder") && (
+                {(activeItem === "Account" || activeItem === "Survey Builder") && (
                   <li>
                     <Link
                       href={`/my/${activeItem.toLowerCase().replace(" ", "-")}`}
@@ -321,10 +274,7 @@ export default function SideNav({
         <div className="w-64 bg-background border-r border-border flex flex-col overflow-hidden">
           <div className="h-16 flex items-center px-4">
             <h2 className="text-xl font-semibold">
-              {
-                settingsItems.find((item) => item.id === activeSettingsItem)
-                  ?.label
-              }
+              {settingsItems.find((item) => item.id === activeSettingsItem)?.label}
             </h2>
           </div>
           <div className="w-full h-px bg-border" />
@@ -342,8 +292,7 @@ export default function SideNav({
                         handleLinkClick();
                       }}
                     >
-                      {subItem.charAt(0).toUpperCase() +
-                        subItem.slice(1).replace("-", " ")}
+                      {subItem.charAt(0).toUpperCase() + subItem.slice(1).replace("-", " ")}
                     </Link>
                   </li>
                 ))}
