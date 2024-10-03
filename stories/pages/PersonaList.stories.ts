@@ -41,7 +41,7 @@ const mockPersonas: PersonaList = [
 ];
 
 const meta: Meta<typeof PersonasList> = {
-  title: "Pages/PersonaGrid",
+  title: "Pages/PersonaList",
   component: PersonasList,
   parameters: {
     layout: "fullscreen",
