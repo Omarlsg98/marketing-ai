@@ -1,37 +1,39 @@
-"use client";
+"use client"
 
-import React, { useCallback, useEffect, useState } from 'react';
-import { Button } from "@/components/ui/button";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import React, { useCallback, useEffect, useState } from 'react'
+import { Button } from "@/components/ui/button"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
+} from "@/components/ui/tooltip"
 import {
   ChevronRight,
   ClipboardList,
   Laptop,
+  Lock,
   MessageSquare,
   Moon,
   Settings,
   Sun,
   User,
   Users,
-  LogOut
-} from "lucide-react";
-import { useTheme } from "next-themes";
-import Image from "next/image";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import LogoutButton from '@/components/general/LogoutButton';
+  Briefcase
+} from "lucide-react"
+import { useTheme } from "next-themes"
+import Image from "next/image"
+import Link from "next/link"
+import { usePathname, useRouter } from "next/navigation"
+import LogoutButton from "@/components/general/LogoutButton"
 
 const navItems = [
   { icon: MessageSquare, label: "Chats", href: "javascript:void(0);" },
   { icon: Users, label: "Personas", href: "javascript:void(0);" },
-  { icon: ClipboardList, label: "Survey Builder", href: "javascript:void(0);" },
-];
+  { icon: ClipboardList, label: "Survey", href: "javascript:void(0);" },
+  { icon: Briefcase, label: "Strategy", href: "javascript:void(0);" },
+]
 
 const settingsItems = [
   {
@@ -40,13 +42,89 @@ const settingsItems = [
     icon: User,
     subItems: ["email", "profile", "password"],
   },
-];
+]
+
+const marketingWorkflow = [
+  {
+    title: "1. Foundations",
+    items: [
+      "Mission",
+      "Vision",
+      "Values",
+      "SWOT",
+      "Porter",
+      "PEST",
+      "McKinsey"
+    ]
+  },
+  {
+    title: "2. Indicators",
+    items: [
+      "Scorecard",
+      "KPIs",
+      "Goals"
+    ]
+  },
+  {
+    title: "3. Insights",
+    items: [
+      "Brand",
+      "Competitive",
+      "Segmentation",
+      "Maturity"
+    ]
+  },
+  {
+    title: "4. Positioning",
+    items: [
+      "Funnel",
+      "Statement",
+      "Pricing",
+      "Personas"
+    ]
+  },
+  {
+    title: "5. Execution",
+    items: [
+      "Inbound",
+      "Content",
+      "Social",
+      "Advertising",
+      "Sales"
+    ]
+  },
+  {
+    title: "6. Financial",
+    items: [
+      "Budget",
+      "Spend",
+      "Reporting",
+      "Analysis"
+    ]
+  },
+  {
+    title: "7. Risk",
+    items: [
+      "Identification",
+      "Impact",
+      "Mitigation",
+      "Contingency"
+    ]
+  },
+  {
+    title: "8. Overview",
+    items: [
+      "Summary",
+      "Timeline"
+    ]
+  }
+]
 
 interface SideNavProps {
-  onStateChange: (newState: "closed" | "level1" | "level2") => void;
-  isMobile?: boolean;
-  onClose?: () => void;
-  isCollapsed?: boolean;
+  onStateChange: (newState: "closed" | "level1" | "level2") => void
+  isMobile?: boolean
+  onClose?: () => void
+  isCollapsed?: boolean
 }
 
 export default function SideNav({
@@ -55,68 +133,68 @@ export default function SideNav({
   onClose,
   isCollapsed = false,
 }: SideNavProps) {
-  const [activeItem, setActiveItem] = useState<string | null>(null);
-  const [activeSettingsItem, setActiveSettingsItem] = useState<string | null>(null);
-  const [activeSubItem, setActiveSubItem] = useState<string | null>(null);
-  const { setTheme, theme, systemTheme } = useTheme();
-  const [currentTheme, setCurrentTheme] = useState<string | undefined>(undefined);
-  const pathname = usePathname();
-  const router = useRouter();
+  const [activeItem, setActiveItem] = useState<string | null>(null)
+  const [activeSettingsItem, setActiveSettingsItem] = useState<string | null>(null)
+  const [activeSubItem, setActiveSubItem] = useState<string | null>(null)
+  const { setTheme, theme, systemTheme } = useTheme()
+  const [currentTheme, setCurrentTheme] = useState<string | undefined>(undefined)
+  const pathname = usePathname()
+  const router = useRouter()
 
   useEffect(() => {
-    setCurrentTheme(theme === "system" ? systemTheme : theme);
-  }, [theme, systemTheme]);
+    setCurrentTheme(theme === "system" ? systemTheme : theme)
+  }, [theme, systemTheme])
 
   const toggleSubMenu = useCallback(
     (label: string) => {
       setActiveItem((prevActiveItem) => {
-        const newActiveItem = prevActiveItem === label ? null : label;
-        onStateChange(newActiveItem ? "level1" : "closed");
-        return newActiveItem;
-      });
-      setActiveSettingsItem(null);
-      setActiveSubItem(null);
+        const newActiveItem = prevActiveItem === label ? null : label
+        onStateChange(newActiveItem ? "level1" : "closed")
+        return newActiveItem
+      })
+      setActiveSettingsItem(null)
+      setActiveSubItem(null)
     },
     [onStateChange]
-  );
+  )
 
   const toggleSettingsSubMenu = useCallback(
     (id: string) => {
       setActiveSettingsItem((prevActiveSettingsItem) => {
-        const newActiveSettingsItem = prevActiveSettingsItem === id ? null : id;
-        onStateChange(newActiveSettingsItem ? "level2" : "level1");
-        return newActiveSettingsItem;
-      });
-      setActiveSubItem(null);
+        const newActiveSettingsItem = prevActiveSettingsItem === id ? null : id
+        onStateChange(newActiveSettingsItem ? "level2" : "level1")
+        return newActiveSettingsItem
+      })
+      setActiveSubItem(null)
     },
     [onStateChange]
-  );
+  )
 
   const toggleSettingsSubItem = useCallback((subItem: string) => {
     setActiveSubItem((prevActiveSubItem) => {
-      const newActiveSubItem = prevActiveSubItem === subItem ? null : subItem;
-      return newActiveSubItem;
-    });
-  }, []);
+      const newActiveSubItem = prevActiveSubItem === subItem ? null : subItem
+      return newActiveSubItem
+    })
+  }, [])
 
   const handleThemeChange = useCallback(
     (value: string) => {
       if (value) {
-        setTheme(value);
+        setTheme(value)
       }
     },
     [setTheme]
-  );
+  )
 
   const handleLinkClick = useCallback(() => {
-    setActiveItem(null);
-    setActiveSettingsItem(null);
-    setActiveSubItem(null);
-    onStateChange("closed");
+    setActiveItem(null)
+    setActiveSettingsItem(null)
+    setActiveSubItem(null)
+    onStateChange("closed")
     if (isMobile && onClose) {
-      onClose();
+      onClose()
     }
-  }, [onStateChange, isMobile, onClose]);
+  }, [onStateChange, isMobile, onClose])
 
   return (
     <div className="flex h-full">
@@ -169,15 +247,15 @@ export default function SideNav({
         </TooltipProvider>
       </nav>
       {activeItem && (
-        <div className="w-64 bg-background border-r border-border flex flex-col overflow-hidden">
+        <div className="w-64 bg-background border-r border-border flex flex-col">
           <div className="h-16 flex items-center px-4">
             <h2 className="text-xl font-semibold">{activeItem}</h2>
           </div>
-          <div className="w-full h-px bg-border" />
+          <div className="w-full h-px bg-border mt-px" />
           <div className="flex-grow overflow-y-auto">
             {activeItem === "Settings" ? (
               <div className="flex flex-col h-full">
-                <div className="p-4 space-y-1 flex-grow overflow-y-auto">
+                <div className="p-4 space-y-1 flex-grow">
                   {settingsItems.map((item) => (
                     <Button
                       key={item.id}
@@ -219,20 +297,32 @@ export default function SideNav({
                   </div>
                 </div>
               </div>
+            ) : activeItem === "Strategy" ? (
+              <div className="p-4 space-y-1">
+                {marketingWorkflow.map((section) => (
+                  <Button
+                    key={section.title}
+                    variant="ghost"
+                    className={`w-full justify-between ${activeSettingsItem === section.title ? "bg-accent" : ""}`}
+                    onClick={() => toggleSettingsSubMenu(section.title)}
+                  >
+                    <span>{section.title}</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </Button>
+                ))}
+              </div>
             ) : (
               <ul className="p-4 space-y-2">
                 {activeItem === "Chats" && (
-                  <>
-                    <li>
-                      <Link
-                        href="/my/chats/create"
-                        className="block w-full text-left px-3 py-2 rounded-md hover:bg-accent"
-                        onClick={handleLinkClick}
-                      >
-                        Chat with Ethan
-                      </Link>
-                    </li>
-                  </>
+                  <li>
+                    <Link
+                      href="/my/chats/create"
+                      className="block w-full text-left px-3 py-2 rounded-md hover:bg-accent"
+                      onClick={handleLinkClick}
+                    >
+                      Chat with Ethan
+                    </Link>
+                  </li>
                 )}
                 {activeItem === "Personas" && (
                   <>
@@ -256,10 +346,10 @@ export default function SideNav({
                     </li>
                   </>
                 )}
-                {(activeItem === "Account" || activeItem === "Survey Builder") && (
+                {activeItem === "Survey" && (
                   <li>
                     <Link
-                      href={`/my/${activeItem.toLowerCase().replace(" ", "-")}`}
+                      href="/my/survey-builder"
                       className="block w-full text-left px-3 py-2 rounded-md hover:bg-accent"
                       onClick={handleLinkClick}
                     >
@@ -272,42 +362,70 @@ export default function SideNav({
           </div>
         </div>
       )}
-      {activeSettingsItem && (
-        <div className="w-64 bg-background border-r border-border flex flex-col overflow-hidden">
+      {(activeSettingsItem || (activeItem === "Strategy" && activeSettingsItem)) && (
+        <div className="w-64 bg-background border-r border-border flex flex-col">
           <div className="h-16 flex items-center px-4">
             <h2 className="text-xl font-semibold">
-              {settingsItems.find((item) => item.id === activeSettingsItem)?.label}
+              {activeItem === "Strategy"
+                ? marketingWorkflow.find((section) => section.title === activeSettingsItem)?.title
+                : settingsItems.find((item) => item.id === activeSettingsItem)?.label}
             </h2>
           </div>
           <div className="w-full h-px bg-border" />
           <div className="flex flex-col h-full">
             <div className="p-4 flex-grow overflow-y-auto">
               <ul className="space-y-2">
-                {settingsItems
-                  .find((item) => item.id === activeSettingsItem)
-                  ?.subItems.map((subItem) => (
-                    <li key={subItem}>
-                      <Link
-                        href={`/my/settings/${activeSettingsItem}/${subItem}`}
-                        className={`block w-full text-left px-3 py-2 rounded-md hover:bg-accent ${activeSubItem === subItem ? "bg-accent" : ""}`}
-                        onClick={() => {
-                          toggleSettingsSubItem(subItem);
-                          handleLinkClick();
-                        }}
-                      >
-                        {subItem.charAt(0).toUpperCase() + subItem.slice(1).replace("-", " ")}
-                      </Link>
-                    </li>
-                  ))}
+                {activeItem === "Strategy"
+                  ? marketingWorkflow
+                      .find((section) => section.title === activeSettingsItem)
+                      ?.items.map((item) => (
+                        <li key={item}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className={`w-full justify-between ${activeSubItem === item ? "bg-accent" : ""}`}
+                            onClick={() => toggleSettingsSubItem(item)}
+                          >
+                            <span>{item}</span>
+                            {item === "Personas" ? (
+                              <Link href="/my/personas" className="text-primary hover:underline">
+                                Open
+                              </Link>
+                            ) : (
+                              <Lock className="w-4 h-4 text-muted-foreground" />
+                            )}
+                          </Button>
+                        </li>
+                      ))
+                  : settingsItems
+                      .find((item) => item.id === activeSettingsItem)
+                      ?.subItems.map((subItem) => (
+                        <li key={subItem}>
+                          <Link
+                            href={`/my/settings/${activeSettingsItem}/${subItem}`}
+                            className={`block w-full text-left px-3 py-2 rounded-md hover:bg-accent ${activeSubItem === subItem ? "bg-accent" : ""}`}
+                            onClick={() => {
+                              toggleSettingsSubItem(subItem)
+                              handleLinkClick()
+                            }}
+                          >
+                            {subItem.charAt(0).toUpperCase() + subItem.slice(1).replace("-", " ")}
+                          </Link>
+                        </li>
+                      ))}
               </ul>
             </div>
-            <div className="mt-auto p-4">
-              <div className="w-full h-px bg-border mb-4" />
-              <LogoutButton />
-            </div>
+            {activeSettingsItem === "account" && (
+              <>
+                <div className="w-full h-px bg-border" />
+                <div className="p-4">
+                  <LogoutButton />
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
     </div>
-  );
+  )
 }
