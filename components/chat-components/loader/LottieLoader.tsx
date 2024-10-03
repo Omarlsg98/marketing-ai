@@ -1,6 +1,6 @@
-import React from 'react';
+import animationData from '@/public/assets/lottie/chat-loader.json';
 import Lottie from 'lottie-react';
-import animationData from './LottieLoader'
+import React from 'react';
 
 interface LottieLoaderProps {
   width?: number;
