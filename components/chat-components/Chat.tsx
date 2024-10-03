@@ -1,4 +1,3 @@
-// Chat.tsx
 "use client";
 
 import { ChatInput } from "@/components/chat-components/ChatInput";
@@ -10,6 +9,7 @@ import { Chat, Message } from "@/types/database";
 import { ExtraInfo } from "@/types/interseed/chat";
 import { FC, useEffect, useRef, useState } from "react";
 import ChatRightPanel from "./RightPanel";
+import LottieLoader from "@/components/chat-components/loader/LottieLoader";
 
 interface ChatProps {
   chat: Chat | null;
@@ -91,10 +91,10 @@ const ChatUI: FC<ChatProps> = ({ chat, messages, handleSendMessage, initLoading}
             </MessageBubble>
           ))}
           {loading && (
-            <div className="flex items-center space-x-2 mt-4  animate-pulse">
+            <div className="flex items-center space-x-2 mt-4">
               <UserAvatar userImage="/placeholder.svg?height=40&width=40" />
               <div className="bg-secondary text-secondary-foreground rounded-lg px-4 py-2">
-                Ethan is typing ...
+                <LottieLoader width={100} height={40} />
               </div>
             </div>
           )}
@@ -114,7 +114,7 @@ const ChatUI: FC<ChatProps> = ({ chat, messages, handleSendMessage, initLoading}
             <ResizableDivider onResize={handleResize} />
             <div className="flex-1 overflow-auto p-4">
               <ChatRightPanel
-                onDone={handleSendMessageWrapper} // TODO: Implement this
+                onDone={handleSendMessageWrapper}
                 displayInfo={
                   JSON.parse(
                     chat.display_info as string
