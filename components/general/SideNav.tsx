@@ -38,43 +38,6 @@ const settingsItems = [
     icon: User,
     subItems: ["email", "profile", "password", "logout"],
   },
-  // Disabled for now, will enable when it is actually implmented
-  // {
-  //   id: "billing",
-  //   label: "Billing",
-  //   icon: CreditCard,
-  //   subItems: ["invoices", "payment", "subscription", "usage"],
-  // },
-  // {
-  //   id: "integrations",
-  //   label: "Integrations",
-  //   icon: Plug,
-  //   subItems: ["available", "connected"],
-  // },
-  // {
-  //   id: "notifications",
-  //   label: "Notifications",
-  //   icon: Bell,
-  //   subItems: ["email", "inapp", "push", "sms"],
-  // },
-  // {
-  //   id: "preferences",
-  //   label: "Preferences",
-  //   icon: Sliders,
-  //   subItems: ["accessibility", "language", "theme", "time-zone"],
-  // },
-  // {
-  //   id: "security",
-  //   label: "Security",
-  //   icon: Shield,
-  //   subItems: ["activity", "api", "devices", "two-factor-auth"],
-  // },
-  // {
-  //   id: "team",
-  //   label: "Team",
-  //   icon: Users2,
-  //   subItems: ["invitations", "members", "roles"],
-  // },
 ];
 
 interface SideNavProps {
@@ -241,9 +204,7 @@ export default function SideNav({
                       <span className="text-sm font-medium">Theme</span>
                       <ToggleGroup
                         type="single"
-                        // disabled while we fix the dark theme
-                        value={"light" || currentTheme}
-                        disabled={true}
+                        value={currentTheme}
                         onValueChange={handleThemeChange}
                       >
                         <ToggleGroupItem value="light" aria-label="Light mode">
