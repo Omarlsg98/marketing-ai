@@ -117,6 +117,9 @@ async function baseIterationFlow(
     messages: messages,
     chat: chat,
     stateDone: false,
+    other: {
+      regenerated: agentResponse.shouldFormat
+    }
   };
 }
 

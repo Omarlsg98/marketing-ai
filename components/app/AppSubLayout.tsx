@@ -1,4 +1,5 @@
 "use client";
+import { ThemeProvider } from "@/components/general/ThemeProvider";
 import config from "@/config";
 import cx from "classnames";
 import PlausibleProvider from "next-plausible";
@@ -14,12 +15,12 @@ interface AppSubLayoutProps {
 }
 
 const AppSubLayout: FC<AppSubLayoutProps> = ({ children }) => {
-
   return (
     <html
       lang="en"
       data-theme="light"
       className={cx(font.className, "h-[100%]")}
+      suppressHydrationWarning
     >
       {config.domainName && (
         <head>
@@ -28,8 +29,10 @@ const AppSubLayout: FC<AppSubLayoutProps> = ({ children }) => {
       )}
       <GTMProvider />
       <body className="h-[100%] bg-background text-foreground">
-        {/* ClientLayout contains all the client wrappers (Crisp chat support, toast messages, tooltips, etc.) */}
-        <ClientLayout>{children}</ClientLayout>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {/* ClientLayout contains all the client wrappers (Crisp chat support, toast messages, tooltips, etc.) */}
+          <ClientLayout>{children}</ClientLayout>
+        </ThemeProvider>
       </body>
     </html>
   );

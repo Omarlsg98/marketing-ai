@@ -1,11 +1,10 @@
-import { ReactNode } from "react";
-import { Viewport } from "next";
-import { getSEOTags } from "@/libs/seo";
-import config from "@/config";
-import "./globals.css";
-import "react-tooltip/dist/react-tooltip.css";
 import AppLayout from "@/components/app/AppLayout";
-import { ThemeProvider } from "@/components/ThemeProvider";
+import config from "@/config";
+import { getSEOTags } from "@/libs/seo";
+import { Viewport } from "next";
+import { ReactNode } from "react";
+import "react-tooltip/dist/react-tooltip.css";
+import "./globals.css";
 
 export const viewport: Viewport = {
   themeColor: config.colors.main,
@@ -16,13 +15,5 @@ export const viewport: Viewport = {
 export const metadata = getSEOTags();
 
 export default function RootLayout({ children }: { children: ReactNode }) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <body>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <AppLayout>{children}</AppLayout>
-        </ThemeProvider>
-      </body>
-    </html>
-  );
+  return <AppLayout>{children}</AppLayout>;
 }

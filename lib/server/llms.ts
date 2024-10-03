@@ -1,3 +1,4 @@
+import { Message } from "@/types/database";
 import axios, { AxiosError } from "axios";
 import axiosRetry from "axios-retry";
 
@@ -9,8 +10,58 @@ export type llm_message = {
 };
 
 import OpenAI from "openai";
+import { LengthFinishReasonError } from "openai/error";
 import { zodResponseFormat } from "openai/helpers/zod";
+import { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { z } from "zod";
+
+export const sendChatGPTJSONWithMessages = async function (
+  prompt: string,
+  messages: Message[],
+  schema: z.AnyZodObject,
+  maxTokens: number = 100,
+  temperature: number = 1
+): Promise<any> {
+  const allMessages = [
+    ...messages.map((m) => ({ role: m.role, content: m.content })),
+    { role: "system", content: prompt },
+  ] as ChatCompletionMessageParam[];
+
+  if (DEBUG_LLM) {
+    console.log("------ DEBUG_LLM PROMPT:\n", allMessages);
+  }
+
+  const openai = new OpenAI();
+
+  let retries = 3;
+  while (retries > 0) {
+    try {
+      const completion = await openai.beta.chat.completions.parse({
+        model: process.env.LLM_MODEL,
+        max_tokens: maxTokens,
+        temperature: temperature,
+        messages: allMessages,
+        response_format: zodResponseFormat(schema, "object"),
+      });
+
+      if (DEBUG_LLM) {
+        console.log(
+          "------ DEBUG_LLM RESPONSE:\n", completion.choices[0].message.content
+        );
+      }
+
+      const event = completion.choices[0].message.parsed;
+      return event;
+    } catch (error) {
+      console.error(error);
+      if (error instanceof LengthFinishReasonError && retries > 0) {
+        retries--;
+      } else {
+        throw error;
+      }
+    }
+  }
+};
 
 export const sendChatGPTJSON = async function (
   prompt: string,
@@ -18,26 +69,21 @@ export const sendChatGPTJSON = async function (
   maxTokens: number = 100,
   temperature: number = 1
 ): Promise<any> {
-  if (DEBUG_LLM) {
-    console.log("------ DEBUG_LLM PROMPT:\n" + prompt);
-  }
-
-  const openai = new OpenAI();
-
-  const completion = await openai.beta.chat.completions.parse({
-    model: process.env.LLM_MODEL,
-    max_tokens: maxTokens,
-    temperature: temperature,
-    messages: [{ role: "system", content: prompt }],
-    response_format: zodResponseFormat(schema, "object"),
-  });
-
-  if (DEBUG_LLM) {
-    console.log("------ DEBUG_LLM RESPONSE:\n" +  completion.choices[0].message.content);
-  }
-
-  const event = completion.choices[0].message.parsed;
-  return event;
+  return sendChatGPTJSONWithMessages(
+    prompt,
+    [
+      {
+        role: "system",
+        content: prompt,
+        chat_id: "",
+        id: "",
+        user_id: "",
+      },
+    ],
+    schema,
+    maxTokens,
+    temperature
+  );
 };
 
 export const sendChatGPTUntilInteger = async (

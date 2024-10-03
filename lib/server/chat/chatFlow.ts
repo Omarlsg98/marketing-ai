@@ -20,12 +20,13 @@ import { sendChatGPT, sendChatGPTUntilInteger } from "@/lib/server/llms";
 import { getNewMessage } from "../database";
 import { questionFlow } from "../question-making/questionFlow";
 
-const MAX_MESSAGES_OUT_OF_CONTEXT = 5;
+const MAX_MESSAGES_OUT_OF_CONTEXT = 10;
 
 async function isFirstInteraction(input: FlowInput): Promise<FlowOutput> {
   let nextState = input.chatState.options.false;
   if (input.chat.is_first_interaction && input.lastMessages.length <= 1) {
     nextState = input.chatState.options.true;
+    input.chat.is_first_interaction = false;
   }
   return {
     nextState: nextState,
@@ -81,26 +82,19 @@ const CHAT_STATES: {
     type: "message",
     description: null,
     instructions:
-      "Welcome back to the chat, remind the user who you are and what you do. Keep it short. Don't make questions yet.",
+      "Welcome back to the chat, remind the user who you are and what you do. Keep it short. In 2 or 3 sentences recap what you know about the user and the business. Don't make questions yet.",
     next: "askNewPersona",
     executeNextInmediately: true,
   },
   askNewPersona: {
-    type: "question",
+    type: "message",
     description: null,
-    questions: [
-      {
-        id: 0,
-        question: "Do you want to create a new persona?",
-        objective:
-          "Determine if the user wants to create a new persona or not.",
-        q_type: "boolean",
-      },
-    ],
-    next: "confirmNewPersona",
-    executeNextInmediately: true,
+    instructions:
+      "Ask the user if they want to create a new persona or continue with the previous one. Don't make any other question yet.",
+    next: "whatToDo",
+    executeNextInmediately: false,
   },
-  confirmNewPersona: {
+  whatToDo: {
     type: "decision",
     description: null,
     function: userWantsToCreateNewPersona,
@@ -113,22 +107,12 @@ const CHAT_STATES: {
   knowYourUser: {
     type: "question",
     description: null,
-    questions: [
-      {
-        id: 0,
-        question: "What is your business or business idea or product?",
-        objective:
-          "Gather all relevant business information from the user to inform customer persona creation and customer journey mapping, recap and confirm if you already know or get new information. FOCUS ON THE BUSINESS/IDEA/PRODUCT, NOT THE TARGET CUSTOMERS.",
-        q_type: "text",
-      },
-      {
-        id: 1,
-        question: "Who are your target customers for these [business/idea]?",
-        objective:
-          "Identify or suggest target customers, or just recap and confirm if you already know or get new information.",
-        q_type: "text",
-      },
-    ],
+    instructions: `Gather all relevant business information from the user.
+    Understand their product, their competitive advantage. How it works. Strenghts and weaknesses.
+    You should gather some information for LATER create a persona, but don't ask for persona information yet. 
+    The information does not need to be complete, but it should be enough to understand the business and the user.
+    Basic information to gather:
+    - Business name, product or idea, and what makes it unique.`,
     checkUpdateWorkspace: true,
     next: "brainstormPersonas",
     executeNextInmediately: true,
@@ -137,21 +121,6 @@ const CHAT_STATES: {
     type: "iteration",
     description: null,
     function: personaBrainstormFlow,
-    checkUpdateWorkspace: true,
-    executeNextInmediately: true,
-    next: "isB2CorB2B",
-  },
-  isB2CorB2B: {
-    type: "question",
-    description: null,
-    questions: [
-      {
-        id: 0,
-        question: "Would you clasify the persona you choose as B2B or B2C?",
-        objective: "Determine if the persona is B2B or B2C.",
-        q_type: "text",
-      },
-    ],
     checkUpdateWorkspace: true,
     executeNextInmediately: true,
     next: "generateDetailedPersona",
@@ -218,7 +187,17 @@ async function updateContext(
   lastMessageIdInContext: string;
   newLastMessages: Message[];
 }> {
-  const messagesToContext = lastMessages.slice(0, MAX_MESSAGES_OUT_OF_CONTEXT);
+  if (lastMessages.length <= MAX_MESSAGES_OUT_OF_CONTEXT) {
+    console.log("Not enough messages to update context");
+
+    return {
+      context: chat.context,
+      lastMessageIdInContext: chat.last_message_id_in_context,
+      newLastMessages: lastMessages,
+    };
+  }
+
+  const messagesToContext = lastMessages.slice(0, -MAX_MESSAGES_OUT_OF_CONTEXT);
   const lastMessageIdInContext =
     messagesToContext[messagesToContext.length - 1].id;
 
@@ -313,7 +292,7 @@ async function executeState(input: FlowInput): Promise<FlowOutput> {
   }
 
   results.chat.state = results.nextState;
-  
+
   console.log("===== State executed: ", results);
 
   if (currentState.executeNextInmediately && results.stateDone) {
@@ -322,8 +301,7 @@ async function executeState(input: FlowInput): Promise<FlowOutput> {
       chat: results.chat,
       lastMessages: results.messages,
       extraInfo: null,
-    }
-  );
+    });
   }
 
   return results;
@@ -334,7 +312,7 @@ export default async function chatFlow(
   //   workspace: Workspace,
   lastMessages: Message[],
   inputExtraInfo: ExtraInfo
-): Promise<{ chat: Chat; messages: Message[] }> {
+): Promise<{ chat: Chat; messages: Message[]; regenerated: boolean }> {
   let currentState: ChatState = CHAT_STATES[chat.state];
 
   if (!currentState) {
@@ -359,5 +337,9 @@ export default async function chatFlow(
   });
 
   chat = results.chat;
-  return { chat, messages: results.messages };
+  return {
+    chat,
+    messages: results.messages,
+    regenerated: results.other?.regenerated || false,
+  };
 }

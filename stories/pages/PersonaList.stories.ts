@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react";
-import PersonasGrid from "@/components/customer/persona/PersonasList";
+import PersonasList from "@/components/customer/persona/PersonasList";
 import { PersonaList } from "@/types/components/persona";
+import type { Meta, StoryObj } from "@storybook/react";
 
 const mockPersonas: PersonaList = [
   {
@@ -40,9 +40,9 @@ const mockPersonas: PersonaList = [
   },
 ];
 
-const meta: Meta<typeof PersonasGrid> = {
+const meta: Meta<typeof PersonasList> = {
   title: "Pages/PersonaGrid",
-  component: PersonasGrid,
+  component: PersonasList,
   parameters: {
     layout: "fullscreen",
   },
@@ -56,7 +56,7 @@ const meta: Meta<typeof PersonasGrid> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof PersonasGrid>;
+type Story = StoryObj<typeof PersonasList>;
 
 export const Base: Story = {
   args: {
