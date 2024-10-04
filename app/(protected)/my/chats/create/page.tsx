@@ -1,73 +1,39 @@
-"use client";
+"use server";
 
-import ChatUI from "@/components/chat-components/Chat";
-import { ChatGetOut } from "@/types/api/chat";
+import { sendMessage } from "@/app/api/chat/[chatId]/send/route";
+import { getChat, getUserId, insertRecord } from "@/lib/server/database";
 import { Chat } from "@/types/database";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { Database } from "@/types/supabase";
+import { redirect, RedirectType } from "next/navigation";
 
-export default function Component() {
-  const router = useRouter();
+export default async function Component() {
+  const execute = async () => {
+    const prevChat = await getChat(null);
 
-  useEffect(() => {
-    const execute = async () => {
-      
-      const getResponse = await fetch("/api/chat", {
-        method: "GET",
-      });
+    if (prevChat) {
+      redirect(`/my/chats/${prevChat.id}`, RedirectType.replace);
+    }
 
-      let { chat } = (await getResponse.json()) as ChatGetOut;
-      //redirect to chat page
-      if (chat) {
-        router.push(`/my/chats/${chat.id}`);
-        return;
-      }
-
-      const postRepsonse = await fetch("/api/chat", {
-        method: "POST",
-        body: JSON.stringify({
-          title: "New Persona",
-          description: "New persona chat",
-          category: "Persona B2B",
-        }),
-      });
-
-      const postJson = (await postRepsonse.json()) as ChatGetOut;
-      const newChat = postJson.chat;
-
-      //redirect to chat page
-      router.push(`/my/chats/${newChat.id}`);
+    let newChat: Database["public"]["Tables"]["llm_chats"]["Insert"] = {
+      user_id: await getUserId(),
+      title: "New Chat",
+      description: "New Chat",
+      id: "", // This will be added by the database
+      is_first_interaction: prevChat === null,
     };
 
-    execute();
-  }, []);
+    newChat = await insertRecord("llm_chats", newChat);
 
-  const emptyChat: Chat = {
-    context: "test",
-    created_at: "2021-10-01T00:00:00.000Z",
-    description: "test",
-    display_info: null as any,
-    id: "1",
-    is_first_interaction: true,
-    progress: 0,
-    state: "test",
-    status: "new",
-    title: "test",
-    updated_at: "2021-10-01T00:00:00.000Z",
-    user_id: "1",
-    deleted_at: "",
-    last_message_id_in_context: "sdfsdf",
-    object_context_id: "",
-    substep_id: 0,
+    await sendMessage(
+      newChat as Chat,
+      "The conversation has started",
+      "system",
+      {}
+    );
+
+    //redirect to chat page
+    redirect(`/my/chats/${newChat.id}`, RedirectType.replace);
   };
 
-  return (
-    <ChatUI
-      chat={emptyChat}
-      messages={[
-      ]}
-      handleSendMessage={null}
-      initLoading={true}
-    />
-  );
+  await execute();
 }

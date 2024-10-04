@@ -6,6 +6,7 @@ import {
 } from "@/types/components/chatTab";
 import { ExtraInfo } from "@/types/interseed/chat";
 import { CheckCircle } from "lucide-react";
+import Image from "next/image";
 import { FC } from "react";
 import { Button } from "../ui/button";
 
@@ -28,6 +29,7 @@ const ImageGenerationTab: FC<ImageGenerationTabProps> = ({
   const submitInfo = async () => {
     await handleDone("LGTM, let's go to the next section!", {
       saved: true,
+      type: "image",
     });
   };
 
@@ -44,13 +46,15 @@ const ImageGenerationTab: FC<ImageGenerationTabProps> = ({
         <CardContent className="p-4">
           <div className="flex flex-col items-center">
             <div className="mb-4 overflow-hidden rounded-lg shadow w-96">
-              <img
+              <Image
                 src={
                   currentInfo.imageUrl ||
                   "/placeholder.svg?height=400&width=400"
                 }
                 alt="Persona portrait"
                 className="h-96 w-96 object-cover"
+                width={400}
+                height={400}
               />
             </div>
           </div>

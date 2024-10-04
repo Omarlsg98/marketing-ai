@@ -38,6 +38,7 @@ const PersonaSelectorTab: FC<PersonaSelectorTabProps> = ({
         {
           idChoice: selectedPersonaId,
           saved: true,
+          type: 'multiplePersona',
         }
       );
     }

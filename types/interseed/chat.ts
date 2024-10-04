@@ -1,4 +1,4 @@
-import { ChatEditColumn } from "../components/chatTab";
+import { ChatEditColumn, ChatTabTypes } from "../components/chatTab";
 import { Chat, Message } from "../database";
 
 import { z } from "zod";
@@ -55,6 +55,7 @@ export const extraInfoSchema = z.object({
   edited: z.boolean().optional(),
   modifications: z.custom<ChatEditColumn>().optional(),
   idChoice: z.string().optional(),
+  type: z.enum(ChatTabTypes).optional(),
 });
 
 export type ExtraInfo = z.infer<typeof extraInfoSchema>;
