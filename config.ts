@@ -5,8 +5,7 @@ const config = {
   // REQUIRED
   appName: "Interseed AI",
   // REQUIRED: a short description of your app for SEO tags (can be overwritten)
-  appDescription:
-    "Simplified Marketing",
+  appDescription: "Simplified Marketing",
   // REQUIRED (no https://, not trialing slash at the end, just the naked domain)
   domainName: "interseed.ai",
   crisp: {
@@ -51,9 +50,7 @@ const config = {
         credits: 100,
         priority: 0,
         features: [
-          {
-            name: "NextJs Boilerplate",
-          },
+          { name: "NextJs Boilerplate" },
           { name: "App-Landing Page Components" },
           { name: "Stripe/Lemon Squeezy" },
           { name: "MongoDB/Supabase" },
@@ -83,9 +80,7 @@ const config = {
         credits: 100,
         priority: 1,
         features: [
-          {
-            name: "Unlimited Usage",
-          },
+          { name: "Unlimited Usage" },
           { name: "Private Generations" },
           { name: "Commercial License" },
         ],
@@ -110,9 +105,7 @@ const config = {
         credits: 100,
         priority: 0,
         features: [
-          {
-            name: "Unlimited Usage",
-          },
+          { name: "Unlimited Usage" },
           { name: "Private Generations" },
           { name: "Commercial License" },
         ],
@@ -137,9 +130,7 @@ const config = {
         // If you have an anchor price (i.e. $29) that you want to display crossed out, put it here. Otherwise, leave it empty
         priority: 0,
         features: [
-          {
-            name: "NextJs Boilerplate",
-          },
+          { name: "NextJs Boilerplate" },
           { name: "App-Landing Page Components" },
           { name: "Stripe/Lemon Squeezy" },
           { name: "Marketing Guide" },
@@ -170,9 +161,7 @@ const config = {
         price: 199,
         priority: 1,
         features: [
-          {
-            name: "NextJs Boilerplate",
-          },
+          { name: "NextJs Boilerplate" },
           { name: "App-Landing Page Components" },
           { name: "Stripe/Lemon Squeezy" },
           { name: "Marketing Guide" },
@@ -201,9 +190,7 @@ const config = {
         credits: 100,
         priority: 0,
         features: [
-          {
-            name: "Next Starter AI Boilerplate",
-          },
+          { name: "Next Starter AI Boilerplate" },
           { name: "Dedicated design/development team" },
           { name: "Fully custom code/design for your project" },
         ],
@@ -233,7 +220,7 @@ const config = {
     theme: "light",
     // REQUIRED — This color will be reflected on the whole app outside of the document (loading bar, Chrome tabs, etc..). By default it takes the primary color from your DaisyUI theme (make sure to update your the theme name after "data-theme=")
     // OR you can just do this to use a custom color: main: "#f37055". HEX only.
-    main: themes[`[data-theme=light]`]["primary"],
+    main: (themes as any)["[data-theme=light]"]["primary"] as string,
   },
   auth: {
     // REQUIRED — the path to log in users. It's use to protect private routes (like /dashboard). It's used in apiClient (/libs/api.js) upon 401 errors from our API
