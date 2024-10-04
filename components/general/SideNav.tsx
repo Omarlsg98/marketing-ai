@@ -18,12 +18,14 @@ import {
   Settings,
   Sun,
   User,
-  Users
+  Users,
+  LogOut
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import LogoutButton from '@/components/general/LogoutButton';
 
 const navItems = [
   { icon: MessageSquare, label: "Chats", href: "javascript:void(0);" },
@@ -36,7 +38,7 @@ const settingsItems = [
     id: "account",
     label: "Account",
     icon: User,
-    subItems: ["email", "profile", "password", "logout"],
+    subItems: ["email", "profile", "password"],
   },
 ];
 
@@ -278,25 +280,31 @@ export default function SideNav({
             </h2>
           </div>
           <div className="w-full h-px bg-border" />
-          <div className="p-4 flex-grow overflow-y-auto">
-            <ul className="space-y-2">
-              {settingsItems
-                .find((item) => item.id === activeSettingsItem)
-                ?.subItems.map((subItem) => (
-                  <li key={subItem}>
-                    <Link
-                      href={`/my/settings/${activeSettingsItem}/${subItem}`}
-                      className={`block w-full text-left px-3 py-2 rounded-md hover:bg-accent ${activeSubItem === subItem ? "bg-accent" : ""}`}
-                      onClick={() => {
-                        toggleSettingsSubItem(subItem);
-                        handleLinkClick();
-                      }}
-                    >
-                      {subItem.charAt(0).toUpperCase() + subItem.slice(1).replace("-", " ")}
-                    </Link>
-                  </li>
-                ))}
-            </ul>
+          <div className="flex flex-col h-full">
+            <div className="p-4 flex-grow overflow-y-auto">
+              <ul className="space-y-2">
+                {settingsItems
+                  .find((item) => item.id === activeSettingsItem)
+                  ?.subItems.map((subItem) => (
+                    <li key={subItem}>
+                      <Link
+                        href={`/my/settings/${activeSettingsItem}/${subItem}`}
+                        className={`block w-full text-left px-3 py-2 rounded-md hover:bg-accent ${activeSubItem === subItem ? "bg-accent" : ""}`}
+                        onClick={() => {
+                          toggleSettingsSubItem(subItem);
+                          handleLinkClick();
+                        }}
+                      >
+                        {subItem.charAt(0).toUpperCase() + subItem.slice(1).replace("-", " ")}
+                      </Link>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+            <div className="mt-auto p-4">
+              <div className="w-full h-px bg-border mb-4" />
+              <LogoutButton />
+            </div>
           </div>
         </div>
       )}
