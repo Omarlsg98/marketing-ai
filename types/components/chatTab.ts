@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { Role } from "../database";
 
 const ChatEditColumnPersonaSelectorSchema = z.object({
   personas: z.array(
@@ -135,9 +134,22 @@ export type ChatEditColumn =
   | ChatEditColumnAboutMe
   | null;
 
+export const ChatTabTypes = ["multiplePersona", "persona", "customerJourney", "image", "aboutMe"] as const;
+
 export type ChatEditColumnComponent = {
-  type: "multiplePersona" | "persona" | "customerJourney" | "image" | "aboutMe";
+  type: typeof ChatTabTypes[number];
   old: ChatEditColumn;
   current: ChatEditColumn;
-  author: Role;
+};
+
+export type PersonaAllTabs = {
+  multiplePersona: ChatEditColumnPersonaSelector | null;
+  persona: ChatEditColumnPersona | null;
+  customerJourney: ChatEditColumnCustomerJourney | null;
+  image: ChatEditColumnImage | null;
+  aboutMe: ChatEditColumnAboutMe | null;
+};
+
+export type ObjectFetchMapping = {
+  persona: (id: string | null) => Promise<PersonaAllTabs>;
 };

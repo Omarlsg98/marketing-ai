@@ -38,6 +38,7 @@ const AboutMeTab: FC<AboutMeTabProps> = ({
       await handleDone("What do you think about these changes?", {
         edited: true,
         modifications: aboutMe,
+        type: "aboutMe",
       });
     }
   };
