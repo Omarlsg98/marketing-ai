@@ -188,6 +188,7 @@ const ChatRightPanel: FC<ChatRightPanelProps> = ({
                         type: key as keyof PersonaAllTabs,
                         old: null,
                         current: otherTabs[key as keyof PersonaAllTabs],
+                        author: null,
                       }
                 }
                 handleDone={handleDone}

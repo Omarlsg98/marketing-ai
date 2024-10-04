@@ -140,6 +140,7 @@ export type ChatEditColumnComponent = {
   type: typeof ChatTabTypes[number];
   old: ChatEditColumn;
   current: ChatEditColumn;
+  author: "assistant" | "user" | "system";
 };
 
 export type PersonaAllTabs = {
