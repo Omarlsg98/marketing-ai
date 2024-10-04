@@ -28,8 +28,6 @@ export default async function Component({
     const customerJourney =
       persona.customer_journey[0]?.information as ChatEditColumnCustomerJourney;
 
-    console.log(customerJourney);
-
     const image_url = persona.image_path
       ? await getFileUrl("persona_images", persona.image_path)
       : null;

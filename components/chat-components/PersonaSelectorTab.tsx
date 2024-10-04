@@ -28,7 +28,7 @@ const PersonaSelectorTab: FC<PersonaSelectorTabProps> = ({
   if (!currentInfoMultiplePersonas) {
     return null;
   }
-  const personas = currentInfoMultiplePersonas.personas;
+  const personas = currentInfoMultiplePersonas.personas || [];
 
   const submitInfo = async () => {
     if (selectedPersonaId) {
@@ -38,6 +38,7 @@ const PersonaSelectorTab: FC<PersonaSelectorTabProps> = ({
         {
           idChoice: selectedPersonaId,
           saved: true,
+          type: 'multiplePersona',
         }
       );
     }

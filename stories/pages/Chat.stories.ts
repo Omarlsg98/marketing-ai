@@ -1,6 +1,8 @@
 import ChatUI from "@/components/chat-components/Chat";
+import { PersonaAllTabs } from "@/types/components/chatTab";
 import { Chat, Message } from "@/types/database";
 import type { Meta, StoryObj } from "@storybook/react";
+import { fn } from '@storybook/test';
 
 const myChat: Chat = {
   context: "test",
@@ -23,26 +25,159 @@ const myChat: Chat = {
 
 const myMessages: Message[] = [
   {
-    id: "sddsff",
-    content: "Hello!",
-    role: "user",
-    user_id: "1",
-    chat_id: "1",
-  },
-  {
     id: "adfsdf",
     content: "Hi there!",
     role: "assistant",
     user_id: "1",
     chat_id: "1",
   },
+  {
+    id: "sddsff",
+    content: "Hello!",
+    role: "user",
+    user_id: "1",
+    chat_id: "1",
+  },
 ];
+
+
+const allPersonasMockData = {
+  personas: [
+    {
+      id: "1",
+      title: "The Startup Owner",
+      whoTheyAre:
+        "A young entrepreneur who is passionate about their new business",
+      needs: "Help with marketing and sales",
+      challenges: "Limited budget and resources",
+    },
+    {
+      id: "2",
+      title: "The Marketing Manager",
+      whoTheyAre:
+        "An experienced marketing professional looking to improve their skills",
+      needs: "Training and resources",
+      challenges: "Limited time and budget",
+    },
+    {
+      id: "3",
+      title: "The Product Manager",
+      whoTheyAre:
+        "A product manager who wants to learn more about their customers",
+      needs: "Customer insights and feedback",
+      challenges: "Limited resources and time",
+    },
+  ],
+}
+
+const personaMainInfoMockData = {
+  name: "Patrick  Bateman",
+  title: "The Startup Owner",
+  shortDescription:
+    "A visionary entrepreneur with a passion for innovation.",
+  demographics: ["55 years old", "Male", "Urban dweller", "Tech-savvy"],
+  psychographics: [
+    "Risk-taker",
+    "Early adopter",
+    "Workaholic",
+    "Ambitious",
+  ],
+  behavior: [
+    "Frequently attends networking events",
+    "Reads business books",
+    "Uses productivity apps",
+    "Invests in startups",
+  ],
+  needs: [
+    "Funding for new ventures",
+    "Mentorship",
+    "Work-life balance",
+    "Skilled team members",
+  ],
+};
+
+
+const customerJourneyMockData = {
+  summary:
+    "The customer discovers the product through online channels, researches thoroughly, makes an informed purchase, engages with the product and support, and ultimately becomes a brand advocate.",
+  awareness: {
+    trigger: "Realizes need for product",
+    touchpoints: `Social media, search engines, Social media, search engines, Social media, search engines,`,
+    action: "Explores options online",
+  },
+  consideration: {
+    research: "Compares features and prices",
+    touchpoints: "Product website, review sites",
+    action: "Shortlists potential products",
+  },
+  purchase: {
+    decision: "Chooses best fit product",
+    touchpoints: "E-commerce platform, sales team",
+    action: "Makes the purchase",
+  },
+  retention: {
+    engagement: "Uses product regularly",
+    touchpoints: "Customer support, product updates",
+    action: "Provides feedback",
+  },
+  advocacy: {
+    satisfaction: "Experiences value from product",
+    touchpoints: "Social media, referral programs",
+    action: "Recommends to others",
+  },
+};
+
+const imageMockData = {
+  imagePrompt: `Create a professional headshot of a(n) [ethnicity] [gender] in their 
+[age range] with [hair description]. They have a [demeanor] demeanor, wearing
+a [clothing description] in a [background description]. 
+The lighting is studio quality, highlighting their [facial features]. 
+The picture should be light and bright. They may wear [accessories]. 
+The composition is tightly framed from the shoulders up, emphasizing 
+their [expression]. The overall effect should be polished and professional, 
+suitable for [use case].`,
+  imageUrl:
+    "https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D",
+};
+
+const aboutMeMockData = {
+  aboutMe: `Patrick Bateman is a visionary entrepreneur with a passion for innovation. He is 55 years old
+and lives in the city. He is a risk-taker and early adopter who is always looking for the next big thing.
+Patrick frequently attends networking events, reads business books, and uses productivity apps to stay
+organized. He invests in startups and is always looking for new opportunities to grow his business.
+Patrick is looking for funding for new ventures, mentorship, work-life balance, and skilled team members
+to help him achieve his goals.`,
+};
 
 const handleSendMessage = async (content: string) => {
   // wait some time to simulate sending a message
+  fn();
   await new Promise((resolve) => setTimeout(resolve, 1000));
+  return {
+   chat: null,
+    messages: null,
+  } as { chat: Chat | null; messages: Message[] | null; };
 };
 
+const fetchPersonaMock = async function (id: string): Promise<PersonaAllTabs> {
+  if (id === null) {
+    return {
+      multiplePersona: allPersonasMockData,
+      persona: null,
+      customerJourney: null,
+      image: null,
+      aboutMe: null,
+    } as PersonaAllTabs;
+  }
+
+  return {
+    multiplePersona: allPersonasMockData,
+    persona: personaMainInfoMockData,
+    customerJourney: customerJourneyMockData,
+    image: imageMockData,
+    aboutMe: aboutMeMockData,
+  } as PersonaAllTabs;
+}
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 const meta = {
   title: "Pages/Chat",
@@ -57,10 +192,12 @@ const meta = {
   argTypes: {},
   // Use `fn` to spy on the onClick arg, which will appear in the actions panel once invoked: https://storybook.js.org/docs/essentials/actions#action-args
   args: {
-    chat: myChat,
-    messages: myMessages,
-    handleSendMessage,
+    chatInitial: myChat,
+    messagesInitial: myMessages,
     initLoading: false,
+    fetchObjects: {
+      persona: fetchPersonaMock,
+    }
   },
 } satisfies Meta<typeof ChatUI>;
 
@@ -70,16 +207,16 @@ type Story = StoryObj<typeof meta>;
 //More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
 export const Base: Story = {
   args: {
-    chat: myChat,
-    messages: myMessages,
+    chatInitial: myChat,
+    messagesInitial: myMessages,
     handleSendMessage,
   },
 };
 
 export const Loading: Story = {
   args: {
-    chat: myChat,
-    messages: myMessages,
+    chatInitial: myChat,
+    messagesInitial: myMessages,
     handleSendMessage,
     initLoading: true,
   },
@@ -88,177 +225,131 @@ export const Loading: Story = {
 
 export const multiplePersonas: Story = {
   args: {
-    chat: {
+    chatInitial: {
       ...myChat,
       display_info: JSON.stringify({
         type: "multiplePersona",
         author: "assistant",
         old: null,
-        current: {
-          personas: [
-            {
-              id: "1",
-              title: "The Startup Owner",
-              whoTheyAre:
-                "A young entrepreneur who is passionate about their new business",
-              needs: "Help with marketing and sales",
-              challenges: "Limited budget and resources",
-            },
-            {
-              id: "2",
-              title: "The Marketing Manager",
-              whoTheyAre:
-                "An experienced marketing professional looking to improve their skills",
-              needs: "Training and resources",
-              challenges: "Limited time and budget",
-            },
-            {
-              id: "3",
-              title: "The Product Manager",
-              whoTheyAre:
-                "A product manager who wants to learn more about their customers",
-              needs: "Customer insights and feedback",
-              challenges: "Limited resources and time",
-            },
-          ],
-        },
+        current: allPersonasMockData,
       }),
     },
-    messages: myMessages,
+    messagesInitial: myMessages,
     handleSendMessage,
   },
 };
 
 export const persona: Story = {
   args: {
-    chat: {
+    chatInitial: {
       ...myChat,
       display_info: JSON.stringify({
         type: "persona",
         author: "assistant",
         old: null,
-        current: {
-          name: "Patrick  Bateman",
-          title: "The Startup Owner",
-          shortDescription:
-            "A visionary entrepreneur with a passion for innovation.",
-          demographics: ["55 years old", "Male", "Urban dweller", "Tech-savvy"],
-          psychographics: [
-            "Risk-taker",
-            "Early adopter",
-            "Workaholic",
-            "Ambitious",
-          ],
-          behavior: [
-            "Frequently attends networking events",
-            "Reads business books",
-            "Uses productivity apps",
-            "Invests in startups",
-          ],
-          needs: [
-            "Funding for new ventures",
-            "Mentorship",
-            "Work-life balance",
-            "Skilled team members",
-          ],
-        },
+        current: personaMainInfoMockData,
       }),
     },
-    messages: myMessages,
+    messagesInitial: myMessages,
     handleSendMessage,
   },
 };
 
 export const customerJourney: Story = {
   args: {
-    chat: {
+    chatInitial: {
       ...myChat,
       display_info: JSON.stringify({
         type: "customerJourney",
         author: "assistant",
         old: null,
-        current: {
-          summary:
-            "The customer discovers the product through online channels, researches thoroughly, makes an informed purchase, engages with the product and support, and ultimately becomes a brand advocate.",
-          awareness: {
-            trigger: "Realizes need for product",
-            touchpoints: `Social media, search engines, Social media, search engines, Social media, search engines,`,
-            action: "Explores options online",
-          },
-          consideration: {
-            research: "Compares features and prices",
-            touchpoints: "Product website, review sites",
-            action: "Shortlists potential products",
-          },
-          purchase: {
-            decision: "Chooses best fit product",
-            touchpoints: "E-commerce platform, sales team",
-            action: "Makes the purchase",
-          },
-          retention: {
-            engagement: "Uses product regularly",
-            touchpoints: "Customer support, product updates",
-            action: "Provides feedback",
-          },
-          advocacy: {
-            satisfaction: "Experiences value from product",
-            touchpoints: "Social media, referral programs",
-            action: "Recommends to others",
-          },
-        },
+        current: customerJourneyMockData,
       }),
     },
-    messages: myMessages,
+    messagesInitial: myMessages,
     handleSendMessage,
   },
 };
 
+
 export const image: Story = {
   args: {
-    chat: {
+    chatInitial: {
       ...myChat,
       display_info: JSON.stringify({
         type: "image",
         author: "assistant",
         old: null,
-        current: {
-          imagePrompt: `Create a professional headshot of a(n) [ethnicity] [gender] in their 
-[age range] with [hair description]. They have a [demeanor] demeanor, wearing
-a [clothing description] in a [background description]. 
-The lighting is studio quality, highlighting their [facial features]. 
-The picture should be light and bright. They may wear [accessories]. 
-The composition is tightly framed from the shoulders up, emphasizing 
-their [expression]. The overall effect should be polished and professional, 
-suitable for [use case].`,
-          imageUrl:
-            "https://plus.unsplash.com/premium_photo-1664474619075-644dd191935f?fm=jpg&q=60&w=3000&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8aW1hZ2V8ZW58MHx8MHx8fDA%3D",
-        },
+        current: imageMockData,
       }),
     },
-    messages: myMessages,
+    messagesInitial: myMessages,
     handleSendMessage,
   },
 };
 
 export const aboutMe: Story = {
   args: {
-    chat: {
+    chatInitial: {
       ...myChat,
       display_info: JSON.stringify({
         type: "aboutMe",
         author: "assistant",
         old: null,
-        current: {
-          aboutMe: `Patrick Bateman is a visionary entrepreneur with a passion for innovation. He is 55 years old
-and lives in the city. He is a risk-taker and early adopter who is always looking for the next big thing.
-Patrick frequently attends networking events, reads business books, and uses productivity apps to stay
-organized. He invests in startups and is always looking for new opportunities to grow his business.
-Patrick is looking for funding for new ventures, mentorship, work-life balance, and skilled team members
-to help him achieve his goals.`,
-        },
+        current: aboutMeMockData,
       }),
     },
-    messages: myMessages,
+    messagesInitial: myMessages,
     handleSendMessage,
+  },
+};
+
+
+export const endWithPersona: Story = {
+  args: {
+    chatInitial: {
+      ...myChat,
+      display_info: JSON.stringify({
+        type: "persona",
+      }),
+     state: "end",
+     object_context_id: "1",
+    },
+    messagesInitial: myMessages,
+    handleSendMessage,
+  },
+};
+
+export const endNoPersona: Story = {
+  args: {
+    chatInitial: {
+      ...myChat,
+      display_info: JSON.stringify({
+        type: "persona",
+      }),
+     state: "end",
+    },
+    messagesInitial: myMessages,
+    handleSendMessage,
+  },
+};
+
+export const fetchingPersona: Story = {
+  args: {
+    chatInitial: {
+      ...myChat,
+      object_context_id: "1",
+      display_info: JSON.stringify({
+        type: "customerJourney",
+        author: "assistant",
+        old: null,
+        current: customerJourneyMockData,
+      }),
+    },
+    messagesInitial: myMessages,
+    handleSendMessage,
+    fetchObjects: {
+      persona: fetchPersonaMock,
+    }
   },
 };

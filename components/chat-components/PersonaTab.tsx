@@ -155,6 +155,7 @@ const PersonaTab: FC<PersonaTabProps> = ({
         "I like the Persona, it is good enough, let's continue",
         {
           saved: true,
+          type: "persona",
         }
       );
     } else {

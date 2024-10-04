@@ -1,24 +1,51 @@
 "use client";
 
 import { ChatInput } from "@/components/chat-components/ChatInput";
+import LottieLoader from "@/components/chat-components/loader/LottieLoader";
 import { MessageBubble } from "@/components/chat-components/MessageBubble";
 import { ResizableDivider } from "@/components/chat-components/ResizableDivider";
 import { UserAvatar } from "@/components/chat-components/UserAvatar";
-import { ChatEditColumnComponent } from "@/types/components/chatTab";
+import { handleMessages } from "@/lib/client/chat";
+import {
+  ChatEditColumnComponent,
+  ObjectFetchMapping,
+} from "@/types/components/chatTab";
 import { Chat, Message } from "@/types/database";
 import { ExtraInfo } from "@/types/interseed/chat";
 import { FC, useEffect, useRef, useState } from "react";
 import ChatRightPanel from "./RightPanel";
-import LottieLoader from "@/components/chat-components/loader/LottieLoader";
 
-interface ChatProps {
-  chat: Chat | null;
-  messages: Message[];
-  handleSendMessage: (message: string, extraInfo?: ExtraInfo) => Promise<void>;
-  initLoading?: boolean;
+interface ChatMessage {
+  content: string;
+  id: string;
+  role: "user" | "assistant" | "system";
+  failed?: boolean;
 }
 
-const ChatUI: FC<ChatProps> = ({ chat, messages, handleSendMessage, initLoading}) => {
+interface ChatProps {
+  chatInitial: Chat | null;
+  messagesInitial: ChatMessage[];
+  handleSendMessage?: (
+    chatId: string,
+    message: string,
+    extraInfo?: ExtraInfo
+  ) => Promise<{
+    chat: Chat;
+    messages: Message[];
+  }>;
+  initLoading?: boolean;
+  fetchObjects: ObjectFetchMapping;
+}
+
+const ChatUI: FC<ChatProps> = ({
+  chatInitial,
+  messagesInitial,
+  handleSendMessage = handleMessages,
+  initLoading,
+  fetchObjects,
+}) => {
+  const [chat, setChat] = useState(chatInitial);
+  const [messages, setMessages] = useState(messagesInitial);
   const [chatWidth, setChatWidth] = useState(100); // 50% initial width
   const [loading, setLoading] = useState(initLoading || false);
 
@@ -62,7 +89,21 @@ const ChatUI: FC<ChatProps> = ({ chat, messages, handleSendMessage, initLoading}
     extraInfo?: ExtraInfo
   ) => Promise<void> = async (content, extraInfo) => {
     setLoading(true);
-    await handleSendMessage(content, extraInfo);
+    setMessages((prev) => [
+      ...prev,
+      {
+        content,
+        id: "temp",
+        role: "user",
+      },
+    ]);
+    const { chat: newChat, messages: newMessages } = await handleSendMessage(
+      chat.id,
+      content,
+      extraInfo
+    );
+    setChat(newChat);
+    setMessages((prev) => [...prev.slice(0, -1), ...newMessages]);
     setLoading(false);
   };
 
@@ -122,7 +163,9 @@ const ChatUI: FC<ChatProps> = ({ chat, messages, handleSendMessage, initLoading}
                 }
                 isLoading={loading}
                 isEnd={chat.state === "end"}
-                personaId={chat.object_context_id}
+                objectId={chat.object_context_id}
+                objectType={"persona"} // TODO: Change this to get it from Chat
+                fetchObjects={fetchObjects}
               />
             </div>
           </>
